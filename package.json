@@ -1,0 +1,23 @@
+{
+  "name": "tsd-generator",
+  "version": "1.0.0",
+  "description": "Generates a typescript declaration file using runtime analysis information.",
+  "main": "dist/index.js",
+  "types" : "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://fcristiani@bitbucket.org/fcristiani/tsd-generator.git"
+  },
+  "keywords": [
+    "typescript",
+    "declaration",
+    "files"
+  ],
+  "author": "“Fernando",
+  "license": "MIT",
+  "homepage": "https://bitbucket.org/fcristiani/tsd-generator#readme"
+}
