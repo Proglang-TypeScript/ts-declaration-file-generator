@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "Generates a typescript declaration file using runtime analysis information.",
   "main": "dist/index.js",
-  "types" : "dist/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
+    "prestart": "npm run build",
+    "start": "node dist/index.js",
+    "prebuild": "rm -r dist",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -19,5 +22,8 @@
   ],
   "author": "“Fernando",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/fcristiani/tsd-generator#readme"
+  "homepage": "https://bitbucket.org/fcristiani/tsd-generator#readme",
+  "devDependencies": {
+    "@types/node": "^10.12.12"
+  }
 }
