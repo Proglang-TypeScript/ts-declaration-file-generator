@@ -24,6 +24,13 @@
   "license": "MIT",
   "homepage": "https://bitbucket.org/fcristiani/tsd-generator#readme",
   "devDependencies": {
+    "@types/command-line-args": "^5.0.0",
     "@types/node": "^10.12.12"
+  },
+  "dependencies": {
+    "command-line-args": "^5.0.2"
+  },
+  "engines": {
+    "node": ">=10.14.2"
   }
 }

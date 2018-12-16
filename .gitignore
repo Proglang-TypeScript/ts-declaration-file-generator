@@ -1,3 +1,5 @@
 node_modules
 dist/**/*
 .vscode
+output/**/*
+output.json
