@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import * as RunTimeInfoUtils from './RunTimeInfoUtils';
 import * as FunctionDeclaration from './FunctionDeclaration';
 import { DeclarationFileWriter } from './DeclarationFileWriter'; 

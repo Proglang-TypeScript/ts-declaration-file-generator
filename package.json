@@ -1,7 +1,10 @@
 {
-  "name": "tsd-generator",
+  "name": "ts-declaration-file-generator",
   "version": "1.0.0",
   "description": "Generates a typescript declaration file using runtime analysis information.",
+  "bin": {
+    "generate-declaration-file": "dist/index.js"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
