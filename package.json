@@ -20,7 +20,7 @@
     "declaration",
     "files"
   ],
-  "author": "“Fernando",
+  "author": "fcristiani",
   "license": "MIT",
   "homepage": "https://bitbucket.org/fcristiani/tsd-generator#readme",
   "devDependencies": {
