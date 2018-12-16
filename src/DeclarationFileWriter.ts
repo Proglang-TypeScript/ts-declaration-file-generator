@@ -14,17 +14,15 @@ export class DeclarationFileWriter {
         let filePath = this.outputDirectory + "/" + this.moduleName;
         let fileName = filePath + "/index.d.ts";
         this.cleanOutput(filePath, fileName);
-
-        let moduleName = "MyFunction";
         
         fs.appendFileSync(
             fileName,
-            "export = " + moduleName + "\n"
+            "export = " + this.moduleName + "\n"
         );
         
         fs.appendFileSync(
             fileName,
-            "declare namespace " + moduleName + " {"  + "\n"
+            "declare namespace " + this.moduleName + " {"  + "\n"
         );
         
         functionDeclarations.forEach(functionDeclaration => {
