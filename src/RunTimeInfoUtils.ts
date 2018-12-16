@@ -35,6 +35,17 @@ export class RuntimeInfoReader {
             let functionInfo : FunctionRuntimeInfo;
 
             functionInfo = jsonInfo[functionId];
+
+            let returnTypeOfsWithoutDuplicates: string[] = [];
+            let differentReturnTypeOfs : { [id: string] : boolean; } = {};
+            functionInfo.returnTypeOfs.forEach(returnTypeOf => {
+                if (!(returnTypeOf in differentReturnTypeOfs)) {
+                    differentReturnTypeOfs[returnTypeOf] = true;
+                    returnTypeOfsWithoutDuplicates.push(returnTypeOf);
+                }
+            });
+            functionInfo.returnTypeOfs = returnTypeOfsWithoutDuplicates;
+
             let args : ArgumentRuntimeInfo[] = [];
 
             for(let argumentId in jsonInfo[functionId].args) {
