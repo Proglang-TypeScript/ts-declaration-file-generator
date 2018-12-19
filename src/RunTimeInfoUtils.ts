@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as FunctionDeclaration from "./FunctionDeclaration";
 
 export interface FunctionRuntimeInfo {
     functionId: string,
@@ -9,7 +8,7 @@ export interface FunctionRuntimeInfo {
     functionIid: number
 }
 
-interface ArgumentRuntimeInfo {
+export interface ArgumentRuntimeInfo {
     argumentIndex: number,
     argumentName: string,
     interactions: InteractionRuntimeInfo[]
@@ -17,7 +16,8 @@ interface ArgumentRuntimeInfo {
 
 interface InteractionRuntimeInfo {
     code: string,
-    typeof: string
+    typeof: string,
+    returnTypeOf: string
 }
 
 export class RunTimeInfo {
@@ -36,16 +36,6 @@ export class RuntimeInfoReader {
 
             functionInfo = jsonInfo[functionId];
 
-            let returnTypeOfsWithoutDuplicates: string[] = [];
-            let differentReturnTypeOfs : { [id: string] : boolean; } = {};
-            functionInfo.returnTypeOfs.forEach(returnTypeOf => {
-                if (!(returnTypeOf in differentReturnTypeOfs)) {
-                    differentReturnTypeOfs[returnTypeOf] = true;
-                    returnTypeOfsWithoutDuplicates.push(returnTypeOf);
-                }
-            });
-            functionInfo.returnTypeOfs = returnTypeOfsWithoutDuplicates;
-
             let args : ArgumentRuntimeInfo[] = [];
 
             for(let argumentId in jsonInfo[functionId].args) {
@@ -58,32 +48,4 @@ export class RuntimeInfoReader {
 
         return runTimeInfo;
     }
-}
-
-export class FunctionDeclarationBuilder {
-    build(functionRunTimeInfo: FunctionRuntimeInfo) : FunctionDeclaration.FunctionDeclaration {
-        let functionDeclaration = new FunctionDeclaration.FunctionDeclaration();
-        functionDeclaration.name = functionRunTimeInfo.functionName;
-        functionDeclaration.differentReturnTypeOfs = functionRunTimeInfo.returnTypeOfs;
-    
-        functionRunTimeInfo.args.forEach(argument => {
-            let argumentDeclaration : FunctionDeclaration.ArgumentDeclaration = {
-                index: argument.argumentIndex,
-                name: argument.argumentName,
-                differentTypeOfs: []
-            };
-    
-            let differentReturnTypeOfs : { [id: string] : boolean; } = {};
-            argument.interactions.forEach(interaction => {
-                if (!(interaction.typeof in differentReturnTypeOfs)) {
-                    differentReturnTypeOfs[interaction.typeof] = true;
-                    argumentDeclaration.differentTypeOfs.push(interaction.typeof);
-                }
-            });
-    
-            functionDeclaration.addArgument(argumentDeclaration);
-        });
-
-        return functionDeclaration;
-    } 
 }

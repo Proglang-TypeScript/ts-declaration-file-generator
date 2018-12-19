@@ -1,44 +1,86 @@
 import * as fs from 'fs';
-import * as FunctionDeclaration from "./FunctionDeclaration";
+import { FunctionDeclaration } from "./TypescriptDeclaration/FunctionDeclaration";
+import { TypescriptModuleDeclaration } from "./TypescriptDeclaration/TypescriptModuleDeclaration";
 
 export class DeclarationFileWriter {
-    moduleName: string;
     outputDirectory: string;
 
-    constructor(moduleName: string) {
-        this.moduleName = moduleName;
+    constructor() {
         this.outputDirectory = "output";
     }
 
-    write(functionDeclarations: FunctionDeclaration.FunctionDeclaration[]) {
-        let filePath = this.outputDirectory + "/" + this.moduleName;
+    write(typescriptModuleDeclaration: TypescriptModuleDeclaration) {
+        let filePath = this.outputDirectory + "/" + typescriptModuleDeclaration.module;
         let fileName = filePath + "/index.d.ts";
         this.cleanOutput(filePath, fileName);
         
-        fs.appendFileSync(
-            fileName,
-            "export = " + this.moduleName + "\n"
-        );
-        
-        fs.appendFileSync(
-            fileName,
-            "declare namespace " + this.moduleName + " {"  + "\n"
-        );
-        
-        functionDeclarations.forEach(functionDeclaration => {
-            let argumentsWithType = functionDeclaration.arguments.map(argument => {
-                return argument.name + ": " + argument.differentTypeOfs.join("|"); 
-            }).join(", ");
-        
-            fs.appendFileSync(
-                fileName,
-                "\texport function " + functionDeclaration.name + "(" + argumentsWithType + "): " + functionDeclaration.differentReturnTypeOfs.join("|") + "\n"
-            );
-        });
+        this.writeExportModule(fileName, typescriptModuleDeclaration);
+        this.writeNamespace(fileName, typescriptModuleDeclaration);
+        this.writeInterfaces(fileName, typescriptModuleDeclaration);
+        this.writeMethods(fileName, typescriptModuleDeclaration);
         
         fs.appendFileSync(
             fileName,
             "}"
+        );
+    }
+
+    private writeInterfaces(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
+        typescriptModuleDeclaration.interfaces.forEach(i => {
+            fs.appendFileSync(
+                fileName,
+                "\texport interface " + i.name + " {\n"
+            );
+
+            i.attributes.forEach(a => {
+                fs.appendFileSync(
+                    fileName,
+                    "\t\t" + a.name + ": " + a.type + ";\n"
+                ); 
+            });
+
+            i.methods.forEach(m => {
+                fs.appendFileSync(
+                    fileName,
+                    "\t\t" + this.getFunctionNameWithTypes(m) + ";\n"
+                ); 
+            });
+
+            fs.appendFileSync(
+                fileName,
+                "\t}\n"
+            );
+        });
+    }
+
+    private writeMethods(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
+        typescriptModuleDeclaration.methods.forEach(functionDeclaration => {
+            fs.appendFileSync(
+                fileName,
+                "\texport function " + this.getFunctionNameWithTypes(functionDeclaration) + "\n"
+            );
+        });
+    }
+
+    private getFunctionNameWithTypes(f: FunctionDeclaration) {
+        let argumentsWithType = f.arguments.map(argument => {
+            return argument.name + ": " + argument.differentTypeOfs.join("|"); 
+        }).join(", ");
+
+        return f.name + "(" + argumentsWithType + "): " + f.differentReturnTypeOfs.join("|");
+    }
+
+    private writeNamespace(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
+        fs.appendFileSync(
+            fileName,
+            "declare namespace " + typescriptModuleDeclaration.module + " {"  + "\n"
+        );
+    }
+
+    private writeExportModule(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
+        fs.appendFileSync(
+            fileName,
+            "export = " + typescriptModuleDeclaration.module + "\n"
         );
     }
 
