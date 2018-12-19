@@ -75,9 +75,11 @@ export class FunctionDeclarationBuilder {
     
             let differentReturnTypeOfs : { [id: string] : boolean; } = {};
             argument.interactions.forEach(interaction => {
-                if (!(interaction.typeof in differentReturnTypeOfs)) {
-                    differentReturnTypeOfs[interaction.typeof] = true;
-                    argumentDeclaration.differentTypeOfs.push(interaction.typeof);
+                if (interaction.code === "inputValue") {
+                    if (!(interaction.typeof in differentReturnTypeOfs)) {
+                        differentReturnTypeOfs[interaction.typeof] = true;
+                        argumentDeclaration.differentTypeOfs.push(interaction.typeof);
+                    }
                 }
             });
     
