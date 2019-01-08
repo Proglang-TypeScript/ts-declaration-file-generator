@@ -17,7 +17,8 @@ export interface ArgumentRuntimeInfo {
 interface InteractionRuntimeInfo {
     code: string,
     typeof: string,
-    returnTypeOf: string
+    returnTypeOf: string,
+    field: string
 }
 
 export class RunTimeInfo {

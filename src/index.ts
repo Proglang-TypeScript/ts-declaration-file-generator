@@ -29,43 +29,6 @@ let writer = new DeclarationFileWriter();
 typescriptModuleDeclaration.module = options['module-name'];
 typescriptModuleDeclaration.methods = functionDeclarations;
 
-let i1 = new InterfaceDeclaration();
-i1.name = "MyInterface";
-i1.attributes.push(
-    {
-        name: "someValue",
-        type: "number"
-    },
-    {
-        name: "anotherValue",
-        type: "string"
-    }
-);
-
-let m1 = new FunctionDeclaration();
-m1.name = "myMethod";
-m1.differentReturnTypeOfs = ["string"];
-m1.addArgument(
-    {
-        name: "firstArgument",
-        index: 0,
-        differentTypeOfs: ["string"]
-    }
-);
-
-let m2 = new FunctionDeclaration();
-m2.name = "myOtherMethod";
-m2.differentReturnTypeOfs = ["string"];
-m2.addArgument(
-    {
-        name: "firstArgument",
-        index: 0,
-        differentTypeOfs: ["number", "boolean"]
-    }
-);
-
-i1.methods.push(m1, m2);
-
-typescriptModuleDeclaration.interfaces.push(i1);
+typescriptModuleDeclaration.interfaces = builder.interfaceDeclarations;
 
 writer.write(typescriptModuleDeclaration);
