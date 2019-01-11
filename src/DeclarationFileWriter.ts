@@ -32,7 +32,7 @@ export class DeclarationFileWriter {
                 "\texport interface " + i.name + " {\n"
             );
 
-            i.attributes.forEach(a => {
+            i.getAttributes().forEach(a => {
                 fs.appendFileSync(
                     fileName,
                     "\t\t" + a.name + ": " + a.type + ";\n"

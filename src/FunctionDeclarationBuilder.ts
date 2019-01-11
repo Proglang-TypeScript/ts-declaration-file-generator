@@ -1,7 +1,6 @@
 import * as FunctionDeclaration from "./TypescriptDeclaration/FunctionDeclaration";
 import { FunctionRuntimeInfo, ArgumentRuntimeInfo } from "./RunTimeInfoUtils";
 import { InterfaceDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
-import { clearLine } from "readline";
 
 export class FunctionDeclarationBuilder {
     interfaceDeclarations: InterfaceDeclaration[];
@@ -16,22 +15,13 @@ export class FunctionDeclarationBuilder {
         functionDeclaration.differentReturnTypeOfs = this.getDifferentReturnTypeOfs(functionRunTimeInfo);
     
         functionRunTimeInfo.args.forEach(argument => {
-            let interfaceDeclarationsForArgument : InterfaceDeclaration[] = [];
+            let interfaceDeclaration = new InterfaceDeclaration();
+            interfaceDeclaration.name = "Interface__" + argument.argumentName + "__" + Math.ceil(Math.random()*1000);
 
-            let interfaceDeclaration : InterfaceDeclaration | null = null;
             argument.interactions.forEach(interaction => {
-                if (interaction.code === "inputValue") {
-                    if (interfaceDeclaration) {
-                        interfaceDeclarationsForArgument.push(interfaceDeclaration);
-                    }
-
-                    interfaceDeclaration = new InterfaceDeclaration();
-                    interfaceDeclaration.name = "Interface__" + argument.argumentName + "__" + Math.ceil(Math.random()*1000);
-                }
-
                 if (interaction.code === "getField") {
                     if (interfaceDeclaration) {
-                        interfaceDeclaration.attributes.push({
+                        interfaceDeclaration.addAttribute({
                             name: interaction.field,
                             type: interaction.returnTypeOf
                         });
@@ -39,21 +29,14 @@ export class FunctionDeclarationBuilder {
                 }
             });
 
-            if (interfaceDeclaration) {
-                interfaceDeclarationsForArgument.push(interfaceDeclaration);
-            }
-
             let argumentDeclaration : FunctionDeclaration.ArgumentDeclaration = {
                 index: argument.argumentIndex,
                 name: argument.argumentName,
-                differentTypeOfs: this.getDifferentInputTypeOfs(argument, interfaceDeclarationsForArgument)
+                differentTypeOfs: this.getDifferentInputTypeOfs(argument, interfaceDeclaration)
             };
     
             functionDeclaration.addArgument(argumentDeclaration);
-
-            interfaceDeclarationsForArgument.forEach(interfaceDeclaration => {
-                this.interfaceDeclarations.push(interfaceDeclaration);
-            });
+            this.interfaceDeclarations.push(interfaceDeclaration);
         });
 
         return functionDeclaration;
@@ -61,7 +44,7 @@ export class FunctionDeclarationBuilder {
 
     private getDifferentInputTypeOfs(
         argument: ArgumentRuntimeInfo,
-        interfaceDeclarationsForArgument: InterfaceDeclaration[]
+        interfaceDeclaration: InterfaceDeclaration
     ): string[] {
 
         let matchedReturnTypeOfs: string[] = argument.interactions.filter(
@@ -72,10 +55,7 @@ export class FunctionDeclarationBuilder {
             return this.matchToTypescriptType(interaction.typeof);
         });
 
-        interfaceDeclarationsForArgument.forEach(interfaceDeclaration => {
-            matchedReturnTypeOfs.push(interfaceDeclaration.name);
-        });
-
+        matchedReturnTypeOfs.push(interfaceDeclaration.name);
         return this.removeDuplicates(matchedReturnTypeOfs);
     }
 
