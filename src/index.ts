@@ -26,7 +26,7 @@ for (let key in runTimeInfo) {
 
 let writer = new DeclarationFileWriter();
 
-typescriptModuleDeclaration.module = options['module-name'];
+typescriptModuleDeclaration.module = options['module-name'].replace(/-/g, "_");
 typescriptModuleDeclaration.methods = functionDeclarations;
 
 typescriptModuleDeclaration.interfaces = builder.interfaceDeclarations;
