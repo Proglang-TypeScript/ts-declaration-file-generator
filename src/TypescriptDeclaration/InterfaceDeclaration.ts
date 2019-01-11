@@ -16,6 +16,18 @@ export class InterfaceDeclaration {
         }
 
         this.attributes[attributeDeclaration.name].push(attributeDeclaration.type);
+        this.attributes[attributeDeclaration.name] = this.removeDuplicates(this.attributes[attributeDeclaration.name]);
+    }
+
+    private removeDuplicates(target: string[]) : string[] {
+        let different : { [id: string] : boolean; } = {};
+        target.forEach(i => {
+            if (!(i in different)) {
+                different[i] = true;
+            }
+        });
+
+        return Object.keys(different);
     }
 
     getAttributes() : InterfaceAttributeDeclaration[] {

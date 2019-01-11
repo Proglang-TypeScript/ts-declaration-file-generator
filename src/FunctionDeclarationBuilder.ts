@@ -29,24 +29,33 @@ export class FunctionDeclarationBuilder {
                 }
             });
 
+            let differentReturnTypeOfs = this.getDifferentInputTypeOfs(argument);
+
+            if (interfaceDeclaration.getAttributes().length > 0) {
+                this.interfaceDeclarations.push(interfaceDeclaration);
+                differentReturnTypeOfs.push(interfaceDeclaration.name);
+                differentReturnTypeOfs = this.removeTypeOfObjectWhenItHasAnInterface(differentReturnTypeOfs);
+            }
+
             let argumentDeclaration : FunctionDeclaration.ArgumentDeclaration = {
                 index: argument.argumentIndex,
                 name: argument.argumentName,
-                differentTypeOfs: this.getDifferentInputTypeOfs(argument, interfaceDeclaration)
+                differentTypeOfs: differentReturnTypeOfs
             };
     
             functionDeclaration.addArgument(argumentDeclaration);
-            this.interfaceDeclarations.push(interfaceDeclaration);
         });
 
         return functionDeclaration;
     }
+    
+    private removeTypeOfObjectWhenItHasAnInterface(differentReturnTypeOfs: string[]): string[] {
+        return differentReturnTypeOfs.filter((val) => {
+            return val !== "object";
+        });
+    }
 
-    private getDifferentInputTypeOfs(
-        argument: ArgumentRuntimeInfo,
-        interfaceDeclaration: InterfaceDeclaration
-    ): string[] {
-
+    private getDifferentInputTypeOfs(argument: ArgumentRuntimeInfo): string[] {
         let matchedReturnTypeOfs: string[] = argument.interactions.filter(
             interaction => {
                 return (interaction.code === "inputValue");
@@ -55,7 +64,6 @@ export class FunctionDeclarationBuilder {
             return this.matchToTypescriptType(interaction.typeof);
         });
 
-        matchedReturnTypeOfs.push(interfaceDeclaration.name);
         return this.removeDuplicates(matchedReturnTypeOfs);
     }
 
