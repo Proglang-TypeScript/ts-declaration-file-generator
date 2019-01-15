@@ -48,7 +48,7 @@ export class DeclarationFileWriter {
 
             fs.appendFileSync(
                 fileName,
-                "\t}\n"
+                "\t}\n\n"
             );
         });
     }
@@ -80,7 +80,7 @@ export class DeclarationFileWriter {
     private writeExportModule(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
         fs.appendFileSync(
             fileName,
-            "export = " + typescriptModuleDeclaration.module + "\n"
+            "export = " + typescriptModuleDeclaration.module + "\n\n"
         );
     }
 
