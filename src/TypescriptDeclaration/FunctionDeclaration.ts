@@ -1,5 +1,3 @@
-import { InterfaceDeclaration } from './InterfaceDeclaration';
-
 export interface ArgumentDeclaration {
     index: number,
     name: string,
