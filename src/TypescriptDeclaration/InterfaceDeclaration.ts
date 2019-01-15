@@ -10,6 +10,16 @@ export class InterfaceDeclaration {
     methods: FunctionDeclaration[] = [];    
     attributes: { [name: string] : string[] } = {}; 
     
+    isEmpty() : boolean {
+        return Object.keys(this.attributes).length === 0 && this.methods.length === 0;
+    }
+
+    merge(i: InterfaceDeclaration) : void {
+        i.getAttributes().forEach(a => {
+            this.addAttribute(a);
+        });
+    }
+
     addAttribute(attributeDeclaration: InterfaceAttributeDeclaration): void {
         if (!(attributeDeclaration.name in this.attributes)) {
             this.attributes[attributeDeclaration.name] = [];
