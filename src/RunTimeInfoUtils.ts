@@ -14,11 +14,12 @@ export interface ArgumentRuntimeInfo {
     interactions: InteractionRuntimeInfo[]
 }
 
-interface InteractionRuntimeInfo {
+export interface InteractionRuntimeInfo {
     code: string,
     typeof: string,
     returnTypeOf: string,
-    field: string
+    field: string,
+    followingInteractions: InteractionRuntimeInfo[]
 }
 
 export class RunTimeInfo {
