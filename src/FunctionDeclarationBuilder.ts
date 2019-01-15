@@ -1,6 +1,6 @@
 import * as FunctionDeclaration from "./TypescriptDeclaration/FunctionDeclaration";
-import { FunctionRuntimeInfo, ArgumentRuntimeInfo } from "./RunTimeInfoUtils";
-import { InterfaceDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
+import { FunctionRuntimeInfo, InteractionRuntimeInfo, ArgumentRuntimeInfo } from "./RunTimeInfoUtils";
+import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
 
 export class FunctionDeclarationBuilder {
     interfaceDeclarations: InterfaceDeclaration[];
@@ -15,23 +15,16 @@ export class FunctionDeclarationBuilder {
         functionDeclaration.differentReturnTypeOfs = this.getDifferentReturnTypeOfs(functionRunTimeInfo);
     
         functionRunTimeInfo.args.forEach(argument => {
-            let interfaceDeclaration = new InterfaceDeclaration();
-            interfaceDeclaration.name = "Interface__" + argument.argumentName + "__" + Math.ceil(Math.random()*1000);
-
-            argument.interactions.forEach(interaction => {
-                if (interaction.code === "getField") {
-                    if (interfaceDeclaration) {
-                        interfaceDeclaration.addAttribute({
-                            name: interaction.field,
-                            type: interaction.returnTypeOf
-                        });
-                    }
-                }
-            });
+            let interactionsConsideredForInterfaces = argument.interactions.filter(
+                v => {return (v.code === "getField")}
+            );
 
             let differentReturnTypeOfs = this.getDifferentInputTypeOfs(argument);
+            let interfaceDeclaration = this.buildInterfaceDeclaration(interactionsConsideredForInterfaces);
 
-            if (interfaceDeclaration.getAttributes().length > 0) {
+            if (!interfaceDeclaration.isEmpty()) {
+                interfaceDeclaration.name = this.getInterfaceName(argument);
+    
                 this.interfaceDeclarations.push(interfaceDeclaration);
                 differentReturnTypeOfs.push(interfaceDeclaration.name);
                 differentReturnTypeOfs = this.removeTypeOfObjectWhenItHasAnInterface(differentReturnTypeOfs);
@@ -48,7 +41,42 @@ export class FunctionDeclarationBuilder {
 
         return functionDeclaration;
     }
-    
+
+    private getInterfaceName(argument: ArgumentRuntimeInfo): string {
+        return "Interface__" + argument.argumentName + "__" + Math.ceil(Math.random()*1000);
+    }
+    private buildInterfaceDeclaration(interactions: InteractionRuntimeInfo[]): InterfaceDeclaration {
+        let interfaceDeclaration = new InterfaceDeclaration();
+
+        let interfaces : { [id: string] : InterfaceDeclaration; } = {};
+        interactions.forEach(interaction => {
+            let interfaceAttribute : InterfaceAttributeDeclaration = {
+                name: interaction.field,
+                type: ""
+            };
+
+            if (interaction.followingInteractions.length > 0) {
+                let followingInterfaceDeclaration = this.buildInterfaceDeclaration(interaction.followingInteractions);
+                followingInterfaceDeclaration.name = "Interface__" + interaction.field + "__" + Math.ceil(Math.random()*1000);
+
+                if (!(interaction.field in interfaces)) {
+                    interfaces[interaction.field] = followingInterfaceDeclaration;
+                    this.interfaceDeclarations.push(followingInterfaceDeclaration);
+                } else {
+                    interfaces[interaction.field].merge(followingInterfaceDeclaration);
+                }
+
+                interfaceAttribute.type = interfaces[interaction.field].name;                
+            } else {
+                interfaceAttribute.type = interaction.returnTypeOf;
+            }
+
+            interfaceDeclaration.addAttribute(interfaceAttribute);
+        });
+
+        return interfaceDeclaration;
+    }
+
     private removeTypeOfObjectWhenItHasAnInterface(differentReturnTypeOfs: string[]): string[] {
         return differentReturnTypeOfs.filter((val) => {
             return val !== "object";
