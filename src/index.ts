@@ -29,6 +29,6 @@ let writer = new DeclarationFileWriter();
 typescriptModuleDeclaration.module = options['module-name'].replace(/-/g, "_");
 typescriptModuleDeclaration.methods = functionDeclarations;
 
-typescriptModuleDeclaration.interfaces = builder.interfaceDeclarations;
+typescriptModuleDeclaration.interfaces = builder.getInterfaceDeclarations();
 
 writer.write(typescriptModuleDeclaration);

@@ -3,11 +3,23 @@ import { FunctionRuntimeInfo, InteractionRuntimeInfo, ArgumentRuntimeInfo } from
 import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
 
 export class FunctionDeclarationBuilder {
-    interfaceDeclarations: InterfaceDeclaration[];
+    interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
+    interfaceNameCounter : number;
 
     constructor() {
-        this.interfaceDeclarations = [];
+        this.interfaceDeclarations = {};
+        this.interfaceNameCounter = 0;
     };
+
+    getInterfaceDeclarations(): InterfaceDeclaration[] {
+        let i : InterfaceDeclaration[] = [];
+
+        for (let k in this.interfaceDeclarations) {
+            i.push(this.interfaceDeclarations[k]);
+        }
+
+        return i;
+    }
 
     build(functionRunTimeInfo: FunctionRuntimeInfo) : FunctionDeclaration.FunctionDeclaration {
         let functionDeclaration = new FunctionDeclaration.FunctionDeclaration();
@@ -23,9 +35,9 @@ export class FunctionDeclarationBuilder {
             let interfaceDeclaration = this.buildInterfaceDeclaration(interactionsConsideredForInterfaces);
 
             if (!interfaceDeclaration.isEmpty()) {
-                interfaceDeclaration.name = this.getInterfaceName(argument);
+                interfaceDeclaration.name = this.getInterfaceName(argument.argumentName);
     
-                this.interfaceDeclarations.push(interfaceDeclaration);
+                this.addInterfaceDeclaration(interfaceDeclaration);
                 differentReturnTypeOfs.push(interfaceDeclaration.name);
                 differentReturnTypeOfs = this.removeTypeOfObjectWhenItHasAnInterface(differentReturnTypeOfs);
             }
@@ -42,8 +54,8 @@ export class FunctionDeclarationBuilder {
         return functionDeclaration;
     }
 
-    private getInterfaceName(argument: ArgumentRuntimeInfo): string {
-        return "Interface__" + argument.argumentName + "__" + Math.ceil(Math.random()*1000);
+    private getInterfaceName(name: string): string {
+        return "I__" + name;
     }
     private buildInterfaceDeclaration(interactions: InteractionRuntimeInfo[]): InterfaceDeclaration {
         let interfaceDeclaration = new InterfaceDeclaration();
@@ -57,11 +69,11 @@ export class FunctionDeclarationBuilder {
 
             if (interaction.followingInteractions.length > 0) {
                 let followingInterfaceDeclaration = this.buildInterfaceDeclaration(interaction.followingInteractions);
-                followingInterfaceDeclaration.name = "Interface__" + interaction.field + "__" + Math.ceil(Math.random()*1000);
+                followingInterfaceDeclaration.name = this.getInterfaceName(interaction.field);
 
                 if (!(interaction.field in interfaces)) {
                     interfaces[interaction.field] = followingInterfaceDeclaration;
-                    this.interfaceDeclarations.push(followingInterfaceDeclaration);
+                    this.addInterfaceDeclaration(followingInterfaceDeclaration);
                 } else {
                     interfaces[interaction.field].merge(followingInterfaceDeclaration);
                 }
@@ -75,6 +87,19 @@ export class FunctionDeclarationBuilder {
         });
 
         return interfaceDeclaration;
+    }
+
+    private addInterfaceDeclaration(interfaceDeclaration: InterfaceDeclaration): void {
+        let interfaceName = interfaceDeclaration.name;
+
+        while (interfaceName in this.interfaceDeclarations) {
+            this.interfaceNameCounter++;
+            interfaceName = interfaceDeclaration.name + "__" + this.interfaceNameCounter;
+        }
+
+        interfaceDeclaration.name = interfaceName;
+
+        this.interfaceDeclarations[interfaceDeclaration.name] = interfaceDeclaration;
     }
 
     private removeTypeOfObjectWhenItHasAnInterface(differentReturnTypeOfs: string[]): string[] {
