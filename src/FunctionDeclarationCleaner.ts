@@ -15,8 +15,36 @@ export class FunctionDeclarationCleaner {
 
 	clean() : FunctionDeclaration[] {
 		this.removeDuplicatedDeclarations();
+		this.combineReturnValues();
 
 		return this.functionDeclarations;
+	}
+
+	private combineReturnValues() {
+		let uniqueDeclarationNameAndArguments: { [id: string]: FunctionDeclaration } = {};
+
+		this.functionDeclarations.forEach(declaration => {
+			let serializedDeclaration = declaration.name + "__" + JSON.stringify(declaration.arguments);
+
+			if (!(serializedDeclaration in uniqueDeclarationNameAndArguments)) {
+				uniqueDeclarationNameAndArguments[serializedDeclaration] = declaration;
+			} else {
+				let d = uniqueDeclarationNameAndArguments[serializedDeclaration];
+				d.returnTypeOfs = d.returnTypeOfs.concat(
+					declaration.returnTypeOfs
+				);
+			}
+		});
+
+		let declarationWithCombinedReturnValues : FunctionDeclaration[] = [];
+
+		for (const serializedDeclaration in uniqueDeclarationNameAndArguments) {
+			if (uniqueDeclarationNameAndArguments.hasOwnProperty(serializedDeclaration)) {
+				declarationWithCombinedReturnValues.push(uniqueDeclarationNameAndArguments[serializedDeclaration]);
+			}
+		}
+
+		this.functionDeclarations = declarationWithCombinedReturnValues;
 	}
 
 	private removeDuplicatedDeclarations() {
@@ -32,19 +60,5 @@ export class FunctionDeclarationCleaner {
 				false;
 			}
 		});
-	}
-
-	private groupByName(functionDeclarations: FunctionDeclaration[]): { [id: string]: FunctionDeclaration[]; } {
-		let functionDeclarationsGroupedByName: { [id: string]: FunctionDeclaration[]; } = {};
-
-		functionDeclarations.forEach(functionDeclaration => {
-			if (!(functionDeclaration.name in functionDeclarationsGroupedByName)) {
-				functionDeclarationsGroupedByName[functionDeclaration.name] = [];
-			}
-
-			functionDeclarationsGroupedByName[functionDeclaration.name].push(functionDeclaration);
-		});
-
-		return functionDeclarationsGroupedByName;
 	}
 }
