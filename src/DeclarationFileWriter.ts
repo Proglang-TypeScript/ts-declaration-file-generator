@@ -64,10 +64,10 @@ export class DeclarationFileWriter {
 
     private getFunctionNameWithTypes(f: FunctionDeclaration) {
         let argumentsWithType = f.arguments.map(argument => {
-            return argument.name + ": " + argument.differentTypeOfs.join("|"); 
+            return argument.name + ": " + argument.typeOfs.join("|");
         }).join(", ");
 
-        return f.name + "(" + argumentsWithType + "): " + f.differentReturnTypeOfs.join("|");
+        return f.name + "(" + argumentsWithType + "): " + f.returnTypeOfs.join("|");
     }
 
     private writeNamespace(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {

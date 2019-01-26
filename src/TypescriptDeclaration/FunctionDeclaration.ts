@@ -1,12 +1,18 @@
-export interface ArgumentDeclaration {
-    index: number,
-    name: string,
-    differentTypeOfs: string[]
+export class ArgumentDeclaration {
+    index: number;
+    name: string;
+    typeOfs: string[];
+
+    constructor(index: number, name: string) {
+        this.index = index;
+        this.name = name;
+        this.typeOfs = [];
+    }
 }
 
 export class FunctionDeclaration {
     name: string = "";
-    differentReturnTypeOfs: string[] = [];
+    returnTypeOfs: string[] = [];
     arguments: ArgumentDeclaration[] = [];
 
     addArgument(a: ArgumentDeclaration) {

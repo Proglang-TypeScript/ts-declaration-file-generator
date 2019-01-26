@@ -21,37 +21,63 @@ export class FunctionDeclarationBuilder {
         return i;
     }
 
-    build(functionRunTimeInfo: FunctionRuntimeInfo) : FunctionDeclaration.FunctionDeclaration {
-        let functionDeclaration = new FunctionDeclaration.FunctionDeclaration();
-        functionDeclaration.name = functionRunTimeInfo.functionName;
-        functionDeclaration.differentReturnTypeOfs = this.getDifferentReturnTypeOfs(functionRunTimeInfo);
-    
-        functionRunTimeInfo.args.forEach(argument => {
-            let interactionsConsideredForInterfaces = argument.interactions.filter(
-                v => {return (v.code === "getField")}
-            );
+    build(functionRunTimeInfo: FunctionRuntimeInfo) : FunctionDeclaration.FunctionDeclaration[] {
+        let functionDeclarations: FunctionDeclaration.FunctionDeclaration[] = [];
 
-            let differentReturnTypeOfs = this.getDifferentInputTypeOfs(argument);
-            let interfaceDeclaration = this.buildInterfaceDeclaration(interactionsConsideredForInterfaces);
+        for (const traceId in functionRunTimeInfo.args) {
+            let functionDeclaration = new FunctionDeclaration.FunctionDeclaration();
+            functionDeclaration.name = functionRunTimeInfo.functionName;
+            functionDeclaration.returnTypeOfs = [functionRunTimeInfo.returnTypeOfs[traceId]];
 
-            if (!interfaceDeclaration.isEmpty()) {
-                interfaceDeclaration.name = this.getInterfaceName(argument.argumentName);
-    
-                this.addInterfaceDeclaration(interfaceDeclaration);
-                differentReturnTypeOfs.push(interfaceDeclaration.name);
-                differentReturnTypeOfs = this.removeTypeOfObjectWhenItHasAnInterface(differentReturnTypeOfs);
+            if (functionRunTimeInfo.args.hasOwnProperty(traceId)) {
+                const argumentInfo = functionRunTimeInfo.args[traceId];
+                argumentInfo.forEach(argument => {
+                    let argumentDeclaration = new FunctionDeclaration.ArgumentDeclaration(
+                        argument.argumentIndex,
+                        argument.argumentName
+                    );
+
+                    argumentDeclaration.typeOfs = this.mergeArgumentTypeOfs(
+                        this.getDifferentInputTypeOfs(argument),
+                        this.getInterfacesTypeOfs(argument)
+                    );
+
+                    functionDeclaration.addArgument(argumentDeclaration);
+                });
             }
 
-            let argumentDeclaration : FunctionDeclaration.ArgumentDeclaration = {
-                index: argument.argumentIndex,
-                name: argument.argumentName,
-                differentTypeOfs: differentReturnTypeOfs
-            };
-    
-            functionDeclaration.addArgument(argumentDeclaration);
-        });
+            functionDeclarations.push(functionDeclaration);
+        }
 
-        return functionDeclaration;
+        return functionDeclarations;
+    }
+
+    private getInterfacesTypeOfs(argument: ArgumentRuntimeInfo): string[] {
+        let interfacesTypeOfs : string[] = [];
+        let interactionsConsideredForInterfaces = argument.interactions.filter(
+            v => { return (v.code === "getField") }
+        );
+
+        let interfaceDeclaration = this.buildInterfaceDeclaration(interactionsConsideredForInterfaces);
+
+        if (!interfaceDeclaration.isEmpty()) {
+            interfaceDeclaration.name = this.getInterfaceName(argument.argumentName);
+
+            this.addInterfaceDeclaration(interfaceDeclaration);
+            interfacesTypeOfs.push(interfaceDeclaration.name);
+        }
+
+        return interfacesTypeOfs;
+    }
+
+    private mergeArgumentTypeOfs(inputTypeOfs: string[], interfacesTypeOfs: string[]): string[] {
+        if (interfacesTypeOfs.length > 0) {
+            inputTypeOfs = inputTypeOfs.filter((val) => {
+                return val !== "object";
+            });
+        }
+
+        return inputTypeOfs.concat(interfacesTypeOfs);
     }
 
     private getInterfaceName(name: string): string {
@@ -102,12 +128,6 @@ export class FunctionDeclarationBuilder {
         this.interfaceDeclarations[interfaceDeclaration.name] = interfaceDeclaration;
     }
 
-    private removeTypeOfObjectWhenItHasAnInterface(differentReturnTypeOfs: string[]): string[] {
-        return differentReturnTypeOfs.filter((val) => {
-            return val !== "object";
-        });
-    }
-
     private getDifferentInputTypeOfs(argument: ArgumentRuntimeInfo): string[] {
         let matchedReturnTypeOfs: string[] = argument.interactions.filter(
             interaction => {
@@ -115,14 +135,6 @@ export class FunctionDeclarationBuilder {
             }
         ).map(interaction => {
             return this.matchToTypescriptType(interaction.typeof);
-        });
-
-        return this.removeDuplicates(matchedReturnTypeOfs);
-    }
-
-    private getDifferentReturnTypeOfs(functionRunTimeInfo: FunctionRuntimeInfo) : string[] {
-        let matchedReturnTypeOfs: string[] = functionRunTimeInfo.returnTypeOfs.map(returnTypeOf => {
-            return this.matchToTypescriptType(returnTypeOf);
         });
 
         return this.removeDuplicates(matchedReturnTypeOfs);
