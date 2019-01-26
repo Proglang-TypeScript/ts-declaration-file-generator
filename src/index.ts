@@ -5,6 +5,7 @@ import { FunctionDeclaration } from './TypescriptDeclaration/FunctionDeclaration
 import { TypescriptModuleDeclaration } from './TypescriptDeclaration/TypescriptModuleDeclaration';
 import { DeclarationFileWriter } from './DeclarationFileWriter'; 
 import { FunctionDeclarationBuilder } from './FunctionDeclarationBuilder';
+import { FunctionDeclarationCleaner } from './FunctionDeclarationCleaner';
 import commandLineArgs from 'command-line-args';
 
 const optionDefinitions = [
@@ -21,6 +22,9 @@ let functionDeclarations: FunctionDeclaration[] = [];
 for (let key in runTimeInfo) {
     functionDeclarations = functionDeclarations.concat(builder.build(runTimeInfo[key]));
 }
+
+let cleaner = new FunctionDeclarationCleaner(functionDeclarations, builder.interfaceDeclarations);
+functionDeclarations = cleaner.clean();
 
 let typescriptModuleDeclaration = new TypescriptModuleDeclaration();
 typescriptModuleDeclaration.module = options['module-name'].replace(/-/g, "_");
