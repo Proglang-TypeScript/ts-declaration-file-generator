@@ -3,10 +3,12 @@ import { FunctionRuntimeInfo, InteractionRuntimeInfo, ArgumentRuntimeInfo } from
 import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
 
 export class FunctionDeclarationBuilder {
+    interfaceNames: { [id: string]: boolean };
     interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
     interfaceNameCounter : number;
 
     constructor() {
+        this.interfaceNames = {}
         this.interfaceDeclarations = {};
         this.interfaceNameCounter = 0;
     };
@@ -116,16 +118,21 @@ export class FunctionDeclarationBuilder {
     }
 
     private addInterfaceDeclaration(interfaceDeclaration: InterfaceDeclaration): void {
-        let interfaceName = interfaceDeclaration.name;
+        let serializedInterface = JSON.stringify(interfaceDeclaration);
 
-        while (interfaceName in this.interfaceDeclarations) {
-            this.interfaceNameCounter++;
-            interfaceName = interfaceDeclaration.name + "__" + this.interfaceNameCounter;
+        if (!(serializedInterface in this.interfaceDeclarations)) {
+            let interfaceName = interfaceDeclaration.name;
+
+            while (interfaceName in this.interfaceNames) {
+                this.interfaceNameCounter++;
+                interfaceName = interfaceDeclaration.name + "__" + this.interfaceNameCounter;
+            }
+
+            interfaceDeclaration.name = interfaceName;
+
+            this.interfaceNames[interfaceDeclaration.name] = true;
+            this.interfaceDeclarations[serializedInterface] = interfaceDeclaration;
         }
-
-        interfaceDeclaration.name = interfaceName;
-
-        this.interfaceDeclarations[interfaceDeclaration.name] = interfaceDeclaration;
     }
 
     private getDifferentInputTypeOfs(argument: ArgumentRuntimeInfo): string[] {
