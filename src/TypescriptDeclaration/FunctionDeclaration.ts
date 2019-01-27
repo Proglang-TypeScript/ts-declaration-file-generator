@@ -1,12 +1,22 @@
 export class ArgumentDeclaration {
     index: number;
     name: string;
-    typeOfs: string[];
+    private typeOfs: { [typeOf: string]: boolean };
 
     constructor(index: number, name: string) {
         this.index = index;
         this.name = name;
-        this.typeOfs = [];
+        this.typeOfs = {};
+    }
+
+    addTypeOf(returnTypeOf: string) {
+        if (!(returnTypeOf in this.typeOfs)) {
+            this.typeOfs[returnTypeOf] = true;
+        }
+    }
+
+    getTypeOfs() : string[] {
+        return Object.keys(this.typeOfs);
     }
 }
 

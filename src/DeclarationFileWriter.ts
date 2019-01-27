@@ -64,7 +64,7 @@ export class DeclarationFileWriter {
 
     private getFunctionNameWithTypes(f: FunctionDeclaration) {
         let argumentsWithType = f.getArguments().map(argument => {
-            return argument.name + ": " + argument.typeOfs.join("|");
+            return argument.name + ": " + argument.getTypeOfs().join("|");
         }).join(", ");
 
         return f.name + "(" + argumentsWithType + "): " + f.getReturnTypeOfs().join("|");

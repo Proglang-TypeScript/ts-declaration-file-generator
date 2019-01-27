@@ -52,10 +52,12 @@ export class FunctionDeclarationBuilder {
                         argument.argumentName
                     );
 
-                    argumentDeclaration.typeOfs = this.mergeArgumentTypeOfs(
-                        this.getDifferentInputTypeOfs(argument),
+                    this.mergeArgumentTypeOfs(
+                        this.getInputTypeOfs(argument),
                         this.getInterfacesTypeOfs(argument)
-                    );
+                    ).forEach(typeOf => {
+                        argumentDeclaration.addTypeOf(typeOf);
+                    });
 
                     functionDeclaration.addArgument(argumentDeclaration);
                 });
@@ -149,16 +151,14 @@ export class FunctionDeclarationBuilder {
         }
     }
 
-    private getDifferentInputTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo): string[] {
-        let matchedReturnTypeOfs: string[] = argument.interactions.filter(
+    private getInputTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo): string[] {
+        return argument.interactions.filter(
             interaction => {
                 return (interaction.code === "inputValue");
             }
         ).map(interaction => {
             return this.matchToTypescriptType(interaction.typeof);
         });
-
-        return this.removeDuplicates(matchedReturnTypeOfs);
     }
 
     private matchToTypescriptType(t: string): string {
@@ -178,16 +178,5 @@ export class FunctionDeclarationBuilder {
         }
 
         return m[t];
-    }
-
-    private removeDuplicates(target: string[]) : string[] {
-        let different : { [id: string] : boolean; } = {};
-        target.forEach(i => {
-            if (!(i in different)) {
-                different[i] = true;
-            }
-        });
-
-        return Object.keys(different);
     }
 }
