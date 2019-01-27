@@ -3,10 +3,10 @@ import * as RunTimeInfoUtils from './RunTimeInfoUtils';
 import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
 
 export class FunctionDeclarationBuilder {
+    reader: RunTimeInfoUtils.RuntimeInfoReader;
     interfaceNames: { [id: string]: boolean };
     interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
     interfaceNameCounter : number;
-    reader: RunTimeInfoUtils.RuntimeInfoReader;
 
     constructor(reader: RunTimeInfoUtils.RuntimeInfoReader) {
         this.reader = reader;
@@ -36,7 +36,7 @@ export class FunctionDeclarationBuilder {
         return functionDeclarations;
     }
 
-    build(functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo) : FunctionDeclaration[] {
+    private build(functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo) : FunctionDeclaration[] {
         let functionDeclarations: FunctionDeclaration[] = [];
 
         for (const traceId in functionRunTimeInfo.args) {
@@ -113,14 +113,14 @@ export class FunctionDeclarationBuilder {
                 let followingInterfaceDeclaration = this.buildInterfaceDeclaration(interaction.followingInteractions);
                 followingInterfaceDeclaration.name = this.getInterfaceName(interaction.field);
 
-                if (!(interaction.field in interfaces)) {
-                    interfaces[interaction.field] = followingInterfaceDeclaration;
+                if (!(followingInterfaceDeclaration.name in interfaces)) {
+                    interfaces[followingInterfaceDeclaration.name] = followingInterfaceDeclaration;
                     this.addInterfaceDeclaration(followingInterfaceDeclaration);
                 } else {
-                    interfaces[interaction.field].merge(followingInterfaceDeclaration);
+                    interfaces[followingInterfaceDeclaration.name].merge(followingInterfaceDeclaration);
                 }
 
-                interfaceAttribute.type = interfaces[interaction.field].name;                
+                interfaceAttribute.type = followingInterfaceDeclaration.name;
             } else {
                 interfaceAttribute.type = interaction.returnTypeOf;
             }

@@ -19,8 +19,8 @@ let reader = new RunTimeInfoUtils.RuntimeInfoReader(options['runtime-info']);
 let builder = new FunctionDeclarationBuilder(reader);
 let functionDeclarations = builder.buildAll();
 
-let cleaner = new FunctionDeclarationCleaner(functionDeclarations, builder.interfaceDeclarations);
-functionDeclarations = cleaner.clean();
+let cleaner = new FunctionDeclarationCleaner();
+functionDeclarations = cleaner.clean(functionDeclarations, builder.interfaceDeclarations);
 
 let typescriptModuleDeclaration = new TypescriptModuleDeclaration();
 typescriptModuleDeclaration.module = options['module-name'].replace(/-/g, "_");

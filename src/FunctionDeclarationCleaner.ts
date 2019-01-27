@@ -2,18 +2,17 @@ import { FunctionDeclaration } from "./TypescriptDeclaration/FunctionDeclaration
 import { InterfaceDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
 
 export class FunctionDeclarationCleaner {
-	functionDeclarations: FunctionDeclaration[];
-	interfaceDeclarations: { [id: string]: InterfaceDeclaration; };
+	functionDeclarations: FunctionDeclaration[] = [];
+	interfaceDeclarations: { [id: string]: InterfaceDeclaration; } = {};
 
-	constructor(
+	clean(
 		functionDeclarations: FunctionDeclaration[],
 		interfaceDeclarations: { [id: string]: InterfaceDeclaration; }
-	) {
+	) : FunctionDeclaration[] {
+
 		this.functionDeclarations = functionDeclarations;
 		this.interfaceDeclarations = interfaceDeclarations;
-	}
 
-	clean() : FunctionDeclaration[] {
 		this.combineReturnValues();
 
 		return this.functionDeclarations;
