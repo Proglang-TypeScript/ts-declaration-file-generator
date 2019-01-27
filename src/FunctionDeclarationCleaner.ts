@@ -14,7 +14,6 @@ export class FunctionDeclarationCleaner {
 	}
 
 	clean() : FunctionDeclaration[] {
-		this.removeDuplicatedDeclarations();
 		this.combineReturnValues();
 
 		return this.functionDeclarations;
@@ -24,15 +23,15 @@ export class FunctionDeclarationCleaner {
 		let uniqueDeclarationNameAndArguments: { [id: string]: FunctionDeclaration } = {};
 
 		this.functionDeclarations.forEach(declaration => {
-			let serializedDeclaration = declaration.name + "__" + JSON.stringify(declaration.arguments);
+			let serializedDeclaration = declaration.name + "__" + JSON.stringify(declaration.getArguments());
 
 			if (!(serializedDeclaration in uniqueDeclarationNameAndArguments)) {
 				uniqueDeclarationNameAndArguments[serializedDeclaration] = declaration;
 			} else {
 				let d = uniqueDeclarationNameAndArguments[serializedDeclaration];
-				d.returnTypeOfs = d.returnTypeOfs.concat(
-					declaration.returnTypeOfs
-				);
+				declaration.getReturnTypeOfs().forEach(returnTypeOf => {
+					d.addReturnTypeOf(returnTypeOf);
+				});
 			}
 		});
 
@@ -45,20 +44,5 @@ export class FunctionDeclarationCleaner {
 		}
 
 		this.functionDeclarations = declarationWithCombinedReturnValues;
-	}
-
-	private removeDuplicatedDeclarations() {
-		let uniqueDeclarations: { [id: string]: boolean } = {};
-
-		this.functionDeclarations = this.functionDeclarations.filter(declaration => {
-			let serialized = JSON.stringify(declaration);
-
-			if (!(serialized in uniqueDeclarations)) {
-				uniqueDeclarations[serialized] = true;
-				return true;
-			} else {
-				false;
-			}
-		});
 	}
 }

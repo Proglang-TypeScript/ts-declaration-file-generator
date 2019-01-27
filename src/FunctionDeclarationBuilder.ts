@@ -29,7 +29,7 @@ export class FunctionDeclarationBuilder {
         for (const traceId in functionRunTimeInfo.args) {
             let functionDeclaration = new FunctionDeclaration.FunctionDeclaration();
             functionDeclaration.name = functionRunTimeInfo.functionName;
-            functionDeclaration.returnTypeOfs = [functionRunTimeInfo.returnTypeOfs[traceId]];
+            functionDeclaration.addReturnTypeOf(functionRunTimeInfo.returnTypeOfs[traceId]);
 
             if (functionRunTimeInfo.args.hasOwnProperty(traceId)) {
                 const argumentInfo = functionRunTimeInfo.args[traceId];
