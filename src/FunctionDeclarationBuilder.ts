@@ -1,13 +1,15 @@
-import * as FunctionDeclaration from "./TypescriptDeclaration/FunctionDeclaration";
-import { FunctionRuntimeInfo, InteractionRuntimeInfo, ArgumentRuntimeInfo } from "./RunTimeInfoUtils";
+import { FunctionDeclaration, ArgumentDeclaration } from "./TypescriptDeclaration/FunctionDeclaration";
+import * as RunTimeInfoUtils from './RunTimeInfoUtils';
 import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
 
 export class FunctionDeclarationBuilder {
     interfaceNames: { [id: string]: boolean };
     interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
     interfaceNameCounter : number;
+    reader: RunTimeInfoUtils.RuntimeInfoReader;
 
-    constructor() {
+    constructor(reader: RunTimeInfoUtils.RuntimeInfoReader) {
+        this.reader = reader;
         this.interfaceNames = {}
         this.interfaceDeclarations = {};
         this.interfaceNameCounter = 0;
@@ -23,18 +25,29 @@ export class FunctionDeclarationBuilder {
         return i;
     }
 
-    build(functionRunTimeInfo: FunctionRuntimeInfo) : FunctionDeclaration.FunctionDeclaration[] {
-        let functionDeclarations: FunctionDeclaration.FunctionDeclaration[] = [];
+    buildAll(): FunctionDeclaration[] {
+        let runTimeInfo = this.reader.read();
+
+        let functionDeclarations: FunctionDeclaration[] = [];
+        for (let key in runTimeInfo) {
+            functionDeclarations = functionDeclarations.concat(this.build(runTimeInfo[key]));
+        }
+
+        return functionDeclarations;
+    }
+
+    build(functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo) : FunctionDeclaration[] {
+        let functionDeclarations: FunctionDeclaration[] = [];
 
         for (const traceId in functionRunTimeInfo.args) {
-            let functionDeclaration = new FunctionDeclaration.FunctionDeclaration();
+            let functionDeclaration = new FunctionDeclaration();
             functionDeclaration.name = functionRunTimeInfo.functionName;
             functionDeclaration.addReturnTypeOf(functionRunTimeInfo.returnTypeOfs[traceId]);
 
             if (functionRunTimeInfo.args.hasOwnProperty(traceId)) {
                 const argumentInfo = functionRunTimeInfo.args[traceId];
                 argumentInfo.forEach(argument => {
-                    let argumentDeclaration = new FunctionDeclaration.ArgumentDeclaration(
+                    let argumentDeclaration = new ArgumentDeclaration(
                         argument.argumentIndex,
                         argument.argumentName
                     );
@@ -54,7 +67,7 @@ export class FunctionDeclarationBuilder {
         return functionDeclarations;
     }
 
-    private getInterfacesTypeOfs(argument: ArgumentRuntimeInfo): string[] {
+    private getInterfacesTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo): string[] {
         let interfacesTypeOfs : string[] = [];
         let interactionsConsideredForInterfaces = argument.interactions.filter(
             v => { return (v.code === "getField") }
@@ -85,7 +98,8 @@ export class FunctionDeclarationBuilder {
     private getInterfaceName(name: string): string {
         return "I__" + name;
     }
-    private buildInterfaceDeclaration(interactions: InteractionRuntimeInfo[]): InterfaceDeclaration {
+
+    private buildInterfaceDeclaration(interactions: RunTimeInfoUtils.InteractionRuntimeInfo[]): InterfaceDeclaration {
         let interfaceDeclaration = new InterfaceDeclaration();
 
         let interfaces : { [id: string] : InterfaceDeclaration; } = {};
@@ -135,7 +149,7 @@ export class FunctionDeclarationBuilder {
         }
     }
 
-    private getDifferentInputTypeOfs(argument: ArgumentRuntimeInfo): string[] {
+    private getDifferentInputTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo): string[] {
         let matchedReturnTypeOfs: string[] = argument.interactions.filter(
             interaction => {
                 return (interaction.code === "inputValue");

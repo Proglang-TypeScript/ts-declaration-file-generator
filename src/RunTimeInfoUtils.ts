@@ -23,23 +23,25 @@ export interface InteractionRuntimeInfo {
     traceId: string
 }
 
-export class RunTimeInfo {
-    info: { [id: string] : FunctionRuntimeInfo; } = {};
-};
-
 export class RuntimeInfoReader {
-    read(fileName: string) : RunTimeInfo {
-        let jsonFile = fs.readFileSync(fileName);
-        let runTimeInfo = new RunTimeInfo();
+    private fileName: string;
+
+    constructor(fileName: string) {
+        this.fileName = fileName;
+    }
+
+    read(): { [id: string]: FunctionRuntimeInfo } {
+        let jsonFile = fs.readFileSync(this.fileName);
+        let runTimeInfo: { [id: string]: FunctionRuntimeInfo } = {};
 
         let jsonInfo = JSON.parse(jsonFile.toString());
 
         for(let functionId in jsonInfo) {
             let functionInfo : FunctionRuntimeInfo = jsonInfo[functionId];
             functionInfo.args = this.getArgumentsInfo(functionInfo);
-            functionInfo.returnTypeOfs = this.getReturnTypeOfs(jsonInfo[functionId]);
+            functionInfo.returnTypeOfs = this.getReturnTypeOfsByTraceId(jsonInfo[functionId]);
 
-            runTimeInfo.info[functionId] = functionInfo;
+            runTimeInfo[functionId] = functionInfo;
         }
 
         return runTimeInfo;
@@ -93,7 +95,7 @@ export class RuntimeInfoReader {
         return attributesAggregatedByTraceId;
     }
 
-    private getReturnTypeOfs(functionInfo: any): { [traceId: string]: string; } {
+    private getReturnTypeOfsByTraceId(functionInfo: any): { [traceId: string]: string; } {
         let returnTypeOfsInfo: { [traceId: string]: string } = {};
         functionInfo.returnTypeOfs.forEach((returnTypeOf: any) => {
             returnTypeOfsInfo[returnTypeOf.traceId] = returnTypeOf.typeOf;

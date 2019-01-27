@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import * as RunTimeInfoUtils from './RunTimeInfoUtils';
-import { FunctionDeclaration } from './TypescriptDeclaration/FunctionDeclaration';
 import { TypescriptModuleDeclaration } from './TypescriptDeclaration/TypescriptModuleDeclaration';
 import { DeclarationFileWriter } from './DeclarationFileWriter'; 
 import { FunctionDeclarationBuilder } from './FunctionDeclarationBuilder';
@@ -15,13 +14,10 @@ const optionDefinitions = [
 
 let options = commandLineArgs(optionDefinitions);
 
-let runTimeInfo = new RunTimeInfoUtils.RuntimeInfoReader().read(options['runtime-info']).info;
+let reader = new RunTimeInfoUtils.RuntimeInfoReader(options['runtime-info']);
 
-let builder = new FunctionDeclarationBuilder();
-let functionDeclarations: FunctionDeclaration[] = []; 
-for (let key in runTimeInfo) {
-    functionDeclarations = functionDeclarations.concat(builder.build(runTimeInfo[key]));
-}
+let builder = new FunctionDeclarationBuilder(reader);
+let functionDeclarations = builder.buildAll();
 
 let cleaner = new FunctionDeclarationCleaner(functionDeclarations, builder.interfaceDeclarations);
 functionDeclarations = cleaner.clean();
