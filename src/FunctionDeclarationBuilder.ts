@@ -4,13 +4,15 @@ import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './Typescrip
 
 export class FunctionDeclarationBuilder {
     reader: RunTimeInfoUtils.RuntimeInfoReader;
-    interfaceNames: { [id: string]: InterfaceDeclaration };
+    interfaceNames: { [id: string]: boolean };
+    interfaceOnlyAttributes: { [attributeNames: string] : InterfaceDeclaration; };
     interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
     interfaceNameCounter : number;
 
     constructor(reader: RunTimeInfoUtils.RuntimeInfoReader) {
         this.reader = reader;
         this.interfaceNames = {}
+        this.interfaceOnlyAttributes = {};
         this.interfaceDeclarations = {};
         this.interfaceNameCounter = 0;
     };
@@ -146,11 +148,13 @@ export class FunctionDeclarationBuilder {
         let serializedInterface = JSON.stringify(interfaceDeclaration);
 
         if (!(serializedInterface in this.interfaceDeclarations)) {
-            if (interfaceDeclaration.name in this.interfaceNames) {
-                let alreadyExistingInterface = this.interfaceNames[interfaceDeclaration.name];
-                if(this.mergeInterfaces(alreadyExistingInterface, interfaceDeclaration)) {
-                    return;
-                };
+            let s = interfaceDeclaration.name + interfaceDeclaration.getAttributesNames();
+            if (s in this.interfaceOnlyAttributes) {
+                let alreadyExistingInterface = this.interfaceOnlyAttributes[s];
+                alreadyExistingInterface.intersectWith(interfaceDeclaration);
+                return;
+            } else {
+                this.interfaceOnlyAttributes[s] = interfaceDeclaration;
             }
 
             let interfaceName = interfaceDeclaration.name;
@@ -161,24 +165,9 @@ export class FunctionDeclarationBuilder {
 
             interfaceDeclaration.name = interfaceName;
 
-            this.interfaceNames[interfaceDeclaration.name] = interfaceDeclaration;
+            this.interfaceNames[interfaceDeclaration.name] = true;
             this.interfaceDeclarations[serializedInterface] = interfaceDeclaration;
         }
-    }
-
-    private mergeInterfaces(alreadyExistingInterface: InterfaceDeclaration, newInterface: InterfaceDeclaration, ): boolean {
-        let merged = false;
-
-        let attributesAlreadyExistingInterfaces = alreadyExistingInterface.getAttributesNames();
-        let attributesNewInterfaces = newInterface.getAttributesNames();
-
-        if (attributesAlreadyExistingInterfaces.toString() === attributesNewInterfaces.toString()) {
-            alreadyExistingInterface.intersectWith(newInterface);
-
-            merged = true;
-        }
-
-        return merged;
     }
 
     private getInputTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo): string[] {
