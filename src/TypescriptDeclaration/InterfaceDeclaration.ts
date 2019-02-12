@@ -14,7 +14,7 @@ export class InterfaceDeclaration {
         return Object.keys(this.attributes).length === 0 && this.methods.length === 0;
     }
 
-    merge(i: InterfaceDeclaration) : void {
+    concatWith(i: InterfaceDeclaration) : void {
         i.getAttributes().forEach(a => {
             this.addAttribute(a);
         });
@@ -27,6 +27,16 @@ export class InterfaceDeclaration {
 
         this.attributes[attributeDeclaration.name].push(attributeDeclaration.type);
         this.attributes[attributeDeclaration.name] = this.removeDuplicates(this.attributes[attributeDeclaration.name]);
+    }
+
+    intersectWith(anotherInterface: InterfaceDeclaration) {
+        anotherInterface.getAttributes().forEach(a => {
+            if (a.name in this.attributes) {
+                this.addAttribute(a);
+            }
+        });
+
+        return this;
     }
 
     private removeDuplicates(target: string[]) : string[] {
@@ -52,5 +62,9 @@ export class InterfaceDeclaration {
         }
 
         return attributes;
+    }
+
+    getAttributesNames() : string[] {
+        return Object.keys(this.attributes).sort();
     }
 }

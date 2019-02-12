@@ -4,7 +4,7 @@ import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './Typescrip
 
 export class FunctionDeclarationBuilder {
     reader: RunTimeInfoUtils.RuntimeInfoReader;
-    interfaceNames: { [id: string]: boolean };
+    interfaceNames: { [id: string]: InterfaceDeclaration };
     interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
     interfaceNameCounter : number;
 
@@ -71,9 +71,7 @@ export class FunctionDeclarationBuilder {
 
     private getInterfacesTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo): string[] {
         let interfacesTypeOfs : string[] = [];
-        let interactionsConsideredForInterfaces = argument.interactions.filter(
-            v => { return (v.code === "getField") }
-        );
+        let interactionsConsideredForInterfaces = this.filterInteractionsForComputingInterfaces(argument.interactions);
 
         let interfaceDeclaration = this.buildInterfaceDeclaration(interactionsConsideredForInterfaces);
 
@@ -85,6 +83,12 @@ export class FunctionDeclarationBuilder {
         }
 
         return interfacesTypeOfs;
+    }
+
+    private filterInteractionsForComputingInterfaces(interactions: RunTimeInfoUtils.InteractionRuntimeInfo[]) {
+        return interactions.filter(
+            v => { return (v.code === "getField") }
+        );
     }
 
     private mergeArgumentTypeOfs(inputTypeOfs: string[], interfacesTypeOfs: string[]): string[] {
@@ -111,15 +115,20 @@ export class FunctionDeclarationBuilder {
                 type: ""
             };
 
-            if (interaction.followingInteractions.length > 0) {
-                let followingInterfaceDeclaration = this.buildInterfaceDeclaration(interaction.followingInteractions);
+            let filteredFollowingInteractions : RunTimeInfoUtils.InteractionRuntimeInfo[] = [];
+            if (interaction.followingInteractions) {
+                filteredFollowingInteractions = this.filterInteractionsForComputingInterfaces(interaction.followingInteractions);
+            }
+
+            if (filteredFollowingInteractions.length > 0) {
+                let followingInterfaceDeclaration = this.buildInterfaceDeclaration(filteredFollowingInteractions);
                 followingInterfaceDeclaration.name = this.getInterfaceName(interaction.field);
 
                 if (!(followingInterfaceDeclaration.name in interfaces)) {
                     interfaces[followingInterfaceDeclaration.name] = followingInterfaceDeclaration;
                     this.addInterfaceDeclaration(followingInterfaceDeclaration);
                 } else {
-                    interfaces[followingInterfaceDeclaration.name].merge(followingInterfaceDeclaration);
+                    interfaces[followingInterfaceDeclaration.name].concatWith(followingInterfaceDeclaration);
                 }
 
                 interfaceAttribute.type = followingInterfaceDeclaration.name;
@@ -137,8 +146,14 @@ export class FunctionDeclarationBuilder {
         let serializedInterface = JSON.stringify(interfaceDeclaration);
 
         if (!(serializedInterface in this.interfaceDeclarations)) {
-            let interfaceName = interfaceDeclaration.name;
+            if (interfaceDeclaration.name in this.interfaceNames) {
+                let alreadyExistingInterface = this.interfaceNames[interfaceDeclaration.name];
+                if(this.mergeInterfaces(alreadyExistingInterface, interfaceDeclaration)) {
+                    return;
+                };
+            }
 
+            let interfaceName = interfaceDeclaration.name;
             while (interfaceName in this.interfaceNames) {
                 this.interfaceNameCounter++;
                 interfaceName = interfaceDeclaration.name + "__" + this.interfaceNameCounter;
@@ -146,9 +161,24 @@ export class FunctionDeclarationBuilder {
 
             interfaceDeclaration.name = interfaceName;
 
-            this.interfaceNames[interfaceDeclaration.name] = true;
+            this.interfaceNames[interfaceDeclaration.name] = interfaceDeclaration;
             this.interfaceDeclarations[serializedInterface] = interfaceDeclaration;
         }
+    }
+
+    private mergeInterfaces(alreadyExistingInterface: InterfaceDeclaration, newInterface: InterfaceDeclaration, ): boolean {
+        let merged = false;
+
+        let attributesAlreadyExistingInterfaces = alreadyExistingInterface.getAttributesNames();
+        let attributesNewInterfaces = newInterface.getAttributesNames();
+
+        if (attributesAlreadyExistingInterfaces.toString() === attributesNewInterfaces.toString()) {
+            alreadyExistingInterface.intersectWith(newInterface);
+
+            merged = true;
+        }
+
+        return merged;
     }
 
     private getInputTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo): string[] {

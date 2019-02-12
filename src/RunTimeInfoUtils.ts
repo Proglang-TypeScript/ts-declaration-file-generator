@@ -19,7 +19,7 @@ export interface InteractionRuntimeInfo {
     typeof: string,
     returnTypeOf: string,
     field: string,
-    followingInteractions: InteractionRuntimeInfo[],
+    followingInteractions?: InteractionRuntimeInfo[],
     traceId: string
 }
 
