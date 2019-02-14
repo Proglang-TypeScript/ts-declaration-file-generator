@@ -5,14 +5,12 @@ import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './Typescrip
 export class FunctionDeclarationBuilder {
     reader: RunTimeInfoUtils.RuntimeInfoReader;
     interfaceNames: { [id: string]: boolean };
-    interfaceOnlyAttributes: { [attributeNames: string] : InterfaceDeclaration; };
     interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
     interfaceNameCounter : number;
 
     constructor(reader: RunTimeInfoUtils.RuntimeInfoReader) {
         this.reader = reader;
         this.interfaceNames = {}
-        this.interfaceOnlyAttributes = {};
         this.interfaceDeclarations = {};
         this.interfaceNameCounter = 0;
     };
@@ -56,7 +54,7 @@ export class FunctionDeclarationBuilder {
 
                     this.mergeArgumentTypeOfs(
                         this.getInputTypeOfs(argument),
-                        this.getInterfacesTypeOfs(argument)
+                        this.getInterfacesTypeOfs(argument, functionRunTimeInfo)
                     ).forEach(typeOf => {
                         argumentDeclaration.addTypeOf(typeOf);
                     });
@@ -71,16 +69,18 @@ export class FunctionDeclarationBuilder {
         return functionDeclarations;
     }
 
-    private getInterfacesTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo): string[] {
+    private getInterfacesTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo, functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo): string[] {
         let interfacesTypeOfs : string[] = [];
         let interactionsConsideredForInterfaces = this.filterInteractionsForComputingInterfaces(argument.interactions);
 
-        let interfaceDeclaration = this.buildInterfaceDeclaration(interactionsConsideredForInterfaces);
+        if (interactionsConsideredForInterfaces.length > 0) {
+            let interfaceDeclaration = this.buildInterfaceDeclaration(
+                interactionsConsideredForInterfaces,
+                this.getInterfaceName(argument.argumentName),
+                argument,
+                functionRunTimeInfo
+            );
 
-        if (!interfaceDeclaration.isEmpty()) {
-            interfaceDeclaration.name = this.getInterfaceName(argument.argumentName);
-
-            this.addInterfaceDeclaration(interfaceDeclaration);
             interfacesTypeOfs.push(interfaceDeclaration.name);
         }
 
@@ -107,10 +107,15 @@ export class FunctionDeclarationBuilder {
         return "I__" + name;
     }
 
-    private buildInterfaceDeclaration(interactions: RunTimeInfoUtils.InteractionRuntimeInfo[]): InterfaceDeclaration {
+    private buildInterfaceDeclaration(
+        interactions: RunTimeInfoUtils.InteractionRuntimeInfo[],
+        name: string,
+        argument: RunTimeInfoUtils.ArgumentRuntimeInfo,
+        functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo
+    ): InterfaceDeclaration {
+
         let interfaceDeclaration = new InterfaceDeclaration();
 
-        let interfaces : { [id: string] : InterfaceDeclaration; } = {};
         interactions.forEach(interaction => {
             let interfaceAttribute : InterfaceAttributeDeclaration = {
                 name: interaction.field,
@@ -123,15 +128,12 @@ export class FunctionDeclarationBuilder {
             }
 
             if (filteredFollowingInteractions.length > 0) {
-                let followingInterfaceDeclaration = this.buildInterfaceDeclaration(filteredFollowingInteractions);
-                followingInterfaceDeclaration.name = this.getInterfaceName(interaction.field);
-
-                if (!(followingInterfaceDeclaration.name in interfaces)) {
-                    interfaces[followingInterfaceDeclaration.name] = followingInterfaceDeclaration;
-                    this.addInterfaceDeclaration(followingInterfaceDeclaration);
-                } else {
-                    interfaces[followingInterfaceDeclaration.name].concatWith(followingInterfaceDeclaration);
-                }
+                let followingInterfaceDeclaration = this.buildInterfaceDeclaration(
+                    filteredFollowingInteractions,
+                    this.getInterfaceName(interaction.field),
+                    argument,
+                    functionRunTimeInfo
+                );
 
                 interfaceAttribute.type = followingInterfaceDeclaration.name;
             } else {
@@ -141,30 +143,36 @@ export class FunctionDeclarationBuilder {
             interfaceDeclaration.addAttribute(interfaceAttribute);
         });
 
+        interfaceDeclaration.name = name;
+        this.addInterfaceDeclaration(
+            interfaceDeclaration,
+            argument,
+            functionRunTimeInfo
+        );
+
         return interfaceDeclaration;
     }
 
-    private addInterfaceDeclaration(interfaceDeclaration: InterfaceDeclaration): void {
-        let serializedInterface = JSON.stringify(interfaceDeclaration);
+    private addInterfaceDeclaration(interfaceDeclaration: InterfaceDeclaration, argument: RunTimeInfoUtils.ArgumentRuntimeInfo, functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo)
+    : void
+ {
+        let serializedInterface = [interfaceDeclaration.name,
+            argument.argumentIndex,
+            argument.argumentName,
+            functionRunTimeInfo.functionId
+        ].join("__");
 
-        if (!(serializedInterface in this.interfaceDeclarations)) {
-            let s = interfaceDeclaration.name + interfaceDeclaration.getAttributesNames();
-            if (s in this.interfaceOnlyAttributes) {
-                let alreadyExistingInterface = this.interfaceOnlyAttributes[s];
-                alreadyExistingInterface.intersectWith(interfaceDeclaration);
-                return;
-            } else {
-                this.interfaceOnlyAttributes[s] = interfaceDeclaration;
-            }
-
+        if (serializedInterface in this.interfaceDeclarations) {
+            this.interfaceDeclarations[serializedInterface].concatWith(interfaceDeclaration);
+        } else {
             let interfaceName = interfaceDeclaration.name;
             while (interfaceName in this.interfaceNames) {
                 this.interfaceNameCounter++;
                 interfaceName = interfaceDeclaration.name + "__" + this.interfaceNameCounter;
             }
-
+    
             interfaceDeclaration.name = interfaceName;
-
+    
             this.interfaceNames[interfaceDeclaration.name] = true;
             this.interfaceDeclarations[serializedInterface] = interfaceDeclaration;
         }
