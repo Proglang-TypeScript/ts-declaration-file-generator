@@ -29,16 +29,6 @@ export class InterfaceDeclaration {
         this.attributes[attributeDeclaration.name] = this.removeDuplicates(this.attributes[attributeDeclaration.name]);
     }
 
-    intersectWith(anotherInterface: InterfaceDeclaration) {
-        anotherInterface.getAttributes().forEach(a => {
-            if (a.name in this.attributes) {
-                this.addAttribute(a);
-            }
-        });
-
-        return this;
-    }
-
     private removeDuplicates(target: string[]) : string[] {
         let different : { [id: string] : boolean; } = {};
         target.forEach(i => {
