@@ -54,7 +54,7 @@ export class FunctionDeclarationBuilder {
 
                     this.mergeArgumentTypeOfs(
                         this.getInputTypeOfs(argument),
-                        this.getInterfacesTypeOfs(argument, functionRunTimeInfo)
+                        this.getInterfacesForArgument(argument, functionRunTimeInfo).map(i => {return i.name;})
                     ).forEach(typeOf => {
                         argumentDeclaration.addTypeOf(typeOf);
                     });
@@ -69,22 +69,20 @@ export class FunctionDeclarationBuilder {
         return functionDeclarations;
     }
 
-    private getInterfacesTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo, functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo): string[] {
-        let interfacesTypeOfs : string[] = [];
+    private getInterfacesForArgument(argument: RunTimeInfoUtils.ArgumentRuntimeInfo, functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo): InterfaceDeclaration[] {
+        let interfaces : InterfaceDeclaration[] = [];
         let interactionsConsideredForInterfaces = this.filterInteractionsForComputingInterfaces(argument.interactions);
 
         if (interactionsConsideredForInterfaces.length > 0) {
-            let interfaceDeclaration = this.buildInterfaceDeclaration(
+            interfaces.push(this.buildInterfaceDeclaration(
                 interactionsConsideredForInterfaces,
                 this.getInterfaceName(argument.argumentName),
                 argument,
                 functionRunTimeInfo
-            );
-
-            interfacesTypeOfs.push(interfaceDeclaration.name);
+            ));
         }
 
-        return interfacesTypeOfs;
+        return interfaces;
     }
 
     private filterInteractionsForComputingInterfaces(interactions: RunTimeInfoUtils.InteractionRuntimeInfo[]) {
