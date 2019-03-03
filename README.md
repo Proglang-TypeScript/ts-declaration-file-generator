@@ -9,9 +9,7 @@ https://docs.docker.com/install/
 
 ```shell
 git clone https://fcristiani@bitbucket.org/fcristiani/ts-declaration-file-generator.git
-```
 
-```shell
 cd ts-declaration-file-generator
 ```
 
