@@ -19,7 +19,7 @@ cd ts-declaration-file-generator
 ./build/build.sh
 ```
 
-This will build an image called 'ts-declaration-file-generator' on your local machine.
+This will build an image called `ts-declaration-file-generator` on your local machine.
 
 ### Usage
 #### Get runtime information from one JS file
