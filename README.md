@@ -54,7 +54,7 @@ docker cp generate-declaration-file:/usr/local/app/output/. /tmp/ts-declaration-
 docker rm generate-declaration-file
 ```
 
-You will find the declaration file under `/tmp/ts-declaration-file/calculator`:
+You will find the declaration file under `/tmp/ts-declaration-file/calculator/index.d.ts`:
 
 ```typescript
 export = calculator
