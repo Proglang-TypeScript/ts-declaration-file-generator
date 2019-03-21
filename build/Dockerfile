@@ -1,4 +1,4 @@
-FROM node:8-alpine AS builder
+FROM node:10-alpine AS builder
 
 WORKDIR /usr/local/app
 COPY . .
@@ -13,7 +13,7 @@ RUN npm run build
 
 # -------------------------------------------------
 
-FROM node:8-alpine
+FROM node:10-alpine
 
 RUN apk update
 
