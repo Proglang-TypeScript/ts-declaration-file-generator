@@ -7,12 +7,14 @@ export class FunctionDeclarationBuilder {
     interfaceNames: { [id: string]: boolean };
     interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
     interfaceNameCounter : number;
+    moduleName: string;
 
-    constructor(reader: RunTimeInfoUtils.RuntimeInfoReader) {
+    constructor(reader: RunTimeInfoUtils.RuntimeInfoReader, moduleName: string) {
         this.reader = reader;
         this.interfaceNames = {}
         this.interfaceDeclarations = {};
         this.interfaceNameCounter = 0;
+        this.moduleName = moduleName;
     };
 
     getInterfaceDeclarations(): InterfaceDeclaration[] {
@@ -39,34 +41,40 @@ export class FunctionDeclarationBuilder {
     private build(functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo) : FunctionDeclaration[] {
         let functionDeclarations: FunctionDeclaration[] = [];
 
-        for (const traceId in functionRunTimeInfo.args) {
-            let functionDeclaration = new FunctionDeclaration();
-            functionDeclaration.name = functionRunTimeInfo.functionName;
-            functionDeclaration.addReturnTypeOf(functionRunTimeInfo.returnTypeOfs[traceId]);
+        if (this.extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName) {
+            for (const traceId in functionRunTimeInfo.args) {
+                let functionDeclaration = new FunctionDeclaration();
+                functionDeclaration.name = functionRunTimeInfo.functionName;
+                functionDeclaration.addReturnTypeOf(functionRunTimeInfo.returnTypeOfs[traceId]);
 
-            if (functionRunTimeInfo.args.hasOwnProperty(traceId)) {
-                const argumentInfo = functionRunTimeInfo.args[traceId];
-                argumentInfo.forEach(argument => {
-                    let argumentDeclaration = new ArgumentDeclaration(
-                        argument.argumentIndex,
-                        argument.argumentName
-                    );
+                if (functionRunTimeInfo.args.hasOwnProperty(traceId)) {
+                    const argumentInfo = functionRunTimeInfo.args[traceId];
+                    argumentInfo.forEach(argument => {
+                        let argumentDeclaration = new ArgumentDeclaration(
+                            argument.argumentIndex,
+                            argument.argumentName
+                        );
 
-                    this.mergeArgumentTypeOfs(
-                        this.getInputTypeOfs(argument),
-                        this.getInterfacesForArgument(argument, functionRunTimeInfo).map(i => {return i.name;})
-                    ).forEach(typeOf => {
-                        argumentDeclaration.addTypeOf(typeOf);
+                        this.mergeArgumentTypeOfs(
+                            this.getInputTypeOfs(argument),
+                            this.getInterfacesForArgument(argument, functionRunTimeInfo).map(i => {return i.name;})
+                        ).forEach(typeOf => {
+                            argumentDeclaration.addTypeOf(typeOf);
+                        });
+
+                        functionDeclaration.addArgument(argumentDeclaration);
                     });
+                }
 
-                    functionDeclaration.addArgument(argumentDeclaration);
-                });
+                functionDeclarations.push(functionDeclaration);
             }
-
-            functionDeclarations.push(functionDeclaration);
         }
 
         return functionDeclarations;
+    }
+
+    private extractModuleName(m: string) {
+        return m.replace(/^.*[\/]/, '').replace(/\.[^/.]+$/, "");
     }
 
     private getInterfacesForArgument(argument: RunTimeInfoUtils.ArgumentRuntimeInfo, functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo): InterfaceDeclaration[] {

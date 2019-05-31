@@ -16,14 +16,15 @@ let options = commandLineArgs(optionDefinitions);
 
 let reader = new RunTimeInfoUtils.RuntimeInfoReader(options['runtime-info']);
 
-let builder = new FunctionDeclarationBuilder(reader);
+let moduleName = options['module-name'];
+let builder = new FunctionDeclarationBuilder(reader, moduleName);
 let functionDeclarations = builder.buildAll();
 
 let cleaner = new FunctionDeclarationCleaner();
 functionDeclarations = cleaner.clean(functionDeclarations, builder.interfaceDeclarations);
 
 let typescriptModuleDeclaration = new TypescriptModuleDeclaration();
-typescriptModuleDeclaration.module = options['module-name'].replace(/-/g, "_");
+typescriptModuleDeclaration.module = moduleName.replace(/-/g, "_");
 typescriptModuleDeclaration.methods = functionDeclarations;
 typescriptModuleDeclaration.interfaces = builder.getInterfaceDeclarations();
 

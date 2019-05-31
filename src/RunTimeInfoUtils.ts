@@ -5,7 +5,9 @@ export interface FunctionRuntimeInfo {
     functionName: string,
     args: { [traceId: string]: ArgumentRuntimeInfo[]; },
     returnTypeOfs: { [traceId: string] : string },
-    functionIid: number
+    functionIid: number,
+    requiredModule: string,
+    isExported: boolean
 }
 
 export interface ArgumentRuntimeInfo {
