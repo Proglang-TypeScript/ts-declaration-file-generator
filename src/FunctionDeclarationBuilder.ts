@@ -45,7 +45,7 @@ export class FunctionDeclarationBuilder {
             for (const traceId in functionRunTimeInfo.args) {
                 let functionDeclaration = new FunctionDeclaration();
                 functionDeclaration.name = functionRunTimeInfo.functionName;
-                functionDeclaration.addReturnTypeOf(functionRunTimeInfo.returnTypeOfs[traceId]);
+                functionDeclaration.addReturnTypeOf(this.matchReturnTypeOfs(functionRunTimeInfo.returnTypeOfs[traceId]));
 
                 if (functionRunTimeInfo.args.hasOwnProperty(traceId)) {
                     const argumentInfo = functionRunTimeInfo.args[traceId];
@@ -59,7 +59,7 @@ export class FunctionDeclarationBuilder {
                             this.getInputTypeOfs(argument),
                             this.getInterfacesForArgument(argument, functionRunTimeInfo).map(i => {return i.name;})
                         ).forEach(typeOf => {
-                            argumentDeclaration.addTypeOf(typeOf);
+                            argumentDeclaration.addTypeOf(this.matchToTypescriptType(typeOf));
                         });
 
                         functionDeclaration.addArgument(argumentDeclaration);
@@ -141,9 +141,9 @@ export class FunctionDeclarationBuilder {
                     functionRunTimeInfo
                 );
 
-                interfaceAttribute.type = followingInterfaceDeclaration.name;
+                interfaceAttribute.type = this.matchToTypescriptType(followingInterfaceDeclaration.name);
             } else {
-                interfaceAttribute.type = interaction.returnTypeOf;
+                interfaceAttribute.type = this.matchToTypescriptType(interaction.returnTypeOf);
             }
 
             interfaceDeclaration.addAttribute(interfaceAttribute);
@@ -211,5 +211,24 @@ export class FunctionDeclarationBuilder {
         }
 
         return m[t];
+    }
+
+    private matchReturnTypeOfs(t: string): string {
+        let m: { [id: string]: string; } = {
+            "string": "string",
+            "number": "number",
+            "undefined": "void",
+            "null": "null",
+            "object": "object",
+            "array": "Array<any>",
+            "boolean": "boolean",
+            "function": "Function",
+        };
+
+        if (!(t in m)) {
+            return t;
+        }
+
+        return m[t]; 
     }
 }
