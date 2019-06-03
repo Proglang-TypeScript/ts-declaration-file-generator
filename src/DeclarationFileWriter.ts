@@ -35,7 +35,7 @@ export class DeclarationFileWriter {
             i.getAttributes().forEach(a => {
                 fs.appendFileSync(
                     fileName,
-                    "\t\t" + a.name + ": " + a.type + ";\n"
+                    "\t\t'" + a.name + "': " + a.type + ";\n"
                 ); 
             });
 
