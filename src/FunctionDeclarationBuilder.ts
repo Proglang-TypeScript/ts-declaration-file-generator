@@ -1,6 +1,7 @@
 import { FunctionDeclaration, ArgumentDeclaration } from "./TypescriptDeclaration/FunctionDeclaration";
 import * as RunTimeInfoUtils from './RunTimeInfoUtils';
 import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
+import { ClassDeclaration } from './TypescriptDeclaration/ClassDeclaration';
 
 export class FunctionDeclarationBuilder {
     reader: RunTimeInfoUtils.RuntimeInfoReader;
@@ -8,6 +9,9 @@ export class FunctionDeclarationBuilder {
     interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
     interfaceNameCounter : number;
     moduleName: string;
+    classes: { [id: string]: ClassDeclaration; };
+
+    constructorFunctionId: string;
 
     constructor(reader: RunTimeInfoUtils.RuntimeInfoReader, moduleName: string) {
         this.reader = reader;
@@ -15,6 +19,8 @@ export class FunctionDeclarationBuilder {
         this.interfaceDeclarations = {};
         this.interfaceNameCounter = 0;
         this.moduleName = moduleName;
+        this.classes = {};
+        this.constructorFunctionId = "";
     };
 
     getInterfaceDeclarations(): InterfaceDeclaration[] {
@@ -25,6 +31,16 @@ export class FunctionDeclarationBuilder {
         }
 
         return i;
+    }
+
+    getClassDeclarations(): ClassDeclaration[] {
+        let c: ClassDeclaration[] = [];
+
+        for (let k in this.classes) {
+            c.push(this.classes[k]);
+        }
+
+        return c;
     }
 
     buildAll(): FunctionDeclaration[] {
@@ -41,11 +57,17 @@ export class FunctionDeclarationBuilder {
     private build(functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo) : FunctionDeclaration[] {
         let functionDeclarations: FunctionDeclaration[] = [];
 
-        if (this.extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName) {
-            for (const traceId in functionRunTimeInfo.args) {
-                let functionDeclaration = new FunctionDeclaration();
-                functionDeclaration.name = functionRunTimeInfo.functionName;
-                functionDeclaration.addReturnTypeOf(this.matchReturnTypeOfs(functionRunTimeInfo.returnTypeOfs[traceId]));
+        if (
+            this.extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName ||
+            functionRunTimeInfo.constructedBy in this.classes
+        ) {
+
+            for (const traceId in functionRunTimeInfo.returnTypeOfs) {
+                let functionDeclaration = this.getFunctionDeclaration(
+                    functionDeclarations,
+                    functionRunTimeInfo,
+                    traceId
+                );
 
                 if (functionRunTimeInfo.args.hasOwnProperty(traceId)) {
                     const argumentInfo = functionRunTimeInfo.args[traceId];
@@ -57,7 +79,9 @@ export class FunctionDeclarationBuilder {
 
                         this.mergeArgumentTypeOfs(
                             this.getInputTypeOfs(argument),
-                            this.getInterfacesForArgument(argument, functionRunTimeInfo).map(i => {return i.name;})
+                            this.getInterfacesForArgument(argument, functionRunTimeInfo).map(
+                                i => {return i.name;}
+                            )
                         ).forEach(typeOf => {
                             argumentDeclaration.addTypeOf(this.matchToTypescriptType(typeOf));
                         });
@@ -65,12 +89,36 @@ export class FunctionDeclarationBuilder {
                         functionDeclaration.addArgument(argumentDeclaration);
                     });
                 }
-
-                functionDeclarations.push(functionDeclaration);
             }
         }
 
         return functionDeclarations;
+    }
+
+    private getFunctionDeclaration(
+        functionDeclarations: FunctionDeclaration[],
+        functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo,
+        traceId: string
+    ) : FunctionDeclaration {
+
+        let functionDeclaration = new FunctionDeclaration();
+        functionDeclaration.name = functionRunTimeInfo.functionName;
+        functionDeclaration.addReturnTypeOf(this.matchReturnTypeOfs(functionRunTimeInfo.returnTypeOfs[traceId]));
+
+        if (functionRunTimeInfo.isConstructor) {
+            let c = new ClassDeclaration();
+            c.setConstructor(functionDeclaration);
+
+            this.classes[functionRunTimeInfo.functionId] = c;
+        } else {
+            if (functionRunTimeInfo.constructedBy in this.classes) {
+                this.classes[functionRunTimeInfo.constructedBy].addMethod(functionDeclaration);
+            } else {
+                functionDeclarations.push(functionDeclaration);
+            }
+        }
+
+        return functionDeclaration;
     }
 
     private extractModuleName(m: string) {

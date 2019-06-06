@@ -17,8 +17,9 @@ export class DeclarationFileWriter {
         this.writeExportModule(fileName, typescriptModuleDeclaration);
         this.writeNamespace(fileName, typescriptModuleDeclaration);
         this.writeInterfaces(fileName, typescriptModuleDeclaration);
+        this.writeClasses(fileName, typescriptModuleDeclaration);
         this.writeMethods(fileName, typescriptModuleDeclaration);
-        
+
         fs.appendFileSync(
             fileName,
             "}"
@@ -29,7 +30,7 @@ export class DeclarationFileWriter {
         typescriptModuleDeclaration.interfaces.forEach(i => {
             fs.appendFileSync(
                 fileName,
-                "\texport interface " + i.name + " {\n"
+                "\tinterface " + i.name + " {\n"
             );
 
             i.getAttributes().forEach(a => {
@@ -53,13 +54,51 @@ export class DeclarationFileWriter {
         });
     }
 
+    private writeClasses(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
+        typescriptModuleDeclaration.classes.forEach(classDeclaration => {
+            fs.appendFileSync(
+                fileName,
+                "\texport class " + classDeclaration.name + " {\n"
+            );
+
+            fs.appendFileSync(
+                fileName,
+                "\t\t" + this.getConstructorSignature(classDeclaration.constructorMethod) + ";\n"
+            );
+
+            classDeclaration.getMethods().forEach(m => {
+                fs.appendFileSync(
+                    fileName,
+                    "\t\t" + this.getFunctionNameWithTypes(m) + ";\n"
+                );
+            });
+
+            fs.appendFileSync(
+                fileName,
+                "\t}\n\n"
+            );
+        });
+
+        typescriptModuleDeclaration.methods.forEach(functionDeclaration => {
+
+        });
+    }
+
     private writeMethods(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
         typescriptModuleDeclaration.methods.forEach(functionDeclaration => {
             fs.appendFileSync(
                 fileName,
-                "\texport function " + this.getFunctionNameWithTypes(functionDeclaration) + "\n"
+                "\texport function " + this.getFunctionNameWithTypes(functionDeclaration) + ";\n"
             );
         });
+    }
+
+    private getConstructorSignature(f: FunctionDeclaration) {
+        let argumentsWithType = f.getArguments().map(argument => {
+            return argument.name + ": " + argument.getTypeOfs().join("|");
+        }).join(", ");
+
+        return "constructor(" + argumentsWithType + ")";
     }
 
     private getFunctionNameWithTypes(f: FunctionDeclaration) {

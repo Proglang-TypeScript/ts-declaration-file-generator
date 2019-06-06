@@ -21,12 +21,17 @@ let builder = new FunctionDeclarationBuilder(reader, moduleName);
 let functionDeclarations = builder.buildAll();
 
 let cleaner = new FunctionDeclarationCleaner();
-functionDeclarations = cleaner.clean(functionDeclarations, builder.interfaceDeclarations);
+functionDeclarations = cleaner.clean(functionDeclarations);
+
+builder.getClassDeclarations().forEach(c => {
+    c.methods = cleaner.clean(c.methods);
+});
 
 let typescriptModuleDeclaration = new TypescriptModuleDeclaration();
 typescriptModuleDeclaration.module = moduleName.replace(/-/g, "_");
 typescriptModuleDeclaration.methods = functionDeclarations;
 typescriptModuleDeclaration.interfaces = builder.getInterfaceDeclarations();
+typescriptModuleDeclaration.classes = builder.getClassDeclarations();
 
 let writer = new DeclarationFileWriter();
 writer.write(typescriptModuleDeclaration);

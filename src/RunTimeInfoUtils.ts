@@ -7,7 +7,9 @@ export interface FunctionRuntimeInfo {
     returnTypeOfs: { [traceId: string] : string },
     functionIid: number,
     requiredModule: string,
-    isExported: boolean
+    isExported: boolean,
+    isConstructor: boolean,
+    constructedBy: string
 }
 
 export interface ArgumentRuntimeInfo {
