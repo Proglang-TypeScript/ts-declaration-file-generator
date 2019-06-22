@@ -17,8 +17,8 @@ let options = commandLineArgs(optionDefinitions);
 let reader = new RunTimeInfoUtils.RuntimeInfoReader(options['runtime-info']);
 
 let moduleName = options['module-name'];
-let builder = new FunctionDeclarationBuilder(reader, moduleName);
-let functionDeclarations = builder.buildAll();
+let builder = new FunctionDeclarationBuilder();
+let functionDeclarations = builder.buildAll(reader.read(), moduleName);
 
 let cleaner = new FunctionDeclarationCleaner();
 functionDeclarations = cleaner.clean(functionDeclarations);

@@ -4,7 +4,6 @@ import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './Typescrip
 import { ClassDeclaration } from './TypescriptDeclaration/ClassDeclaration';
 
 export class FunctionDeclarationBuilder {
-    reader: RunTimeInfoUtils.RuntimeInfoReader;
     interfaceNames: { [id: string]: boolean };
     interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
     interfaceNameCounter : number;
@@ -13,12 +12,12 @@ export class FunctionDeclarationBuilder {
 
     constructorFunctionId: string;
 
-    constructor(reader: RunTimeInfoUtils.RuntimeInfoReader, moduleName: string) {
-        this.reader = reader;
+    constructor(
+    ) {
         this.interfaceNames = {}
         this.interfaceDeclarations = {};
         this.interfaceNameCounter = 0;
-        this.moduleName = moduleName;
+        this.moduleName = "";
         this.classes = {};
         this.constructorFunctionId = "";
     };
@@ -43,8 +42,12 @@ export class FunctionDeclarationBuilder {
         return c;
     }
 
-    buildAll(): FunctionDeclaration[] {
-        let runTimeInfo = this.reader.read();
+    buildAll(
+        runTimeInfo: { [id: string]: RunTimeInfoUtils.FunctionRuntimeInfo },
+        moduleName: string
+    ): FunctionDeclaration[] {
+
+        this.moduleName = moduleName;
 
         let functionDeclarations: FunctionDeclaration[] = [];
         for (let key in runTimeInfo) {
