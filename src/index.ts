@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 
-import * as RunTimeInfoUtils from './RunTimeInfoUtils';
-import { TypescriptModuleDeclaration } from './TypescriptDeclaration/TypescriptModuleDeclaration';
-import { DeclarationFileWriter } from './DeclarationFileWriter'; 
-import { FunctionDeclarationBuilder } from './FunctionDeclarationBuilder';
+import { RuntimeInfoReader } from './RunTimeInfoUtils';
+import { TypescriptDeclarationBuilder } from './TypescriptDeclarationBuilder';
 import { FunctionDeclarationCleaner } from './FunctionDeclarationCleaner';
 import commandLineArgs from 'command-line-args';
 
@@ -15,17 +13,10 @@ const optionDefinitions = [
 let options = commandLineArgs(optionDefinitions);
 let moduleName = options['module-name'];
 
-let builder = new FunctionDeclarationBuilder(new FunctionDeclarationCleaner());
-builder.buildAll(
-    new RunTimeInfoUtils.RuntimeInfoReader(options['runtime-info']).read(),
+let builder = new TypescriptDeclarationBuilder(new FunctionDeclarationCleaner());
+let typescriptModuleDeclaration = builder.buildAll(
+    new RuntimeInfoReader(options['runtime-info']).read(),
     moduleName
 );
 
-let typescriptModuleDeclaration = new TypescriptModuleDeclaration();
-typescriptModuleDeclaration.module = moduleName.replace(/-/g, "_");
-typescriptModuleDeclaration.methods = builder.getFunctionDeclarations();
-typescriptModuleDeclaration.interfaces = builder.getInterfaceDeclarations();
-typescriptModuleDeclaration.classes = builder.getClassDeclarations();
-
-let writer = new DeclarationFileWriter();
-writer.write(typescriptModuleDeclaration);
+typescriptModuleDeclaration.writeToFile("something useless");

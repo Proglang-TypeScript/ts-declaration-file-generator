@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { FunctionDeclaration } from "./TypescriptDeclaration/FunctionDeclaration";
-import { TypescriptModuleDeclaration } from "./TypescriptDeclaration/TypescriptModuleDeclaration";
+import { ModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleTypescriptDeclaration";
 
 export class DeclarationFileWriter {
     outputDirectory: string;
@@ -9,7 +9,7 @@ export class DeclarationFileWriter {
         this.outputDirectory = "output";
     }
 
-    write(typescriptModuleDeclaration: TypescriptModuleDeclaration) {
+    write(typescriptModuleDeclaration: ModuleTypescriptDeclaration) {
         let filePath = this.outputDirectory + "/" + typescriptModuleDeclaration.module;
         let fileName = filePath + "/index.d.ts";
         this.cleanOutput(filePath, fileName);
@@ -26,7 +26,7 @@ export class DeclarationFileWriter {
         );
     }
 
-    private writeInterfaces(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
+    private writeInterfaces(fileName: string, typescriptModuleDeclaration: ModuleTypescriptDeclaration): void {
         typescriptModuleDeclaration.interfaces.forEach(i => {
             fs.appendFileSync(
                 fileName,
@@ -54,7 +54,7 @@ export class DeclarationFileWriter {
         });
     }
 
-    private writeClasses(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
+    private writeClasses(fileName: string, typescriptModuleDeclaration: ModuleTypescriptDeclaration): void {
         typescriptModuleDeclaration.classes.forEach(classDeclaration => {
             fs.appendFileSync(
                 fileName,
@@ -84,7 +84,7 @@ export class DeclarationFileWriter {
         });
     }
 
-    private writeMethods(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
+    private writeMethods(fileName: string, typescriptModuleDeclaration: ModuleTypescriptDeclaration): void {
         typescriptModuleDeclaration.methods.forEach(functionDeclaration => {
             fs.appendFileSync(
                 fileName,
@@ -109,14 +109,14 @@ export class DeclarationFileWriter {
         return f.name + "(" + argumentsWithType + "): " + f.getReturnTypeOfs().join("|");
     }
 
-    private writeNamespace(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
+    private writeNamespace(fileName: string, typescriptModuleDeclaration: ModuleTypescriptDeclaration): void {
         fs.appendFileSync(
             fileName,
             "declare namespace " + typescriptModuleDeclaration.module + " {"  + "\n"
         );
     }
 
-    private writeExportModule(fileName: string, typescriptModuleDeclaration: TypescriptModuleDeclaration): void {
+    private writeExportModule(fileName: string, typescriptModuleDeclaration: ModuleTypescriptDeclaration): void {
         fs.appendFileSync(
             fileName,
             "export = " + typescriptModuleDeclaration.module + "\n\n"

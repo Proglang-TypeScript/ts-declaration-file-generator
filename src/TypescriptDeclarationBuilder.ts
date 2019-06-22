@@ -3,8 +3,10 @@ import * as RunTimeInfoUtils from './RunTimeInfoUtils';
 import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
 import { ClassDeclaration } from './TypescriptDeclaration/ClassDeclaration';
 import { FunctionDeclarationCleaner } from "./FunctionDeclarationCleaner";
+import { TypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/TypescriptDeclaration";
+import { ModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleTypescriptDeclaration";
 
-export class FunctionDeclarationBuilder {
+export class TypescriptDeclarationBuilder {
     interfaceNames: { [id: string]: boolean };
     interfaceDeclarations : { [id: string] : InterfaceDeclaration; };
     interfaceNameCounter : number;
@@ -59,13 +61,21 @@ export class FunctionDeclarationBuilder {
     buildAll(
         runTimeInfo: { [id: string]: RunTimeInfoUtils.FunctionRuntimeInfo },
         moduleName: string
-    ): void {
+    ): TypescriptDeclaration {
 
         this.moduleName = moduleName;
 
         for (let key in runTimeInfo) {
             this.functionDeclarations = this.functionDeclarations.concat(this.build(runTimeInfo[key]));
         }
+
+        let typescriptModuleDeclaration = new ModuleTypescriptDeclaration;
+        typescriptModuleDeclaration.module = moduleName.replace(/-/g, "_");
+        typescriptModuleDeclaration.methods = this.getFunctionDeclarations();
+        typescriptModuleDeclaration.interfaces = this.getInterfaceDeclarations();
+        typescriptModuleDeclaration.classes = this.getClassDeclarations();
+
+        return typescriptModuleDeclaration;
     }
 
     private build(functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo) : FunctionDeclaration[] {
