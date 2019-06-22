@@ -2,6 +2,7 @@ import { FunctionDeclaration, ArgumentDeclaration } from "./TypescriptDeclaratio
 import * as RunTimeInfoUtils from './RunTimeInfoUtils';
 import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
 import { ClassDeclaration } from './TypescriptDeclaration/ClassDeclaration';
+import { FunctionDeclarationCleaner } from "./FunctionDeclarationCleaner";
 
 export class FunctionDeclarationBuilder {
     interfaceNames: { [id: string]: boolean };
@@ -9,6 +10,7 @@ export class FunctionDeclarationBuilder {
     interfaceNameCounter : number;
     moduleName: string;
     classes: { [id: string]: ClassDeclaration; };
+    functionDeclarations: FunctionDeclaration[];
 
     constructorFunctionId: string;
 
@@ -19,6 +21,7 @@ export class FunctionDeclarationBuilder {
         this.interfaceNameCounter = 0;
         this.moduleName = "";
         this.classes = {};
+        this.functionDeclarations = [];
         this.constructorFunctionId = "";
     };
 
@@ -42,19 +45,20 @@ export class FunctionDeclarationBuilder {
         return c;
     }
 
+    getFunctionDeclarations(): FunctionDeclaration[] {
+        return this.functionDeclarations;
+    }
+
     buildAll(
         runTimeInfo: { [id: string]: RunTimeInfoUtils.FunctionRuntimeInfo },
         moduleName: string
-    ): FunctionDeclaration[] {
+    ): void {
 
         this.moduleName = moduleName;
 
-        let functionDeclarations: FunctionDeclaration[] = [];
         for (let key in runTimeInfo) {
-            functionDeclarations = functionDeclarations.concat(this.build(runTimeInfo[key]));
+            this.functionDeclarations = this.functionDeclarations.concat(this.build(runTimeInfo[key]));
         }
-
-        return functionDeclarations;
     }
 
     private build(functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo) : FunctionDeclaration[] {

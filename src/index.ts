@@ -18,7 +18,9 @@ let reader = new RunTimeInfoUtils.RuntimeInfoReader(options['runtime-info']);
 
 let moduleName = options['module-name'];
 let builder = new FunctionDeclarationBuilder();
-let functionDeclarations = builder.buildAll(reader.read(), moduleName);
+builder.buildAll(reader.read(), moduleName);
+
+let functionDeclarations = builder.getFunctionDeclarations();
 
 let cleaner = new FunctionDeclarationCleaner();
 functionDeclarations = cleaner.clean(functionDeclarations);
