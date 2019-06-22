@@ -11,11 +11,14 @@ export class FunctionDeclarationBuilder {
     moduleName: string;
     classes: { [id: string]: ClassDeclaration; };
     functionDeclarations: FunctionDeclaration[];
+    cleaner: FunctionDeclarationCleaner;
 
     constructorFunctionId: string;
 
     constructor(
+        cleaner: FunctionDeclarationCleaner
     ) {
+        this.cleaner = cleaner;
         this.interfaceNames = {}
         this.interfaceDeclarations = {};
         this.interfaceNameCounter = 0;
@@ -36,17 +39,21 @@ export class FunctionDeclarationBuilder {
     }
 
     getClassDeclarations(): ClassDeclaration[] {
-        let c: ClassDeclaration[] = [];
+        let classes: ClassDeclaration[] = [];
 
         for (let k in this.classes) {
-            c.push(this.classes[k]);
+            classes.push(this.classes[k]);
         }
 
-        return c;
+        classes.forEach(c => {
+            c.methods = this.cleaner.clean(c.methods);
+        });
+
+        return classes;
     }
 
     getFunctionDeclarations(): FunctionDeclaration[] {
-        return this.functionDeclarations;
+        return this.cleaner.clean(this.functionDeclarations);
     }
 
     buildAll(

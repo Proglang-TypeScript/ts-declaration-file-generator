@@ -13,25 +13,17 @@ const optionDefinitions = [
 ];
 
 let options = commandLineArgs(optionDefinitions);
-
-let reader = new RunTimeInfoUtils.RuntimeInfoReader(options['runtime-info']);
-
 let moduleName = options['module-name'];
-let builder = new FunctionDeclarationBuilder();
-builder.buildAll(reader.read(), moduleName);
 
-let functionDeclarations = builder.getFunctionDeclarations();
-
-let cleaner = new FunctionDeclarationCleaner();
-functionDeclarations = cleaner.clean(functionDeclarations);
-
-builder.getClassDeclarations().forEach(c => {
-    c.methods = cleaner.clean(c.methods);
-});
+let builder = new FunctionDeclarationBuilder(new FunctionDeclarationCleaner());
+builder.buildAll(
+    new RunTimeInfoUtils.RuntimeInfoReader(options['runtime-info']).read(),
+    moduleName
+);
 
 let typescriptModuleDeclaration = new TypescriptModuleDeclaration();
 typescriptModuleDeclaration.module = moduleName.replace(/-/g, "_");
-typescriptModuleDeclaration.methods = functionDeclarations;
+typescriptModuleDeclaration.methods = builder.getFunctionDeclarations();
 typescriptModuleDeclaration.interfaces = builder.getInterfaceDeclarations();
 typescriptModuleDeclaration.classes = builder.getClassDeclarations();
 
