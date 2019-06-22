@@ -2,7 +2,7 @@ import { FunctionDeclaration } from '../FunctionDeclaration';
 import { InterfaceDeclaration } from '../InterfaceDeclaration';
 import { ClassDeclaration } from '../ClassDeclaration';
 import { TypescriptDeclaration } from './TypescriptDeclaration';
-import { DeclarationFileWriter } from '../../DeclarationFileWriter';
+import { ModuleTypescriptDeclarationWriter } from '../TypescriptDeclarationWriter/ModuleTypescriptDeclarationWriter';
 
 export class ModuleTypescriptDeclaration implements TypescriptDeclaration{
     module: string = "";
@@ -10,8 +10,8 @@ export class ModuleTypescriptDeclaration implements TypescriptDeclaration{
     interfaces: InterfaceDeclaration[] = [];
     classes: ClassDeclaration[] = [];
 
-    writeToFile(fileName: string) {
-        let writer = new DeclarationFileWriter();
-        writer.write(this);
+    writeToFile(outputDirectory: string) {
+        let writer = new ModuleTypescriptDeclarationWriter();
+        writer.write(this, outputDirectory);
     }
 }

@@ -1,3 +1,3 @@
 export interface TypescriptDeclaration {
-	writeToFile(fileName: string): void; 
+	writeToFile(outputDirectory: string): void;
 }

@@ -1,16 +1,10 @@
 import * as fs from 'fs';
-import { FunctionDeclaration } from "./TypescriptDeclaration/FunctionDeclaration";
-import { ModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleTypescriptDeclaration";
+import { FunctionDeclaration } from "../FunctionDeclaration";
+import { ModuleTypescriptDeclaration } from "../ModuleDeclaration/ModuleTypescriptDeclaration";
 
-export class DeclarationFileWriter {
-    outputDirectory: string;
-
-    constructor() {
-        this.outputDirectory = "output";
-    }
-
-    write(typescriptModuleDeclaration: ModuleTypescriptDeclaration) {
-        let filePath = this.outputDirectory + "/" + typescriptModuleDeclaration.module;
+export class ModuleTypescriptDeclarationWriter {
+    write(typescriptModuleDeclaration: ModuleTypescriptDeclaration, outputDirectory: string) {
+        let filePath = outputDirectory + "/" + typescriptModuleDeclaration.module;
         let fileName = filePath + "/index.d.ts";
         this.cleanOutput(filePath, fileName);
         
