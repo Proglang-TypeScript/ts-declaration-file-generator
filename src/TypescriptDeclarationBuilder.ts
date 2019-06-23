@@ -5,6 +5,8 @@ import { ClassDeclaration } from './TypescriptDeclaration/ClassDeclaration';
 import { FunctionDeclarationCleaner } from "./FunctionDeclarationCleaner";
 import { TypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/TypescriptDeclaration";
 import { ModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleTypescriptDeclaration";
+import { ModuleClassTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleClassTypescriptDeclaration";
+import { BaseModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/BaseModuleTypescriptDeclaration";
 
 export class TypescriptDeclarationBuilder {
     interfaceNames: { [id: string]: boolean };
@@ -58,7 +60,7 @@ export class TypescriptDeclarationBuilder {
         return this.cleaner.clean(this.functionDeclarations);
     }
 
-    buildAll(
+    build(
         runTimeInfo: { [id: string]: RunTimeInfoUtils.FunctionRuntimeInfo },
         moduleName: string
     ): TypescriptDeclaration {
@@ -66,19 +68,24 @@ export class TypescriptDeclarationBuilder {
         this.moduleName = moduleName;
 
         for (let key in runTimeInfo) {
-            this.functionDeclarations = this.functionDeclarations.concat(this.build(runTimeInfo[key]));
+            this.functionDeclarations = this.functionDeclarations.concat(this.processRunTimeInfoElement(runTimeInfo[key]));
         }
 
-        let typescriptModuleDeclaration = new ModuleTypescriptDeclaration;
-        typescriptModuleDeclaration.module = moduleName.replace(/-/g, "_");
-        typescriptModuleDeclaration.methods = this.getFunctionDeclarations();
-        typescriptModuleDeclaration.interfaces = this.getInterfaceDeclarations();
-        typescriptModuleDeclaration.classes = this.getClassDeclarations();
+        let functionDeclarations = this.getFunctionDeclarations();
+        let interfaceDeclarations = this.getInterfaceDeclarations();
+        let classDeclarations = this.getClassDeclarations();
 
-        return typescriptModuleDeclaration;
+        let typescriptDeclaration = this.getTypescriptDeclaration(runTimeInfo);
+
+        typescriptDeclaration.module = moduleName;
+        typescriptDeclaration.classes = classDeclarations;
+        typescriptDeclaration.methods = functionDeclarations;
+        typescriptDeclaration.interfaces = interfaceDeclarations;
+
+        return typescriptDeclaration;
     }
 
-    private build(functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo) : FunctionDeclaration[] {
+    private processRunTimeInfoElement(functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo) : FunctionDeclaration[] {
         let functionDeclarations: FunctionDeclaration[] = [];
 
         if (
@@ -302,5 +309,21 @@ export class TypescriptDeclarationBuilder {
         }
 
         return m[t]; 
+    }
+
+    private getTypescriptDeclaration(runTimeInfo: { [id: string]: RunTimeInfoUtils.FunctionRuntimeInfo }) : BaseModuleTypescriptDeclaration {
+        for (let key in runTimeInfo) {
+            let functionRunTimeInfo = runTimeInfo[key];
+
+            if (functionRunTimeInfo.isExported === true) {
+                if (functionRunTimeInfo.isConstructor === true) {
+                    return new ModuleClassTypescriptDeclaration();
+                } else {
+                    // return new ModuleFunctionTypescriptDeclaration();
+                }
+            }
+        }
+
+        return new ModuleTypescriptDeclaration();
     }
 }

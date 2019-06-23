@@ -14,7 +14,7 @@ const optionDefinitions = [
 let options = commandLineArgs(optionDefinitions);
 
 let builder = new TypescriptDeclarationBuilder(new FunctionDeclarationCleaner());
-let typescriptModuleDeclaration = builder.buildAll(
+let typescriptModuleDeclaration = builder.build(
     new RuntimeInfoReader(options['runtime-info']).read(),
     options['module-name']
 );
