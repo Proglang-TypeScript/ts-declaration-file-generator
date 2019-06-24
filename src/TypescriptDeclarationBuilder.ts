@@ -7,6 +7,7 @@ import { TypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration
 import { ModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleTypescriptDeclaration";
 import { ModuleClassTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleClassTypescriptDeclaration";
 import { BaseModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/BaseModuleTypescriptDeclaration";
+import { ModuleFunctionTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleFunctionTypescriptDeclaration";
 
 export class TypescriptDeclarationBuilder {
     interfaceNames: { [id: string]: boolean };
@@ -315,11 +316,13 @@ export class TypescriptDeclarationBuilder {
         for (let key in runTimeInfo) {
             let functionRunTimeInfo = runTimeInfo[key];
 
-            if (functionRunTimeInfo.isExported === true) {
-                if (functionRunTimeInfo.isConstructor === true) {
-                    return new ModuleClassTypescriptDeclaration();
-                } else {
-                    // return new ModuleFunctionTypescriptDeclaration();
+            if (this.extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName) {
+                if (functionRunTimeInfo.isExported === true) {
+                    if (functionRunTimeInfo.isConstructor === true) {
+                        return new ModuleClassTypescriptDeclaration();
+                    } else {
+                        return new ModuleFunctionTypescriptDeclaration();
+                    }
                 }
             }
         }

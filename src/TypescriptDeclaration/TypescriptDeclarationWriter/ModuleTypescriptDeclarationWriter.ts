@@ -10,6 +10,7 @@ export class ModuleTypescriptDeclarationWriter {
         
         this.writeInterfaces(fileName, typescriptModuleDeclaration);
         this.writeFunctions(fileName, typescriptModuleDeclaration);
+        this.writeClasses(fileName, typescriptModuleDeclaration);
     }
 
     private writeInterfaces(fileName: string, typescriptModuleDeclaration: ModuleTypescriptDeclaration): void {
@@ -48,6 +49,41 @@ export class ModuleTypescriptDeclarationWriter {
             );
         });
     }
+
+    private writeClasses(fileName: string, typescriptModuleDeclaration: ModuleTypescriptDeclaration): void {
+        typescriptModuleDeclaration.classes.forEach(classDeclaration => {
+                fs.appendFileSync(
+                    fileName,
+                    "export class " + classDeclaration.name + " {\n"
+                );
+
+            fs.appendFileSync(
+                fileName,
+                "\t" + this.getConstructorSignature(classDeclaration.constructorMethod) + ";\n"
+            );
+
+            classDeclaration.getMethods().forEach(m => {
+                fs.appendFileSync(
+                    fileName,
+                    "\t" + this.getFunctionNameWithTypes(m) + ";\n"
+                );
+            });
+
+            fs.appendFileSync(
+                fileName,
+                "}\n\n"
+            );
+        });
+    }
+
+    private getConstructorSignature(f: FunctionDeclaration) {
+        let argumentsWithType = f.getArguments().map(argument => {
+            return argument.name + ": " + argument.getTypeOfs().join("|");
+        }).join(", ");
+
+        return "constructor(" + argumentsWithType + ")";
+    }
+
     private getFunctionNameWithTypes(f: FunctionDeclaration) {
         let argumentsWithType = f.getArguments().map(argument => {
             return argument.name + ": " + argument.getTypeOfs().join("|");
