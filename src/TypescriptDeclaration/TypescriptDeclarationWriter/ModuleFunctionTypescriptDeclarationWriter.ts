@@ -11,10 +11,15 @@ export class ModuleFunctionTypescriptDeclarationWriter {
         this.writeExportModule(fileName, typescriptModuleDeclaration);
         this.writeFunction(fileName, typescriptModuleDeclaration);
         
-        if (typescriptModuleDeclaration.interfaces.length > 0 && typescriptModuleDeclaration.classes.length > 0) {
+        if (
+            typescriptModuleDeclaration.interfaces.length > 0 ||
+            typescriptModuleDeclaration.classes.length > 0 ||
+            typescriptModuleDeclaration.methods.length > 1
+        ) {
             this.openNamespace(fileName, typescriptModuleDeclaration);
             this.writeInterfaces(fileName, typescriptModuleDeclaration);
             this.writeClasses(fileName, typescriptModuleDeclaration);
+            this.writeFunctions(fileName, typescriptModuleDeclaration);
             this.closeNamespace(fileName, typescriptModuleDeclaration);
         }
     }
@@ -27,14 +32,23 @@ export class ModuleFunctionTypescriptDeclarationWriter {
     }
 
     private writeFunction(fileName: string, typescriptModuleDeclaration: ModuleFunctionTypescriptDeclaration): void {
-        let functionDeclaration = typescriptModuleDeclaration.methods[0];
+        let exportedFunctionDeclaration = typescriptModuleDeclaration.methods.filter(t => (t.isExported === true))[0];
 
-        functionDeclaration.name = this.getExportedName(typescriptModuleDeclaration);
+        exportedFunctionDeclaration.name = this.getExportedName(typescriptModuleDeclaration);
 
         fs.appendFileSync(
             fileName,
-            "declare function " + this.getFunctionNameWithTypes(functionDeclaration) + ";\n"
+            "declare function " + this.getFunctionNameWithTypes(exportedFunctionDeclaration) + ";\n"
         );
+    }
+
+    private writeFunctions(fileName: string, typescriptModuleDeclaration: ModuleFunctionTypescriptDeclaration): void {
+        typescriptModuleDeclaration.methods.filter(t => (t.isExported !== true)).forEach(innerNotExportedFunction => {
+            fs.appendFileSync(
+                fileName,
+                "\texport function " + this.getFunctionNameWithTypes(innerNotExportedFunction) + ";\n"
+            );
+        });
     }
 
     private openNamespace(fileName: string, typescriptModuleDeclaration: ModuleFunctionTypescriptDeclaration): void {

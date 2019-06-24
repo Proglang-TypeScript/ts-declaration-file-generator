@@ -136,6 +136,7 @@ export class TypescriptDeclarationBuilder {
         let functionDeclaration = new FunctionDeclaration();
         functionDeclaration.name = functionRunTimeInfo.functionName;
         functionDeclaration.addReturnTypeOf(this.matchReturnTypeOfs(functionRunTimeInfo.returnTypeOfs[traceId]));
+        functionDeclaration.isExported = functionRunTimeInfo.isExported;
 
         if (functionRunTimeInfo.isConstructor) {
             let c = new ClassDeclaration();

@@ -22,6 +22,7 @@ export class ArgumentDeclaration {
 
 export class FunctionDeclaration {
     name: string = "";
+    isExported: boolean = false;
     private arguments: ArgumentDeclaration[] = [];
     private returnTypeOfs: { [typeOf: string]: boolean } = {};
 
