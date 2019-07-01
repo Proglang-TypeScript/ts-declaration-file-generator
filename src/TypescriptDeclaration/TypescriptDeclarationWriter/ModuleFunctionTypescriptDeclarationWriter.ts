@@ -3,7 +3,17 @@ import { FunctionDeclaration } from "../FunctionDeclaration";
 import { ModuleFunctionTypescriptDeclaration } from '../ModuleDeclaration/ModuleFunctionTypescriptDeclaration';
 
 export class ModuleFunctionTypescriptDeclarationWriter {
+    interfaceNames: string[];
+
+    constructor() {
+        this.interfaceNames = [];
+    }
+
     write(typescriptModuleDeclaration: ModuleFunctionTypescriptDeclaration, outputDirectory: string) {
+        this.interfaceNames = typescriptModuleDeclaration.interfaces.map(i => {
+            return i.name;
+        });
+
         let filePath = outputDirectory + "/" + typescriptModuleDeclaration.module;
         let fileName = filePath + "/index.d.ts";
         this.cleanOutput(filePath, fileName);
@@ -38,7 +48,7 @@ export class ModuleFunctionTypescriptDeclarationWriter {
 
         fs.appendFileSync(
             fileName,
-            "declare function " + this.getFunctionNameWithTypes(exportedFunctionDeclaration) + ";\n"
+            "declare function " + this.getFunctionNameWithTypesWithNamespaceMapping(exportedFunctionDeclaration) + ";\n"
         );
     }
 
@@ -129,6 +139,16 @@ export class ModuleFunctionTypescriptDeclarationWriter {
         return "constructor(" + argumentsWithType + ")";
     }
 
+    private getFunctionNameWithTypesWithNamespaceMapping(f: FunctionDeclaration) {
+        let argumentsWithType = f.getArguments().map(argument => {
+            return argument.name + ": " + argument.getTypeOfs()
+                .map(this.mapArgumenTypeToNamespace(f.name))
+                .join("|");
+        }).join(", ");
+
+        return f.name + "(" + argumentsWithType + "): " + f.getReturnTypeOfs().join("|");
+    }
+
     private getFunctionNameWithTypes(f: FunctionDeclaration) {
         let argumentsWithType = f.getArguments().map(argument => {
             return argument.name + ": " + argument.getTypeOfs().join("|");
@@ -155,5 +175,16 @@ export class ModuleFunctionTypescriptDeclarationWriter {
         if (fs.existsSync(fileName)) {
             fs.unlinkSync(fileName);
         }
+    }
+
+    private mapArgumenTypeToNamespace(namespace: string) {
+        return (argumentType: string) => {
+            let newType = argumentType;
+            if (this.interfaceNames.indexOf(newType) !== -1) {
+                newType = namespace + "." + newType;
+            }
+
+            return newType;
+        };
     }
 }
