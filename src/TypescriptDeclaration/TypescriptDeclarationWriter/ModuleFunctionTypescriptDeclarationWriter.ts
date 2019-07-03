@@ -42,14 +42,16 @@ export class ModuleFunctionTypescriptDeclarationWriter {
     }
 
     private writeFunction(fileName: string, typescriptModuleDeclaration: ModuleFunctionTypescriptDeclaration): void {
-        let exportedFunctionDeclaration = typescriptModuleDeclaration.methods.filter(t => (t.isExported === true))[0];
+        let exportedFunctionDeclarations = typescriptModuleDeclaration.methods.filter(t => (t.isExported === true));
 
-        exportedFunctionDeclaration.name = this.getExportedName(typescriptModuleDeclaration);
-
-        fs.appendFileSync(
-            fileName,
-            "declare function " + this.getFunctionNameWithTypesWithNamespaceMapping(exportedFunctionDeclaration) + ";\n"
-        );
+        exportedFunctionDeclarations.forEach(exportedFunctionDeclaration => {
+            exportedFunctionDeclaration.name = this.getExportedName(typescriptModuleDeclaration);
+    
+            fs.appendFileSync(
+                fileName,
+                "declare function " + this.getFunctionNameWithTypesWithNamespaceMapping(exportedFunctionDeclaration) + ";\n"
+            );
+        })
     }
 
     private writeFunctions(fileName: string, typescriptModuleDeclaration: ModuleFunctionTypescriptDeclaration): void {
