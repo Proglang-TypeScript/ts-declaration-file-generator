@@ -51,9 +51,13 @@ docker rm generate-declaration-file
 You will find the declaration file under `/tmp/ts-declaration-file/calculator/index.d.ts`:
 
 ```typescript
-export = calculator
+export = Calculator;
 
-declare namespace calculator {
-        export function sum(a: number, b: number): number
+declare class Calculator {
+	constructor();
+	sum(a: number, b: number): number;
+}
+
+declare namespace Calculator {
 }
 ```
