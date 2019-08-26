@@ -1,0 +1,104 @@
+{
+	"functionId_1": {
+		"functionId": "functionId_1",
+		"functionName": "",
+		"isConstructor": true,
+		"args": {},
+		"returnTypeOfs": [
+			{
+				"typeOf": "",
+				"traceId": "trace__1"
+			}
+		],
+		"functionIid": 105,
+		"requiredModule": "",
+		"isExported": false,
+		"constructedBy": ""
+	},
+	"functionId_3": {
+		"functionId": "functionId_3",
+		"functionName": "sum",
+		"isConstructor": false,
+		"args": {
+			"0": {
+				"argumentIndex": 0,
+				"argumentName": "a",
+				"interactions": [
+					{
+						"code": "inputValue",
+						"traceId": "trace__2",
+						"typeof": "number"
+					},
+					{
+						"code": "convertedTo",
+						"traceId": "trace__2",
+						"convertedTo": "number",
+						"isNaN": false,
+						"toPrimitive": null,
+						"operator": "+",
+						"originalTypeof": "number"
+					},
+					{
+						"code": "operator",
+						"traceId": "trace__2",
+						"leftType": "number",
+						"rightType": "number",
+						"leftIsNaN": false,
+						"rightIsNan": false,
+						"leftToPrimitiveType": "number",
+						"rightToPrimitiveType": "number",
+						"leftToPrimitiveIsNaN": false,
+						"rightToPrimitiveIsNaN": false,
+						"operator": "+",
+						"operandForInteraction": "left"
+					}
+				]
+			},
+			"1": {
+				"argumentIndex": 1,
+				"argumentName": "b",
+				"interactions": [
+					{
+						"code": "inputValue",
+						"traceId": "trace__2",
+						"typeof": "number"
+					},
+					{
+						"code": "convertedTo",
+						"traceId": "trace__2",
+						"convertedTo": "number",
+						"isNaN": false,
+						"toPrimitive": null,
+						"operator": "+",
+						"originalTypeof": "number"
+					},
+					{
+						"code": "operator",
+						"traceId": "trace__2",
+						"leftType": "number",
+						"rightType": "number",
+						"leftIsNaN": false,
+						"rightIsNan": false,
+						"leftToPrimitiveType": "number",
+						"rightToPrimitiveType": "number",
+						"leftToPrimitiveIsNaN": false,
+						"rightToPrimitiveIsNaN": false,
+						"operator": "+",
+						"operandForInteraction": "right"
+					}
+				]
+			}
+		},
+		"declarationEnclosingFunctionId": -1,
+		"returnTypeOfs": [
+			{
+				"typeOf": "number",
+				"traceId": "trace__2"
+			}
+		],
+		"functionIid": 49,
+		"requiredModule": "",
+		"isExported": false,
+		"constructedBy": "functionId_1"
+	}
+}
