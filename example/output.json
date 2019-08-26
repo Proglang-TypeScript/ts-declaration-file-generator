@@ -1,18 +1,19 @@
 {
 	"functionId_1": {
 		"functionId": "functionId_1",
-		"functionName": "",
+		"functionName": "Calculator",
 		"isConstructor": true,
 		"args": {},
+		"declarationEnclosingFunctionId": -1,
 		"returnTypeOfs": [
 			{
 				"typeOf": "",
 				"traceId": "trace__1"
 			}
 		],
-		"functionIid": 105,
-		"requiredModule": "",
-		"isExported": false,
+		"functionIid": 113,
+		"requiredModule": "./calculator",
+		"isExported": true,
 		"constructedBy": ""
 	},
 	"functionId_3": {
@@ -96,7 +97,7 @@
 				"traceId": "trace__2"
 			}
 		],
-		"functionIid": 49,
+		"functionIid": 57,
 		"requiredModule": "",
 		"isExported": false,
 		"constructedBy": "functionId_1"
