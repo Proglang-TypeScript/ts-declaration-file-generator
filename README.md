@@ -7,11 +7,7 @@ https://docs.docker.com/install/
 
 #### Build Docker image
 
-```shell
-git clone https://fcristiani@bitbucket.org/fcristiani/ts-declaration-file-generator.git
-
-cd ts-declaration-file-generator
-```
+Clone this repository and then run:
 
 ```shell
 ./build/build.sh
