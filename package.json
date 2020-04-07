@@ -3,7 +3,7 @@
   "version": "1.0.1",
   "description": "Generates a typescript declaration file using runtime analysis information.",
   "bin": {
-    "generate-tsd": "dist/index.js"
+    "dts-generate": "dist/index.js"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
