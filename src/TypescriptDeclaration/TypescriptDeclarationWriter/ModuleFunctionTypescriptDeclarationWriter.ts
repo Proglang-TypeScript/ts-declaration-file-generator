@@ -87,9 +87,10 @@ export class ModuleFunctionTypescriptDeclarationWriter {
             );
 
             i.getAttributes().forEach(a => {
+	    	let colon = a.optional ? "?: " : ": ";
                 fs.appendFileSync(
                     fileName,
-                    "\t\t'" + a.name + "': " + a.type + ";\n"
+                    "\t\t'" + a.name + "'" + colon + a.type + ";\n"
                 ); 
             });
 
@@ -134,16 +135,22 @@ export class ModuleFunctionTypescriptDeclarationWriter {
     }
 
     private getConstructorSignature(f: FunctionDeclaration) {
+    	var optional = false;
         let argumentsWithType = f.getArguments().map(argument => {
-            return argument.name + ": " + argument.getTypeOfs().join("|");
+	    optional = argument.isOptional() || optional;
+	    let colon = optional ? "?: " : ": ";
+            return argument.name + colon + argument.getTypeOfs().join("|");
         }).join(", ");
 
         return "constructor(" + argumentsWithType + ")";
     }
 
     private getFunctionNameWithTypesWithNamespaceMapping(f: FunctionDeclaration) {
+    	var optional = false;
         let argumentsWithType = f.getArguments().map(argument => {
-            return argument.name + ": " + argument.getTypeOfs()
+	    optional = argument.isOptional() || optional;
+	    let colon = optional ? "?: " : ": ";
+            return argument.name + colon + argument.getTypeOfs()
                 .map(this.mapArgumenTypeToNamespace(f.name))
                 .join("|");
         }).join(", ");
@@ -152,8 +159,11 @@ export class ModuleFunctionTypescriptDeclarationWriter {
     }
 
     private getFunctionNameWithTypes(f: FunctionDeclaration) {
+    	var optional = false;
         let argumentsWithType = f.getArguments().map(argument => {
-            return argument.name + ": " + argument.getTypeOfs().join("|");
+	    optional = argument.isOptional() || optional;
+	    let colon = optional ? "?: " : ": ";
+            return argument.name + colon + argument.getTypeOfs().join("|");
         }).join(", ");
 
         return f.name + "(" + argumentsWithType + "): " + f.getReturnTypeOfs().join("|");

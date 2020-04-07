@@ -84,9 +84,10 @@ export class ModuleClassTypescriptDeclarationWriter {
             );
 
             i.getAttributes().forEach(a => {
+	    	let colon = a.optional ? "?: " : ": ";
                 fs.appendFileSync(
                     fileName,
-                    "\t\t'" + a.name + "': " + a.type + ";\n"
+                    "\t\t'" + a.name + "'" + colon + a.type + ";\n"
                 ); 
             });
 
@@ -114,8 +115,11 @@ export class ModuleClassTypescriptDeclarationWriter {
 	}
 
 	private getClassMethod(f: FunctionDeclaration) {
+		var optional = false;
 		let argumentsWithType = f.getArguments().map(argument => {
-			return argument.name + ": " + argument.getTypeOfs().join("|");
+		    	optional = argument.isOptional() || optional;
+			let colon = optional ? "?: " : ": ";
+			return argument.name + colon + argument.getTypeOfs().join("|");
 		}).join(", ");
 
 		return f.name + "(" + argumentsWithType + "): " + f.getReturnTypeOfs().join("|");
@@ -123,9 +127,11 @@ export class ModuleClassTypescriptDeclarationWriter {
 
     private getFunctionNameWithTypes(f: FunctionDeclaration, typescriptModuleDeclaration: ModuleClassTypescriptDeclaration) {
 		let classDeclaration = typescriptModuleDeclaration.classes[0];
-
+		var optional = false;
 		let argumentsWithType = f.getArguments().map(argument => {
-			return argument.name + ": " + argument.getTypeOfs().map(this.mapArgumenTypeToClassNamespace(classDeclaration.name)).join("|");
+		        optional = argument.isOptional() || optional;
+			let colon = optional ? "?: " : ": ";
+			return argument.name + colon + argument.getTypeOfs().map(this.mapArgumenTypeToClassNamespace(classDeclaration.name)).join("|");
         }).join(", ");
 
         return f.name + "(" + argumentsWithType + "): " + f.getReturnTypeOfs().join("|");
@@ -133,9 +139,11 @@ export class ModuleClassTypescriptDeclarationWriter {
 
 	private getConstructorSignature(classDeclaration: ClassDeclaration) {
 		let f = classDeclaration.constructorMethod;
-
+		var optional = false;
 		let argumentsWithType = f.getArguments().map(argument => {
-			return argument.name + ": " + argument.getTypeOfs().map(this.mapArgumenTypeToClassNamespace(classDeclaration.name)).join("|");
+		    	optional = argument.isOptional() || optional;
+			let colon = optional ? "?: " : ": ";
+			return argument.name + colon + argument.getTypeOfs().map(this.mapArgumenTypeToClassNamespace(classDeclaration.name)).join("|");
 		}).join(", ");
 
 		return "constructor(" + argumentsWithType + ")";

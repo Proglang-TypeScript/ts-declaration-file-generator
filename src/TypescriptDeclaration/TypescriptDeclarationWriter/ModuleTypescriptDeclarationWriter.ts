@@ -21,9 +21,10 @@ export class ModuleTypescriptDeclarationWriter {
             );
 
             i.getAttributes().forEach(a => {
+	    	let colon = a.optional ? "?: " : ": ";
                 fs.appendFileSync(
                     fileName,
-                    "\t'" + a.name + "': " + a.type + ";\n"
+                    "\t'" + a.name + "'" + colon + a.type + ";\n"
                 ); 
             });
 
@@ -77,16 +78,22 @@ export class ModuleTypescriptDeclarationWriter {
     }
 
     private getConstructorSignature(f: FunctionDeclaration) {
+    	var optional = false;
         let argumentsWithType = f.getArguments().map(argument => {
-            return argument.name + ": " + argument.getTypeOfs().join("|");
+	    optional = argument.isOptional() || optional;
+	    let colon = optional ? "?: " : ": ";
+            return argument.name + colon + argument.getTypeOfs().join("|");
         }).join(", ");
 
         return "constructor(" + argumentsWithType + ")";
     }
 
     private getFunctionNameWithTypes(f: FunctionDeclaration) {
+    	var optional = false;
         let argumentsWithType = f.getArguments().map(argument => {
-            return argument.name + ": " + argument.getTypeOfs().join("|");
+	    optional = argument.isOptional() || optional;
+	    let colon = optional ? "?: " : ": ";
+            return argument.name + colon + argument.getTypeOfs().join("|");
         }).join(", ");
 
         return f.name + "(" + argumentsWithType + "): " + f.getReturnTypeOfs().join("|");

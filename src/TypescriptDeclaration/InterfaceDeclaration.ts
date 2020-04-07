@@ -2,7 +2,8 @@ import { FunctionDeclaration } from './FunctionDeclaration';
 
 export interface InterfaceAttributeDeclaration {
     name: string,
-    type: string
+    type: string,
+    optional?: boolean
 }
 
 export class InterfaceDeclaration {
@@ -45,7 +46,8 @@ export class InterfaceDeclaration {
         for (let name in this.attributes) {
             let attribute : InterfaceAttributeDeclaration = {
                 name: name,
-                type: this.attributes[name].join(" | ")
+                type: this.attributes[name].filter(ty => {return ty !== "undefined";}).join(" | "),
+		optional: this.attributes[name].indexOf("undefined") > -1
             };
 
             attributes.push(attribute);
