@@ -1,26 +1,39 @@
-## TypeScript declaration file generator
+## TypeScript declaration file generator | dts-generate
 
 ### Installation
-#### Docker
-Install Docker.
-https://docs.docker.com/install/
-
-#### Build Docker image
-
 Clone this repository and then run:
+```shell
+$ npm install
+$ npm run build
+```
+
+A link will be created using `npm link` called `dts-generate`. For more info take a look at the `package.json` file.
+
+#### Docker
+Install Docker (https://docs.docker.com/install) and then run:
 
 ```shell
-./build/build.sh
+$ ./build/build.sh
 ```
 
 This will build an image called `tsd-generator` on your local machine.
 
 ### Usage
-#### Get runtime information from one JS file
+After installing and building the app, you need to run:
+
+```shell
+$ dts-generate -i [FILE-RUNTIME-INFO] -m [MODULE-NAME] -o [OUTPUT-DIRECTORY]
+```
+
+If the `-o` option is not given, the default output directory is the current directory.
+
+**Note:** The runtime info file needs to be generated before running this tool.
+
+#### Docker
 Run the docker container mounting your runtime information file on /tmp/output.json.
 
 ```shell
-docker run \
+$ docker run \
 	--name generate-declaration-file \
 	-v FILE_RUNTIME_INFO:/tmp/output.json \
 	tsd-generator \
@@ -30,22 +43,29 @@ docker run \
 You still need to retrieve the declaration file from the container.
 
 ```shell
-docker cp generate-declaration-file:/usr/local/app/output/. YOUR_PATH
+$ docker cp generate-declaration-file:/usr/local/app/output/. YOUR_PATH
 ```
 
-#### Example
+### Example
 You can use the example provided in this repo under `examples/calculator/output.json`, which corresponds to the file `examples/calculator/calculator.js`.
 
 ```shell
-docker run --name generate-declaration-file -v $(pwd)/examples/calculator/output.json:/tmp/output.json tsd-generator --module-name calculator -i /tmp/output.json
+$ dts-generate -i examples/calcuator/output.json -m calculator
+```
+
+This will generate the declaration file in the default output directory `./output`.
+
+#### Docker
+```shell
+$ docker run --name generate-declaration-file -v $(pwd)/examples/calculator/output.json:/tmp/output.json tsd-generator --module-name calculator -i /tmp/output.json
 ```
 
 ```shell
-docker cp generate-declaration-file:/usr/local/app/output/. /tmp/ts-declaration-file
+$ docker cp generate-declaration-file:/usr/local/app/output/. /tmp/ts-declaration-file
 ```
 
 ```shell
-docker rm generate-declaration-file
+$ docker rm generate-declaration-file
 ```
 
 You will find the declaration file under `/tmp/ts-declaration-file/calculator/index.d.ts`:
