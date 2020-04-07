@@ -34,10 +34,10 @@ docker cp generate-declaration-file:/usr/local/app/output/. YOUR_PATH
 ```
 
 #### Example
-You can use the example provided in this repo under `example/output.json`, which corresponds to the file `example/calculator.js`.
+You can use the example provided in this repo under `examples/calculator/output.json`, which corresponds to the file `examples/calculator/calculator.js`.
 
 ```shell
-docker run --name generate-declaration-file -v $(pwd)/example/output.json:/tmp/output.json tsd-generator --module-name calculator -i /tmp/output.json
+docker run --name generate-declaration-file -v $(pwd)/examples/calculator/output.json:/tmp/output.json tsd-generator --module-name calculator -i /tmp/output.json
 ```
 
 ```shell

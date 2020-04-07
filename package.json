@@ -13,11 +13,12 @@
     "start": "node dist/index.js",
     "prebuild": "rm -rf dist",
     "build": "tsc",
+    "postbuild": "npm link",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://fcristiani@bitbucket.org/fcristiani/tsd-generator.git"
+    "url": "git+https://github.com/proglang/ts-declaration-file-generator.git"
   },
   "keywords": [
     "typescript",
