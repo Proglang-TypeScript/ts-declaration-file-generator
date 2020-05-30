@@ -5,6 +5,7 @@ Clone this repository and then run:
 ```shell
 $ npm install
 $ npm run build
+$ npm link
 ```
 
 A link will be created using `npm link` called `dts-generate`. For more info take a look at the `package.json` file.
