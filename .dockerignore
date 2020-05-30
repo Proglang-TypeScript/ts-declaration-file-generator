@@ -1,4 +1,6 @@
-.gitignore
-.git
-.npmignore
-node_modules
+# Ignore everything
+**
+
+!src/**
+!package*.json
+!tsconfig.json

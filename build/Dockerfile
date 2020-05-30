@@ -1,19 +1,18 @@
-FROM node:10-alpine AS builder
+FROM node:lts-alpine AS builder
 
 WORKDIR /usr/local/app
-COPY . .
+RUN apk update
 
-RUN apk update && \
-	apk add git
-
-RUN npm install npm@latest -g
-RUN npm install -g typescript
+COPY package*.json ./
 RUN npm install
+
+COPY . .
 RUN npm run build
+RUN npm prune --production
 
 # -------------------------------------------------
 
-FROM node:10-alpine
+FROM node:lts-alpine
 
 RUN apk update
 
