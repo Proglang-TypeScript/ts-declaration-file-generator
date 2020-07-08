@@ -13,7 +13,7 @@
     "start": "node dist/index.js",
     "prebuild": "rm -rf dist",
     "build": "npx tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,10 @@
   "homepage": "https://bitbucket.org/fcristiani/tsd-generator#readme",
   "devDependencies": {
     "@types/command-line-args": "^5.0.0",
-    "@types/node": "^10.12.12",
+    "@types/jest": "^26.0.3",
+    "@types/node": "^14.0.14",
+    "jest": "^26.1.0",
+    "ts-jest": "^26.1.1",
     "typescript": "^3.9.3"
   },
   "dependencies": {
