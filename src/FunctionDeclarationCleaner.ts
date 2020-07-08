@@ -7,8 +7,31 @@ export class FunctionDeclarationCleaner {
 		this.functionDeclarations = functionDeclarations;
 
 		this.combineReturnValues();
+		this.combineOptionalValue();
 
 		return this.functionDeclarations;
+	}
+
+	private combineOptionalValue() {
+		const functionsMapByName = new Map<string, FunctionDeclaration[]>();
+
+		this.functionDeclarations.forEach(functionDeclaration => {
+			const functionsInMap = functionsMapByName.get(functionDeclaration.name) || [];
+			functionsInMap.push(functionDeclaration);
+			functionsMapByName.set(functionDeclaration.name, functionsInMap);
+		});
+
+		Array.from(functionsMapByName.keys()).forEach(functionName => {
+			functionsMapByName.get(functionName)?.forEach(functionDeclaration => {
+				functionDeclaration.getArguments().forEach(argumentDeclaration => {
+					if (argumentDeclaration.isOptional()) {
+						functionsMapByName.get(functionName)?.forEach(f => {
+							f.getArguments().filter(a => a.index === argumentDeclaration.index).forEach(a => a.addTypeOf("undefined"));
+						});
+					}
+				});
+			});
+		});
 	}
 
 	private combineReturnValues() {

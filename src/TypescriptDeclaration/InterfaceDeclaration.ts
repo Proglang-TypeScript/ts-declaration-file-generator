@@ -2,7 +2,7 @@ import { FunctionDeclaration } from './FunctionDeclaration';
 
 export interface InterfaceAttributeDeclaration {
     name: string,
-    type: string,
+    type: string[],
     optional?: boolean
 }
 
@@ -26,7 +26,7 @@ export class InterfaceDeclaration {
             this.attributes[attributeDeclaration.name] = [];
         }
 
-        this.attributes[attributeDeclaration.name].push(attributeDeclaration.type);
+        this.attributes[attributeDeclaration.name] = this.attributes[attributeDeclaration.name].concat(attributeDeclaration.type);
         this.attributes[attributeDeclaration.name] = this.removeDuplicates(this.attributes[attributeDeclaration.name]);
     }
 
@@ -46,8 +46,8 @@ export class InterfaceDeclaration {
         for (let name in this.attributes) {
             let attribute : InterfaceAttributeDeclaration = {
                 name: name,
-                type: this.attributes[name].filter(ty => {return ty !== "undefined";}).join(" | "),
-		optional: this.attributes[name].indexOf("undefined") > -1
+                type: this.attributes[name],
+		        optional: this.attributes[name].indexOf("undefined") > -1
             };
 
             attributes.push(attribute);

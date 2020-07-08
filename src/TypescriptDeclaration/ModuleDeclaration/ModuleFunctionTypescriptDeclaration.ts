@@ -3,6 +3,6 @@ import { BaseModuleTypescriptDeclaration } from './BaseModuleTypescriptDeclarati
 
 export class ModuleFunctionTypescriptDeclaration extends BaseModuleTypescriptDeclaration {
     getTypescriptDeclarationWriter() {
-		return new ModuleFunctionTypescriptDeclarationWriter();
+		  return new ModuleFunctionTypescriptDeclarationWriter();
     }
 }

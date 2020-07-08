@@ -6,7 +6,7 @@ import { TypescriptDeclarationWriter } from '../TypescriptDeclarationWriter/Type
 
 export abstract class BaseModuleTypescriptDeclaration implements TypescriptDeclaration {
 	protected abstract getTypescriptDeclarationWriter(): TypescriptDeclarationWriter;
-	
+
 	module: string = "";
     methods: FunctionDeclaration[] = [];
     interfaces: InterfaceDeclaration[] = [];

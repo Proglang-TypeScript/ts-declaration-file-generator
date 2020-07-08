@@ -33,7 +33,7 @@ export class TypescriptDeclarationBuilder {
         this.constructorFunctionId = "";
     };
 
-    getInterfaceDeclarations(): InterfaceDeclaration[] {
+    private getInterfaceDeclarations(): InterfaceDeclaration[] {
         let i : InterfaceDeclaration[] = [];
 
         for (let k in this.interfaceDeclarations) {
@@ -43,7 +43,7 @@ export class TypescriptDeclarationBuilder {
         return i;
     }
 
-    getClassDeclarations(): ClassDeclaration[] {
+    private getClassDeclarations(): ClassDeclaration[] {
         let classes: ClassDeclaration[] = [];
 
         for (let k in this.classes) {
@@ -57,7 +57,7 @@ export class TypescriptDeclarationBuilder {
         return classes;
     }
 
-    getFunctionDeclarations(): FunctionDeclaration[] {
+    private getFunctionDeclarations(): FunctionDeclaration[] {
         return this.cleaner.clean(this.functionDeclarations);
     }
 
@@ -206,7 +206,7 @@ export class TypescriptDeclarationBuilder {
         interactions.forEach(interaction => {
             let interfaceAttribute : InterfaceAttributeDeclaration = {
                 name: interaction.field,
-                type: ""
+                type: []
             };
 
             let filteredFollowingInteractions : RunTimeInfoUtils.InteractionRuntimeInfo[] = [];
@@ -222,9 +222,9 @@ export class TypescriptDeclarationBuilder {
                     functionRunTimeInfo
                 );
 
-                interfaceAttribute.type = this.matchToTypescriptType(followingInterfaceDeclaration.name);
+                interfaceAttribute.type.push(this.matchToTypescriptType(followingInterfaceDeclaration.name));
             } else {
-                interfaceAttribute.type = this.matchToTypescriptType(interaction.returnTypeOf);
+                interfaceAttribute.type.push(this.matchToTypescriptType(interaction.returnTypeOf));
             }
 
             interfaceDeclaration.addAttribute(interfaceAttribute);

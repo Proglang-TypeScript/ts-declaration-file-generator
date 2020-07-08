@@ -1,12 +1,15 @@
-import * as fs from 'fs';
+import fs from 'fs';
 import { FunctionDeclaration } from "../FunctionDeclaration";
 import { ModuleFunctionTypescriptDeclaration } from '../ModuleDeclaration/ModuleFunctionTypescriptDeclaration';
+import { InterfaceAttributeDeclaration } from '../InterfaceDeclaration';
 
 export class ModuleFunctionTypescriptDeclarationWriter {
     interfaceNames: string[];
+    private exportNamespace: string;
 
     constructor() {
         this.interfaceNames = [];
+        this.exportNamespace = "";
     }
 
     write(typescriptModuleDeclaration: ModuleFunctionTypescriptDeclaration, outputDirectory: string) {
@@ -18,7 +21,9 @@ export class ModuleFunctionTypescriptDeclarationWriter {
         let fileName = filePath + "/index.d.ts";
         this.cleanOutput(filePath, fileName);
 
-        this.writeExportModule(fileName, typescriptModuleDeclaration);
+        this.exportNamespace = this.getExportedName(typescriptModuleDeclaration);
+
+        this.writeExportModule(fileName);
         this.writeFunction(fileName, typescriptModuleDeclaration);
         
         if (
@@ -26,7 +31,7 @@ export class ModuleFunctionTypescriptDeclarationWriter {
             typescriptModuleDeclaration.classes.length > 0 ||
             typescriptModuleDeclaration.methods.length > 1
         ) {
-            this.openNamespace(fileName, typescriptModuleDeclaration);
+            this.openNamespace(fileName);
             this.writeInterfaces(fileName, typescriptModuleDeclaration);
             this.writeClasses(fileName, typescriptModuleDeclaration);
             this.writeFunctions(fileName, typescriptModuleDeclaration);
@@ -34,10 +39,10 @@ export class ModuleFunctionTypescriptDeclarationWriter {
         }
     }
 
-    private writeExportModule(fileName: string, typescriptModuleDeclaration: ModuleFunctionTypescriptDeclaration): void {
+    private writeExportModule(fileName: string): void {
         fs.appendFileSync(
             fileName,
-            "export = " + this.getExportedName(typescriptModuleDeclaration) + ";\n\n"
+            "export = " + this.exportNamespace + ";\n\n"
         );
     }
 
@@ -45,11 +50,11 @@ export class ModuleFunctionTypescriptDeclarationWriter {
         let exportedFunctionDeclarations = typescriptModuleDeclaration.methods.filter(t => (t.isExported === true));
 
         exportedFunctionDeclarations.forEach(exportedFunctionDeclaration => {
-            exportedFunctionDeclaration.name = this.getExportedName(typescriptModuleDeclaration);
+            exportedFunctionDeclaration.name = this.exportNamespace;
     
             fs.appendFileSync(
                 fileName,
-                "declare function " + this.getFunctionNameWithTypesWithNamespaceMapping(exportedFunctionDeclaration) + ";\n"
+                "declare function " + this.getFunctionNameWithTypes(exportedFunctionDeclaration) + ";\n"
             );
         })
     }
@@ -63,12 +68,10 @@ export class ModuleFunctionTypescriptDeclarationWriter {
         });
     }
 
-    private openNamespace(fileName: string, typescriptModuleDeclaration: ModuleFunctionTypescriptDeclaration): void {
-        let namespaceName = this.getExportedName(typescriptModuleDeclaration);
-
+    private openNamespace(fileName: string): void {
         fs.appendFileSync(
             fileName,
-            "declare namespace " + namespaceName + " {\n"
+            "declare namespace " + this.exportNamespace + " {\n"
         );
     }
 
@@ -87,11 +90,10 @@ export class ModuleFunctionTypescriptDeclarationWriter {
             );
 
             i.getAttributes().forEach(a => {
-	    	let colon = a.optional ? "?: " : ": ";
                 fs.appendFileSync(
                     fileName,
-                    "\t\t'" + a.name + "'" + colon + a.type + ";\n"
-                ); 
+                    `\t\t${this.buildInterfaceAttribute(a)};\n`
+                );
             });
 
             i.methods.forEach(m => {
@@ -135,38 +137,15 @@ export class ModuleFunctionTypescriptDeclarationWriter {
     }
 
     private getConstructorSignature(f: FunctionDeclaration) {
-    	var optional = false;
-        let argumentsWithType = f.getArguments().map(argument => {
-	    optional = argument.isOptional() || optional;
-	    let colon = optional ? "?: " : ": ";
-            return argument.name + colon + argument.getTypeOfs().join("|");
-        }).join(", ");
+        let argumentsWithType = this.buildArgumentsWithType(f, this.mapArgumenTypeToNamespace(this.exportNamespace));
 
         return "constructor(" + argumentsWithType + ")";
     }
 
-    private getFunctionNameWithTypesWithNamespaceMapping(f: FunctionDeclaration) {
-    	var optional = false;
-        let argumentsWithType = f.getArguments().map(argument => {
-	    optional = argument.isOptional() || optional;
-	    let colon = optional ? "?: " : ": ";
-            return argument.name + colon + argument.getTypeOfs()
-                .map(this.mapArgumenTypeToNamespace(f.name))
-                .join("|");
-        }).join(", ");
-
-        return f.name + "(" + argumentsWithType + "): " + f.getReturnTypeOfs().join("|");
-    }
-
     private getFunctionNameWithTypes(f: FunctionDeclaration) {
-    	var optional = false;
-        let argumentsWithType = f.getArguments().map(argument => {
-	    optional = argument.isOptional() || optional;
-	    let colon = optional ? "?: " : ": ";
-            return argument.name + colon + argument.getTypeOfs().join("|");
-        }).join(", ");
+        let argumentsWithType = this.buildArgumentsWithType(f, this.mapArgumenTypeToNamespace(f.name));
 
-        return f.name + "(" + argumentsWithType + "): " + f.getReturnTypeOfs().join("|");
+        return `${f.name}(${argumentsWithType.join(", ")}): ${f.getReturnTypeOfs().join(" | ")}`;
     }
 
     private getExportedName(typescriptModuleDeclaration: ModuleFunctionTypescriptDeclaration) {
@@ -198,5 +177,32 @@ export class ModuleFunctionTypescriptDeclarationWriter {
 
             return newType;
         };
+    }
+
+    private buildArgumentsWithType(f: FunctionDeclaration, mapping?: ((s: string) => string)): string[] {
+        return f.getArguments().map(argument => {
+            let argumentTypes = argument.getTypeOfs();
+            let colon = ":";
+            if (argument.isOptional()) {
+                if (argumentTypes.length > 1) {
+                    argumentTypes = argumentTypes.filter(t => t !== "undefined");
+                }
+
+                colon = "?:"
+            }
+
+            return `${argument.name}${colon} ${argumentTypes
+                .map(mapping || ((a: string) => a))
+                .join(" | ")}`;
+        });
+    }
+
+    private buildInterfaceAttribute(a: InterfaceAttributeDeclaration): string {
+        let types = a.type;
+        if (types.length > 1) {
+            types = types.filter(t => t !== "undefined");
+        }
+
+        return `'${a.name}'${a.optional ? "?" : ""}: ${types.join(" | ")}`;
     }
 }

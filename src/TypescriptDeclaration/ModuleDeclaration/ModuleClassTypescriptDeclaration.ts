@@ -1,4 +1,3 @@
-import { FunctionDeclaration } from '../FunctionDeclaration';
 import { ModuleClassTypescriptDeclarationWriter } from '../TypescriptDeclarationWriter/ModuleClassTypescriptDeclarationWriter';
 import { BaseModuleTypescriptDeclaration } from './BaseModuleTypescriptDeclaration';
 

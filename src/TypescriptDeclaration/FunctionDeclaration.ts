@@ -2,21 +2,15 @@ export class ArgumentDeclaration {
     index: number;
     name: string;
     private typeOfs: { [typeOf: string]: boolean };
-    private hasUndefined: boolean;
 
     constructor(index: number, name: string) {
         this.index = index;
         this.name = name;
         this.typeOfs = {};
-	this.hasUndefined = false;
     }
 
     addTypeOf(returnTypeOf: string) {
-	if (returnTypeOf === "undefined") {
-	    this.hasUndefined = true;
-	} else {
-            this.typeOfs[returnTypeOf] = true;
-        }
+        this.typeOfs[returnTypeOf] = true;
     }
 
     getTypeOfs() : string[] {
@@ -24,7 +18,7 @@ export class ArgumentDeclaration {
     }
 
     isOptional() : boolean {
-        return this.hasUndefined;
+        return Object.keys(this.typeOfs).includes("undefined");
     }
 }
 

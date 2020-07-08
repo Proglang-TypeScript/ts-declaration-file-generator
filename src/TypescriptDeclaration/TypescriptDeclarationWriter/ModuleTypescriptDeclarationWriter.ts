@@ -24,7 +24,7 @@ export class ModuleTypescriptDeclarationWriter {
 	    	let colon = a.optional ? "?: " : ": ";
                 fs.appendFileSync(
                     fileName,
-                    "\t'" + a.name + "'" + colon + a.type + ";\n"
+                    "\t'" + a.name + "'" + colon + a.type.join(" | ") + ";\n"
                 ); 
             });
 
