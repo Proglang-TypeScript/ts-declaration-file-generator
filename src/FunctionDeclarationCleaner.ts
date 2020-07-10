@@ -26,7 +26,7 @@ export class FunctionDeclarationCleaner {
 				functionDeclaration.getArguments().forEach(argumentDeclaration => {
 					if (argumentDeclaration.isOptional()) {
 						functionsMapByName.get(functionName)?.forEach(f => {
-							f.getArguments().filter(a => a.index === argumentDeclaration.index).forEach(a => a.addTypeOf("undefined"));
+							f.getArguments().filter(a => a.index === argumentDeclaration.index).forEach(a => a.makeOptional());
 						});
 					}
 				});

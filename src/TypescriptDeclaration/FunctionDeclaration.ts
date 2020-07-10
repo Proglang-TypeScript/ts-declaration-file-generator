@@ -17,6 +17,10 @@ export class ArgumentDeclaration {
         return Object.keys(this.typeOfs);
     }
 
+    makeOptional() {
+        this.addTypeOf("undefined");
+    }
+
     isOptional() : boolean {
         return Object.keys(this.typeOfs).includes("undefined");
     }
