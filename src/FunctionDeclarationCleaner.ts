@@ -38,7 +38,7 @@ export class FunctionDeclarationCleaner {
 		let uniqueDeclarationNameAndArguments: { [id: string]: FunctionDeclaration } = {};
 
 		this.functionDeclarations.forEach(declaration => {
-			let serializedDeclaration = declaration.name + "__" + JSON.stringify(declaration.getArguments());
+			let serializedDeclaration = declaration.name + "__" + declaration.getArguments().map(a => a.serialize()).join(",");
 
 			if (!(serializedDeclaration in uniqueDeclarationNameAndArguments)) {
 				uniqueDeclarationNameAndArguments[serializedDeclaration] = declaration;

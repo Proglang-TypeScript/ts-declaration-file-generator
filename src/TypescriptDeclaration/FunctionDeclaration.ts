@@ -1,20 +1,21 @@
 export class ArgumentDeclaration {
     index: number;
     name: string;
-    private typeOfs: { [typeOf: string]: boolean };
+    private typeOfs: Set<string>;
 
     constructor(index: number, name: string) {
         this.index = index;
         this.name = name;
-        this.typeOfs = {};
+        this.typeOfs = new Set<string>();
     }
 
-    addTypeOf(returnTypeOf: string) {
-        this.typeOfs[returnTypeOf] = true;
+    addTypeOf(typeOf: string) {
+        this.typeOfs.add(typeOf);
+        return this;
     }
 
     getTypeOfs() : string[] {
-        return Object.keys(this.typeOfs);
+        return Array.from(this.typeOfs);
     }
 
     makeOptional() {
@@ -22,7 +23,14 @@ export class ArgumentDeclaration {
     }
 
     isOptional() : boolean {
-        return Object.keys(this.typeOfs).includes("undefined");
+        return this.typeOfs.has("undefined");
+    }
+
+    serialize(): string {
+        let a: { [k: string]: any} = {...this};
+        a.typeOfs = this.getTypeOfs().sort();
+
+        return JSON.stringify(a);
     }
 }
 
