@@ -191,6 +191,37 @@
                         "iid": 97,
                         "field": "world",
                         "returnTypeOf": "string"
+                    },
+                    {
+                        "code": "inputValue",
+                        "traceId": "trace__5",
+                        "typeof": "object"
+                    },
+                    {
+                        "code": "getField",
+                        "traceId": "trace__5",
+                        "isComputed": false,
+                        "isOpAssign": false,
+                        "enclosingFunctionId": "functionId_1",
+                        "followingInteractions": [
+                            {
+                                "code": "operator",
+                                "traceId": null,
+                                "leftType": "undefined",
+                                "rightType": "undefined",
+                                "leftIsNaN": true,
+                                "rightIsNan": true,
+                                "leftToPrimitiveType": "undefined",
+                                "rightToPrimitiveType": "undefined",
+                                "leftToPrimitiveIsNaN": true,
+                                "rightToPrimitiveIsNaN": true,
+                                "operator": "conditional",
+                                "operandForInteraction": "left"
+                            }
+                        ],
+                        "iid": 81,
+                        "field": "world",
+                        "returnTypeOf": "undefined"
                     }
                 ]
             },
@@ -217,6 +248,11 @@
                         "code": "inputValue",
                         "traceId": "trace__4",
                         "typeof": "boolean"
+                    },
+                    {
+                        "code": "inputValue",
+                        "traceId": "trace__5",
+                        "typeof": "boolean"
                     }
                 ]
             }
@@ -238,6 +274,10 @@
             {
                 "typeOf": "string",
                 "traceId": "trace__4"
+            },
+            {
+                "typeOf": "undefined",
+                "traceId": "trace__5"
             }
         ],
         "functionIid": 121,
@@ -256,7 +296,7 @@
                 "interactions": [
                     {
                         "code": "inputValue",
-                        "traceId": "trace__5",
+                        "traceId": "trace__6",
                         "typeof": "number"
                     }
                 ]
@@ -266,7 +306,7 @@
         "returnTypeOfs": [
             {
                 "typeOf": "number",
-                "traceId": "trace__5"
+                "traceId": "trace__6"
             }
         ],
         "functionIid": 185,
