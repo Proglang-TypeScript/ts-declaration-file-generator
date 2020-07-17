@@ -1,4 +1,3 @@
-import fs from 'fs';
 import { FunctionDeclaration } from "../FunctionDeclaration";
 import { InterfaceAttributeDeclaration } from '../InterfaceDeclaration';
 import { BaseModuleTypescriptDeclaration } from '../ModuleDeclaration/BaseModuleTypescriptDeclaration';
@@ -6,7 +5,7 @@ import { BaseModuleTypescriptDeclaration } from '../ModuleDeclaration/BaseModule
 export abstract class BaseTypescriptDeclarationWriter {
     interfaceNames: string[];
 	protected exportNamespace: string;
-	protected fileName: string;
+    protected fileContents: string;
 
 	protected abstract doWrite(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void;
 	protected abstract getExportedName(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): string;
@@ -14,42 +13,32 @@ export abstract class BaseTypescriptDeclarationWriter {
     constructor() {
         this.interfaceNames = [];
 		this.exportNamespace = ""
-		this.fileName = "";
+        this.fileContents = "";
     }
 
-	write(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration, outputDirectory: string) {
+	write(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): string {
+        this.fileContents = "";
+
         this.interfaceNames = typescriptModuleDeclaration.interfaces.map(i => {
             return i.name;
         });
 
-        let filePath = outputDirectory + "/" + typescriptModuleDeclaration.module;
-		let fileName = filePath + "/index.d.ts";
-		this.fileName = fileName;
-        this.cleanOutput(filePath, fileName);
-
 		this.exportNamespace = this.getExportedName(typescriptModuleDeclaration);
-		this.doWrite(typescriptModuleDeclaration);	
+        this.doWrite(typescriptModuleDeclaration);
+
+        return this.fileContents;
     }
 
-    protected writeExportModule(fileName: string): void {
-        fs.appendFileSync(
-            fileName,
-            "export = " + this.exportNamespace + ";\n\n"
-        );
+    protected writeExportModule(): void {
+        this.fileContents += "export = " + this.exportNamespace + ";\n\n";
     }
 
-    protected openNamespace(fileName: string): void {
-        fs.appendFileSync(
-            fileName,
-            "declare namespace " + this.exportNamespace + " {\n"
-        );
+    protected openNamespace(): void {
+        this.fileContents += "declare namespace " + this.exportNamespace + " {\n";
     }
 
-    protected closeNamespace(fileName: string, typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
-        fs.appendFileSync(
-            fileName,
-            "}"
-        );
+    protected closeNamespace(): void {
+        this.fileContents += "}";
     }
 
 	protected getConstructorSignature(f: FunctionDeclaration) {
@@ -62,16 +51,6 @@ export abstract class BaseTypescriptDeclarationWriter {
         let argumentsWithType = this.buildArgumentsWithType(f);
 
         return `${f.name}(${argumentsWithType.join(", ")}): ${f.getReturnTypeOfs().join(" | ")}`;
-    }
-
-    private cleanOutput(filePath: string, fileName: string) : void {
-        if (!fs.existsSync(filePath)) {
-            fs.mkdirSync(filePath, { recursive: true });
-        }
-
-        if (fs.existsSync(fileName)) {
-            fs.unlinkSync(fileName);
-        }
     }
 
     protected buildArgumentsWithType(f: FunctionDeclaration): string[] {

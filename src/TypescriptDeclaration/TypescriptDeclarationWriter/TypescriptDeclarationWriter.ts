@@ -4,5 +4,5 @@ export interface TypescriptDeclarationWriter {
     write(
 		typescriptModuleDeclaration: BaseModuleTypescriptDeclaration,
 		outputDirectory: string
-	): void;
+	): string;
 }

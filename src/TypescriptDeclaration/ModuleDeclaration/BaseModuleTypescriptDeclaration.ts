@@ -1,10 +1,9 @@
 import { FunctionDeclaration } from '../FunctionDeclaration';
 import { InterfaceDeclaration } from '../InterfaceDeclaration';
 import { ClassDeclaration } from '../ClassDeclaration';
-import { TypescriptDeclaration } from './TypescriptDeclaration';
 import { TypescriptDeclarationWriter } from '../TypescriptDeclarationWriter/TypescriptDeclarationWriter';
 
-export abstract class BaseModuleTypescriptDeclaration implements TypescriptDeclaration {
+export abstract class BaseModuleTypescriptDeclaration {
 	protected abstract getTypescriptDeclarationWriter(): TypescriptDeclarationWriter;
 
 	module: string = "";
@@ -12,8 +11,8 @@ export abstract class BaseModuleTypescriptDeclaration implements TypescriptDecla
     interfaces: InterfaceDeclaration[] = [];
     classes: ClassDeclaration[] = [];
 
-    writeToFile(outputDirectory: string) {
+    getFileContents(): string {
 		let writer = this.getTypescriptDeclarationWriter();
-        writer.write(this, outputDirectory);
+        return writer.write(this, './');
     }
 }

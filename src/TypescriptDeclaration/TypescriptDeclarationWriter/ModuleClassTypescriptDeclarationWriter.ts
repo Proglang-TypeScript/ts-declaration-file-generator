@@ -1,82 +1,52 @@
-import fs from 'fs';
-import { ModuleClassTypescriptDeclaration } from '../ModuleDeclaration/ModuleClassTypescriptDeclaration';
 import { BaseTypescriptDeclarationWriter } from './BaseTypescriptDeclarationWriter';
 import { BaseModuleTypescriptDeclaration } from '../ModuleDeclaration/BaseModuleTypescriptDeclaration';
 
 export class ModuleClassTypescriptDeclarationWriter extends BaseTypescriptDeclarationWriter {
-    protected doWrite(typescriptModuleDeclaration: ModuleClassTypescriptDeclaration) {
-		this.writeExportModule(this.fileName);
-		this.writeClass(this.fileName, typescriptModuleDeclaration);
-		this.openNamespace(this.fileName);
-        this.writeInterfaces(this.fileName, typescriptModuleDeclaration);
-		this.writeFunctions(this.fileName, typescriptModuleDeclaration);
-		this.closeNamespace(this.fileName, typescriptModuleDeclaration);
+    protected doWrite(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration) {
+		this.writeExportModule();
+		this.writeClass(typescriptModuleDeclaration);
+		this.openNamespace();
+        this.writeInterfaces(typescriptModuleDeclaration);
+		this.writeFunctions(typescriptModuleDeclaration);
+		this.closeNamespace();
     }
 
 	protected getExportedName(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): string {
 		return typescriptModuleDeclaration.classes[0].name
 	}
 
-	private writeClass(fileName: string, typescriptModuleDeclaration: ModuleClassTypescriptDeclaration): void {
+	private writeClass(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
 		let classDeclaration = typescriptModuleDeclaration.classes[0];
-		
-		fs.appendFileSync(
-			fileName,
-			"declare class " + classDeclaration.name + " {\n"
-		);
 
-		fs.appendFileSync(
-			fileName,
-			"\t" + this.getConstructorSignature(classDeclaration.constructorMethod) + ";\n"
-		);
+		this.fileContents += "declare class " + classDeclaration.name + " {\n";
+		this.fileContents += "\t" + this.getConstructorSignature(classDeclaration.constructorMethod) + ";\n";
 
 		classDeclaration.getMethods().forEach(m => {
-			fs.appendFileSync(
-				fileName,
-				"\t" + this.getFunctionNameWithTypes(m) + ";\n"
-			);
+			this.fileContents += "\t" + this.getFunctionNameWithTypes(m) + ";\n";
 		});
 
-		fs.appendFileSync(
-			fileName,
-			"}\n\n"
-		);
+		this.fileContents += "}\n\n";
 	}
 
-    private writeInterfaces(fileName: string, typescriptModuleDeclaration: ModuleClassTypescriptDeclaration): void {
+    private writeInterfaces(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
         typescriptModuleDeclaration.interfaces.forEach(i => {
-            fs.appendFileSync(
-                fileName,
-                "\texport interface " + i.name + " {\n"
-            );
+			this.fileContents += "\texport interface " + i.name + " {\n";
 
             i.getAttributes().forEach(a => {
-                fs.appendFileSync(
-                    fileName,
-					`\t\t${this.buildInterfaceAttribute(a)};\n`
-                ); 
+				this.fileContents += `\t\t${this.buildInterfaceAttribute(a)};\n`;
             });
 
-            i.methods.forEach(m => {
-                fs.appendFileSync(
-                    fileName,
-                    "\t\t" + this.getFunctionNameWithTypes(m) + ";\n"
-                ); 
+			i.methods.forEach(m => {
+                this.fileContents += "\t\t" + this.getFunctionNameWithTypes(m) + ";\n";
             });
 
-            fs.appendFileSync(
-                fileName,
-                "\t}\n\n"
-            );
+            this.fileContents += "\t}\n\n";
         });
     }
 
-    private writeFunctions(fileName: string, typescriptModuleDeclaration: ModuleClassTypescriptDeclaration): void {
+    private writeFunctions(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
 		typescriptModuleDeclaration.methods.forEach(functionDeclaration => {
-            fs.appendFileSync(
-                fileName,
-                "export function " + this.getFunctionNameWithTypes(functionDeclaration) + ";\n"
-            );
+            this.fileContents += "export function " + this.getFunctionNameWithTypes(functionDeclaration) + ";\n";
         });
 	}
 }

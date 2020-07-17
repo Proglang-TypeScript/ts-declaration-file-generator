@@ -3,7 +3,6 @@ import * as RunTimeInfoUtils from './RunTimeInfoUtils';
 import { InterfaceDeclaration, InterfaceAttributeDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
 import { ClassDeclaration } from './TypescriptDeclaration/ClassDeclaration';
 import { FunctionDeclarationCleaner } from "./FunctionDeclarationCleaner";
-import { TypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/TypescriptDeclaration";
 import { ModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleTypescriptDeclaration";
 import { ModuleClassTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleClassTypescriptDeclaration";
 import { BaseModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/BaseModuleTypescriptDeclaration";
@@ -64,7 +63,7 @@ export class TypescriptDeclarationBuilder {
     build(
         runTimeInfo: { [id: string]: RunTimeInfoUtils.FunctionRuntimeInfo },
         moduleName: string
-    ): TypescriptDeclaration {
+    ): BaseModuleTypescriptDeclaration {
 
         this.moduleName = moduleName;
 
