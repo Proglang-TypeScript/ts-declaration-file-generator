@@ -41,7 +41,7 @@ export class ModuleTypescriptDeclarationWriter extends BaseTypescriptDeclaration
             this.fileContents += "\t" + this.getConstructorSignature(classDeclaration.constructorMethod) + ";\n";
 
             classDeclaration.getMethods().forEach(m => {
-                this.fileContents = "\t" + this.getFunctionNameWithTypes(m) + ";\n";
+                this.fileContents += "\t" + this.getFunctionNameWithTypes(m) + ";\n";
             });
 
             this.fileContents += "}\n\n";
