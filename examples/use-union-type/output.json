@@ -1,0 +1,77 @@
+{
+    "functionId_3": {
+        "functionId": "functionId_3",
+        "functionName": "unionTypeFunction",
+        "isConstructor": false,
+        "args": {
+            "0": {
+                "argumentIndex": 0,
+                "argumentName": "a",
+                "interactions": [
+                    {
+                        "code": "inputValue",
+                        "traceId": "trace__2",
+                        "typeof": "undefined"
+                    },
+                    {
+                        "code": "inputValue",
+                        "traceId": "trace__4",
+                        "typeof": "string"
+                    },
+                    {
+                        "code": "operator",
+                        "traceId": "trace__4",
+                        "leftType": "string",
+                        "rightType": "undefined",
+                        "leftIsNaN": false,
+                        "rightIsNan": true,
+                        "leftToPrimitiveType": "string",
+                        "rightToPrimitiveType": "undefined",
+                        "leftToPrimitiveIsNaN": false,
+                        "rightToPrimitiveIsNaN": true,
+                        "operator": "===",
+                        "operandForInteraction": "left"
+                    },
+                    {
+                        "code": "inputValue",
+                        "traceId": "trace__6",
+                        "typeof": "number"
+                    },
+                    {
+                        "code": "operator",
+                        "traceId": "trace__6",
+                        "leftType": "number",
+                        "rightType": "undefined",
+                        "leftIsNaN": false,
+                        "rightIsNan": true,
+                        "leftToPrimitiveType": "number",
+                        "rightToPrimitiveType": "undefined",
+                        "leftToPrimitiveIsNaN": false,
+                        "rightToPrimitiveIsNaN": true,
+                        "operator": "===",
+                        "operandForInteraction": "left"
+                    }
+                ]
+            }
+        },
+        "declarationEnclosingFunctionId": -1,
+        "returnTypeOfs": [
+            {
+                "typeOf": "number",
+                "traceId": "trace__2"
+            },
+            {
+                "typeOf": "boolean",
+                "traceId": "trace__4"
+            },
+            {
+                "typeOf": "boolean",
+                "traceId": "trace__6"
+            }
+        ],
+        "functionIid": 153,
+        "requiredModule": "./union-type-function",
+        "isExported": true,
+        "constructedBy": ""
+    }
+}

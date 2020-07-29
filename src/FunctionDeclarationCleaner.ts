@@ -8,8 +8,32 @@ export class FunctionDeclarationCleaner {
 
 		this.combineReturnValues();
 		this.combineOptionalValue();
+		this.combineArgumentTypesWithEqualReturnType();
 
 		return this.functionDeclarations;
+	}
+
+	private combineArgumentTypesWithEqualReturnType() {
+		const functionsByNameAndReturnType = new Map<string, FunctionDeclaration>();
+
+		this.functionDeclarations.forEach(functionDeclaration => {
+			const key = `${functionDeclaration.name}:${functionDeclaration.getReturnTypeOfs().sort().join("|")}`;
+			const functionInMap = functionsByNameAndReturnType.get(key);
+			if (!functionInMap) {
+				functionsByNameAndReturnType.set(key, functionDeclaration);
+				return;
+			}
+
+			functionInMap.getArguments().forEach(a => {
+				const equivalentArgument = functionDeclaration.getArguments().filter(argument => (argument.index === a.index))[0];
+
+				if (equivalentArgument) {
+					equivalentArgument.getTypeOfs().forEach(t => a.addTypeOf(t));
+				}
+			});
+		});
+
+		this.functionDeclarations = Array.from(functionsByNameAndReturnType.values());
 	}
 
 	private combineOptionalValue() {

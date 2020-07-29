@@ -20,6 +20,7 @@ export class ArgumentDeclaration {
 
     makeOptional() {
         this.addTypeOf("undefined");
+        return this;
     }
 
     isOptional() : boolean {
