@@ -1,0 +1,70 @@
+{
+    "functionId_3": {
+        "functionId": "functionId_3",
+        "functionName": "stringManipulator",
+        "isConstructor": false,
+        "args": {
+            "0": {
+                "argumentIndex": 0,
+                "argumentName": "s",
+                "interactions": [
+                    {
+                        "code": "inputValue",
+                        "traceId": "trace__2",
+                        "typeof": "string"
+                    },
+                    {
+                        "code": "methodCall",
+                        "traceId": "trace__2",
+                        "isComputed": false,
+                        "isOpAssign": false,
+                        "enclosingFunctionId": "functionId_3",
+                        "followingInteractions": [],
+                        "iid": 35,
+                        "methodName": "charAt",
+                        "functionId": "functionId_5",
+                        "returnTypeOf": "string",
+                        "traceIdInTargetFunction": "trace__3"
+                    },
+                    {
+                        "code": "getField",
+                        "traceId": "trace__2",
+                        "isComputed": false,
+                        "isOpAssign": false,
+                        "enclosingFunctionId": "functionId_3",
+                        "followingInteractions": [],
+                        "iid": 57,
+                        "field": "length",
+                        "returnTypeOf": "number"
+                    }
+                ]
+            }
+        },
+        "declarationEnclosingFunctionId": -1,
+        "returnTypeOfs": [
+            {
+                "typeOf": "number",
+                "traceId": "trace__2"
+            }
+        ],
+        "functionIid": 81,
+        "requiredModule": "./string-manipulator",
+        "isExported": true,
+        "constructedBy": ""
+    },
+    "functionId_5": {
+        "functionId": "functionId_5",
+        "functionName": "charAt",
+        "isConstructor": false,
+        "args": {},
+        "returnTypeOfs": [
+            {
+                "typeOf": "string",
+                "traceId": null
+            }
+        ],
+        "requiredModule": "",
+        "isExported": false,
+        "constructedBy": ""
+    }
+}
