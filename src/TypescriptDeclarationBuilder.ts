@@ -7,6 +7,8 @@ import { ModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDecla
 import { ModuleClassTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleClassTypescriptDeclaration";
 import { BaseModuleTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/BaseModuleTypescriptDeclaration";
 import { ModuleFunctionTypescriptDeclaration } from "./TypescriptDeclaration/ModuleDeclaration/ModuleFunctionTypescriptDeclaration";
+import { InterfaceSubsetPrimitiveValidator } from "./utils/InterfaceSubsetPrimitiveValidator";
+
 
 export class TypescriptDeclarationBuilder {
     interfaceNames: { [id: string]: boolean };
@@ -16,6 +18,7 @@ export class TypescriptDeclarationBuilder {
     classes: { [id: string]: ClassDeclaration; };
     functionDeclarations: FunctionDeclaration[];
     cleaner: FunctionDeclarationCleaner;
+    interfaceSubsetPrimitiveValidator: InterfaceSubsetPrimitiveValidator;
 
     constructorFunctionId: string;
 
@@ -30,6 +33,7 @@ export class TypescriptDeclarationBuilder {
         this.classes = {};
         this.functionDeclarations = [];
         this.constructorFunctionId = "";
+        this.interfaceSubsetPrimitiveValidator = new InterfaceSubsetPrimitiveValidator();
     };
 
     private getInterfaceDeclarations(): InterfaceDeclaration[] {
@@ -110,9 +114,7 @@ export class TypescriptDeclarationBuilder {
 
                         this.mergeArgumentTypeOfs(
                             this.getInputTypeOfs(argument),
-                            this.getInterfacesForArgument(argument, functionRunTimeInfo).map(
-                                i => {return i.name;}
-                            )
+                            this.getInterfacesForArgument(argument, functionRunTimeInfo)
                         ).forEach(typeOf => {
                             argumentDeclaration.addTypeOf(this.matchToTypescriptType(typeOf));
                         });
@@ -158,8 +160,8 @@ export class TypescriptDeclarationBuilder {
     }
 
     private getInterfacesForArgument(argument: RunTimeInfoUtils.ArgumentRuntimeInfo, functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo): InterfaceDeclaration[] {
-        let interfaces : InterfaceDeclaration[] = [];
-        let interactionsConsideredForInterfaces = this.filterInteractionsForComputingInterfaces(argument.interactions);
+        const interfaces : InterfaceDeclaration[] = [];
+        const interactionsConsideredForInterfaces = this.filterInteractionsForComputingInterfaces(argument.interactions);
 
         if (interactionsConsideredForInterfaces.length > 0) {
             interfaces.push(this.buildInterfaceDeclaration(
@@ -179,14 +181,38 @@ export class TypescriptDeclarationBuilder {
         );
     }
 
-    private mergeArgumentTypeOfs(inputTypeOfs: string[], interfacesTypeOfs: string[]): string[] {
+    private mergeArgumentTypeOfs(inputTypeOfs: string[], interfacesTypeOfs: InterfaceDeclaration[]): string[] {
         if (interfacesTypeOfs.length > 0) {
             inputTypeOfs = inputTypeOfs.filter((val) => {
                 return val !== "object";
             });
         }
 
-        return inputTypeOfs.concat(interfacesTypeOfs);
+        const inputHasString = inputTypeOfs.includes("string");
+
+        return inputTypeOfs.concat(
+            interfacesTypeOfs
+                .filter((i) => {
+                    if (
+                        inputHasString &&
+                        this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(i)
+                    ) {
+                        this.removeInterfaceDeclaration(i.name)
+                        return false;
+                    }
+
+                    return true;
+                })
+                .map((i) => i.name)
+        );
+    }
+
+    private removeInterfaceDeclaration(name: string) {
+        for (let k in this.interfaceDeclarations) {
+            if (this.interfaceDeclarations[k].name === name) {
+                delete this.interfaceDeclarations[k];
+            }
+        }
     }
 
     private getInterfaceName(name: string): string {
