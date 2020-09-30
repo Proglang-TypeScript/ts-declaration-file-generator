@@ -1,25 +1,28 @@
 FROM node:lts-alpine AS builder
 
-WORKDIR /usr/local/app
-RUN apk update
+WORKDIR /usr/src/app
 
 COPY package*.json ./
-RUN npm install
+ENV NODE_ENV=development
+RUN npm ci
 
 COPY . .
 RUN npm run build
-RUN npm prune --production
 
 # -------------------------------------------------
 
 FROM node:lts-alpine
 
-RUN apk update
+WORKDIR /usr/src/app
+RUN chown node:node -R /usr/src/app
+USER node
 
-WORKDIR /usr/local/app
+ENV NODE_ENV=production
 
-COPY --from=builder /usr/local/app/node_modules ./node_modules
-COPY --from=builder /usr/local/app/dist ./dist
+COPY package*.json ./
+COPY --from=builder /usr/src/app/dist ./dist
+
+RUN npm ci
 
 RUN mkdir output
 
