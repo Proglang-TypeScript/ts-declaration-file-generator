@@ -14,7 +14,7 @@
     "prebuild": "rm -rf dist",
     "build": "npx tsc",
     "test": "jest",
-    "lint": "eslint 'src/**/*.ts'",
+    "lint": "eslint --max-warnings 0 'src/**/*.ts'",
     "prettier": "prettier --write 'src/**/*.ts'"
   },
   "husky": {
