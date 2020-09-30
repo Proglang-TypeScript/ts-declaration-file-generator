@@ -1,95 +1,95 @@
-import { FunctionDeclaration } from "../FunctionDeclaration";
+import { FunctionDeclaration } from '../FunctionDeclaration';
 import { InterfaceAttributeDeclaration } from '../InterfaceDeclaration';
 import { BaseModuleTypescriptDeclaration } from '../ModuleDeclaration/BaseModuleTypescriptDeclaration';
 
 export abstract class BaseTypescriptDeclarationWriter {
-    interfaceNames: string[];
-	protected exportNamespace: string;
-    protected fileContents: string;
+  interfaceNames: string[];
+  protected exportNamespace: string;
+  protected fileContents: string;
 
-	protected abstract doWrite(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void;
-	protected abstract getExportedName(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): string;
+  protected abstract doWrite(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void;
+  protected abstract getExportedName(
+    typescriptModuleDeclaration: BaseModuleTypescriptDeclaration,
+  ): string;
 
-    constructor() {
-        this.interfaceNames = [];
-		this.exportNamespace = ""
-        this.fileContents = "";
-    }
+  constructor() {
+    this.interfaceNames = [];
+    this.exportNamespace = '';
+    this.fileContents = '';
+  }
 
-	write(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): string {
-        this.fileContents = "";
+  write(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): string {
+    this.fileContents = '';
 
-        this.interfaceNames = typescriptModuleDeclaration.interfaces.map(i => {
-            return i.name;
-        });
+    this.interfaceNames = typescriptModuleDeclaration.interfaces.map((i) => {
+      return i.name;
+    });
 
-		this.exportNamespace = this.getExportedName(typescriptModuleDeclaration);
-        this.doWrite(typescriptModuleDeclaration);
+    this.exportNamespace = this.getExportedName(typescriptModuleDeclaration);
+    this.doWrite(typescriptModuleDeclaration);
 
-        return this.fileContents;
-    }
+    return this.fileContents;
+  }
 
-    protected writeExportModule(): void {
-        this.fileContents += "export = " + this.exportNamespace + ";\n\n";
-    }
+  protected writeExportModule(): void {
+    this.fileContents += 'export = ' + this.exportNamespace + ';\n\n';
+  }
 
-    protected openNamespace(): void {
-        this.fileContents += "declare namespace " + this.exportNamespace + " {\n";
-    }
+  protected openNamespace(): void {
+    this.fileContents += 'declare namespace ' + this.exportNamespace + ' {\n';
+  }
 
-    protected closeNamespace(): void {
-        this.fileContents += "}";
-    }
+  protected closeNamespace(): void {
+    this.fileContents += '}';
+  }
 
-	protected getConstructorSignature(f: FunctionDeclaration) {
-		let argumentsWithType = this.buildArgumentsWithType(f);
+  protected getConstructorSignature(f: FunctionDeclaration) {
+    let argumentsWithType = this.buildArgumentsWithType(f);
 
-        return "constructor(" + argumentsWithType + ")";
-    }
+    return 'constructor(' + argumentsWithType + ')';
+  }
 
-	protected getFunctionNameWithTypes(f: FunctionDeclaration) {
-        let argumentsWithType = this.buildArgumentsWithType(f);
+  protected getFunctionNameWithTypes(f: FunctionDeclaration) {
+    let argumentsWithType = this.buildArgumentsWithType(f);
 
-        return `${f.name}(${argumentsWithType.join(", ")}): ${f.getReturnTypeOfs().join(" | ")}`;
-    }
+    return `${f.name}(${argumentsWithType.join(', ')}): ${f.getReturnTypeOfs().join(' | ')}`;
+  }
 
-    protected buildArgumentsWithType(f: FunctionDeclaration): string[] {
-        return f.getArguments().map(argument => {
-            let argumentTypes = argument.getTypeOfs();
-            let colon = ":";
-            if (argument.isOptional()) {
-                if (argumentTypes.length > 1) {
-                    argumentTypes = argumentTypes.filter(t => t !== "undefined");
-                }
-
-                colon = "?:"
-            }
-
-            return `${argument.name}${colon} ${argumentTypes
-                .map(this.getMapping())
-                .join(" | ")}`;
-        });
-	}
-
-    protected buildInterfaceAttribute(a: InterfaceAttributeDeclaration): string {
-        let types = a.type;
-        if (types.length > 1) {
-            types = types.filter(t => t !== "undefined");
+  protected buildArgumentsWithType(f: FunctionDeclaration): string[] {
+    return f.getArguments().map((argument) => {
+      let argumentTypes = argument.getTypeOfs();
+      let colon = ':';
+      if (argument.isOptional()) {
+        if (argumentTypes.length > 1) {
+          argumentTypes = argumentTypes.filter((t) => t !== 'undefined');
         }
 
-        return `'${a.name}'${a.optional ? "?" : ""}: ${types.join(" | ")}`;
-	}
+        colon = '?:';
+      }
 
-	protected getMapping(): ((s: string) => string) {
-		return (argumentType: string) => {
-			let newType = argumentType;
-			if (this.interfaceNames.indexOf(newType) !== -1) {
-				if (this.exportNamespace !== "") {
-					newType = this.exportNamespace + "." + newType;
-				}
-			}
+      return `${argument.name}${colon} ${argumentTypes.map(this.getMapping()).join(' | ')}`;
+    });
+  }
 
-			return newType;
-		};
-	}
+  protected buildInterfaceAttribute(a: InterfaceAttributeDeclaration): string {
+    let types = a.type;
+    if (types.length > 1) {
+      types = types.filter((t) => t !== 'undefined');
+    }
+
+    return `'${a.name}'${a.optional ? '?' : ''}: ${types.join(' | ')}`;
+  }
+
+  protected getMapping(): (s: string) => string {
+    return (argumentType: string) => {
+      let newType = argumentType;
+      if (this.interfaceNames.indexOf(newType) !== -1) {
+        if (this.exportNamespace !== '') {
+          newType = this.exportNamespace + '.' + newType;
+        }
+      }
+
+      return newType;
+    };
+  }
 }

@@ -1,87 +1,102 @@
-import { FunctionDeclaration } from "./TypescriptDeclaration/FunctionDeclaration";
+import { FunctionDeclaration } from './TypescriptDeclaration/FunctionDeclaration';
 
 export class FunctionDeclarationCleaner {
-	functionDeclarations: FunctionDeclaration[] = [];
+  functionDeclarations: FunctionDeclaration[] = [];
 
-	clean(functionDeclarations: FunctionDeclaration[]) : FunctionDeclaration[] {
-		this.functionDeclarations = functionDeclarations;
+  clean(functionDeclarations: FunctionDeclaration[]): FunctionDeclaration[] {
+    this.functionDeclarations = functionDeclarations;
 
-		this.combineReturnValues();
-		this.combineOptionalValue();
-		this.combineArgumentTypesWithEqualReturnType();
+    this.combineReturnValues();
+    this.combineOptionalValue();
+    this.combineArgumentTypesWithEqualReturnType();
 
-		return this.functionDeclarations;
-	}
+    return this.functionDeclarations;
+  }
 
-	private combineArgumentTypesWithEqualReturnType() {
-		const functionsByNameAndReturnType = new Map<string, FunctionDeclaration>();
+  private combineArgumentTypesWithEqualReturnType() {
+    const functionsByNameAndReturnType = new Map<string, FunctionDeclaration>();
 
-		this.functionDeclarations.forEach(functionDeclaration => {
-			const key = `${functionDeclaration.name}:${functionDeclaration.getReturnTypeOfs().sort().join("|")}`;
-			const functionInMap = functionsByNameAndReturnType.get(key);
-			if (!functionInMap) {
-				functionsByNameAndReturnType.set(key, functionDeclaration);
-				return;
-			}
+    this.functionDeclarations.forEach((functionDeclaration) => {
+      const key = `${functionDeclaration.name}:${functionDeclaration
+        .getReturnTypeOfs()
+        .sort()
+        .join('|')}`;
+      const functionInMap = functionsByNameAndReturnType.get(key);
+      if (!functionInMap) {
+        functionsByNameAndReturnType.set(key, functionDeclaration);
+        return;
+      }
 
-			functionInMap.getArguments().forEach(a => {
-				const equivalentArgument = functionDeclaration.getArguments().filter(argument => (argument.index === a.index))[0];
+      functionInMap.getArguments().forEach((a) => {
+        const equivalentArgument = functionDeclaration
+          .getArguments()
+          .filter((argument) => argument.index === a.index)[0];
 
-				if (equivalentArgument) {
-					equivalentArgument.getTypeOfs().forEach(t => a.addTypeOf(t));
-				}
-			});
-		});
+        if (equivalentArgument) {
+          equivalentArgument.getTypeOfs().forEach((t) => a.addTypeOf(t));
+        }
+      });
+    });
 
-		this.functionDeclarations = Array.from(functionsByNameAndReturnType.values());
-	}
+    this.functionDeclarations = Array.from(functionsByNameAndReturnType.values());
+  }
 
-	private combineOptionalValue() {
-		const functionsMapByName = new Map<string, FunctionDeclaration[]>();
+  private combineOptionalValue() {
+    const functionsMapByName = new Map<string, FunctionDeclaration[]>();
 
-		this.functionDeclarations.forEach(functionDeclaration => {
-			const functionsInMap = functionsMapByName.get(functionDeclaration.name) || [];
-			functionsInMap.push(functionDeclaration);
-			functionsMapByName.set(functionDeclaration.name, functionsInMap);
-		});
+    this.functionDeclarations.forEach((functionDeclaration) => {
+      const functionsInMap = functionsMapByName.get(functionDeclaration.name) || [];
+      functionsInMap.push(functionDeclaration);
+      functionsMapByName.set(functionDeclaration.name, functionsInMap);
+    });
 
-		Array.from(functionsMapByName.keys()).forEach(functionName => {
-			functionsMapByName.get(functionName)?.forEach(functionDeclaration => {
-				functionDeclaration.getArguments().forEach(argumentDeclaration => {
-					if (argumentDeclaration.isOptional()) {
-						functionsMapByName.get(functionName)?.forEach(f => {
-							f.getArguments().filter(a => a.index === argumentDeclaration.index).forEach(a => a.makeOptional());
-						});
-					}
-				});
-			});
-		});
-	}
+    Array.from(functionsMapByName.keys()).forEach((functionName) => {
+      functionsMapByName.get(functionName)?.forEach((functionDeclaration) => {
+        functionDeclaration.getArguments().forEach((argumentDeclaration) => {
+          if (argumentDeclaration.isOptional()) {
+            functionsMapByName.get(functionName)?.forEach((f) => {
+              f.getArguments()
+                .filter((a) => a.index === argumentDeclaration.index)
+                .forEach((a) => a.makeOptional());
+            });
+          }
+        });
+      });
+    });
+  }
 
-	private combineReturnValues() {
-		let uniqueDeclarationNameAndArguments: { [id: string]: FunctionDeclaration } = {};
+  private combineReturnValues() {
+    let uniqueDeclarationNameAndArguments: { [id: string]: FunctionDeclaration } = {};
 
-		this.functionDeclarations.forEach(declaration => {
-			let serializedDeclaration = declaration.name + "__" + declaration.getArguments().map(a => a.serialize()).join(",");
+    this.functionDeclarations.forEach((declaration) => {
+      let serializedDeclaration =
+        declaration.name +
+        '__' +
+        declaration
+          .getArguments()
+          .map((a) => a.serialize())
+          .join(',');
 
-			if (!(serializedDeclaration in uniqueDeclarationNameAndArguments)) {
-				uniqueDeclarationNameAndArguments[serializedDeclaration] = declaration;
-			} else {
-				let d = uniqueDeclarationNameAndArguments[serializedDeclaration];
-				declaration.getReturnTypeOfs().forEach(returnTypeOf => {
-					d.addReturnTypeOf(returnTypeOf);
-				});
-			}
-		});
+      if (!(serializedDeclaration in uniqueDeclarationNameAndArguments)) {
+        uniqueDeclarationNameAndArguments[serializedDeclaration] = declaration;
+      } else {
+        let d = uniqueDeclarationNameAndArguments[serializedDeclaration];
+        declaration.getReturnTypeOfs().forEach((returnTypeOf) => {
+          d.addReturnTypeOf(returnTypeOf);
+        });
+      }
+    });
 
-		let declarationWithCombinedReturnValues : FunctionDeclaration[] = [];
+    let declarationWithCombinedReturnValues: FunctionDeclaration[] = [];
 
-		for (const serializedDeclaration in uniqueDeclarationNameAndArguments) {
-			if (uniqueDeclarationNameAndArguments.hasOwnProperty(serializedDeclaration)) {
-				declarationWithCombinedReturnValues.push(uniqueDeclarationNameAndArguments[serializedDeclaration]);
-			}
-		}
+    for (const serializedDeclaration in uniqueDeclarationNameAndArguments) {
+      if (uniqueDeclarationNameAndArguments.hasOwnProperty(serializedDeclaration)) {
+        declarationWithCombinedReturnValues.push(
+          uniqueDeclarationNameAndArguments[serializedDeclaration],
+        );
+      }
+    }
 
-		this.functionDeclarations = declarationWithCombinedReturnValues;
-	}
+    this.functionDeclarations = declarationWithCombinedReturnValues;
+  }
 }
