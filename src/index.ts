@@ -12,18 +12,18 @@ const optionDefinitions = [
   { name: 'output-directory', alias: 'o', type: String, defaultValue: './output' },
 ];
 
-let options = commandLineArgs(optionDefinitions);
+const options = commandLineArgs(optionDefinitions);
 
-let builder = new TypescriptDeclarationBuilder(new FunctionDeclarationCleaner());
-let typescriptModuleDeclaration = builder.build(
+const builder = new TypescriptDeclarationBuilder(new FunctionDeclarationCleaner());
+const typescriptModuleDeclaration = builder.build(
   new RuntimeInfoReader(options['runtime-info']).read(),
   options['module-name'],
 );
 
-let declarationFileContent = typescriptModuleDeclaration.getFileContents();
+const declarationFileContent = typescriptModuleDeclaration.getFileContents();
 
-let filePath = options['output-directory'] + '/' + options['module-name'];
-let fileName = filePath + '/index.d.ts';
+const filePath = options['output-directory'] + '/' + options['module-name'];
+const fileName = filePath + '/index.d.ts';
 
 if (!fs.existsSync(filePath)) {
   fs.mkdirSync(filePath, { recursive: true });
@@ -33,4 +33,5 @@ if (fs.existsSync(fileName)) {
   fs.unlinkSync(fileName);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 fs.writeFile(fileName, declarationFileContent, () => {});

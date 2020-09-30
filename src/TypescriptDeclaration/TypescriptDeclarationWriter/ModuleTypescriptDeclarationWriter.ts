@@ -8,7 +8,7 @@ export class ModuleTypescriptDeclarationWriter extends BaseTypescriptDeclaration
     this.writeClasses(typescriptModuleDeclaration);
   }
 
-  protected getExportedName(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): string {
+  protected getExportedName(): string {
     return '';
   }
 

@@ -7,7 +7,7 @@ export interface InterfaceAttributeDeclaration {
 }
 
 export class InterfaceDeclaration {
-  name: string = '';
+  name = '';
   methods: FunctionDeclaration[] = [];
   attributes: { [name: string]: string[] } = {};
 
@@ -35,7 +35,7 @@ export class InterfaceDeclaration {
   }
 
   private removeDuplicates(target: string[]): string[] {
-    let different: { [id: string]: boolean } = {};
+    const different: { [id: string]: boolean } = {};
     target.forEach((i) => {
       if (!(i in different)) {
         different[i] = true;
@@ -46,9 +46,9 @@ export class InterfaceDeclaration {
   }
 
   getAttributes(): InterfaceAttributeDeclaration[] {
-    let attributes: InterfaceAttributeDeclaration[] = [];
-    for (let name in this.attributes) {
-      let attribute: InterfaceAttributeDeclaration = {
+    const attributes: InterfaceAttributeDeclaration[] = [];
+    for (const name in this.attributes) {
+      const attribute: InterfaceAttributeDeclaration = {
         name: name,
         type: this.attributes[name],
         optional: this.attributes[name].indexOf('undefined') > -1,

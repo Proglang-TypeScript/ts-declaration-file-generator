@@ -40,9 +40,9 @@ export class TypescriptDeclarationBuilder {
   }
 
   private getInterfaceDeclarations(): InterfaceDeclaration[] {
-    let i: InterfaceDeclaration[] = [];
+    const i: InterfaceDeclaration[] = [];
 
-    for (let k in this.interfaceDeclarations) {
+    for (const k in this.interfaceDeclarations) {
       i.push(this.interfaceDeclarations[k]);
     }
 
@@ -50,9 +50,9 @@ export class TypescriptDeclarationBuilder {
   }
 
   private getClassDeclarations(): ClassDeclaration[] {
-    let classes: ClassDeclaration[] = [];
+    const classes: ClassDeclaration[] = [];
 
-    for (let k in this.classes) {
+    for (const k in this.classes) {
       classes.push(this.classes[k]);
     }
 
@@ -73,17 +73,17 @@ export class TypescriptDeclarationBuilder {
   ): BaseModuleTypescriptDeclaration {
     this.moduleName = moduleName;
 
-    for (let key in runTimeInfo) {
+    for (const key in runTimeInfo) {
       this.functionDeclarations = this.functionDeclarations.concat(
         this.processRunTimeInfoElement(runTimeInfo[key]),
       );
     }
 
-    let functionDeclarations = this.getFunctionDeclarations();
-    let interfaceDeclarations = this.getInterfaceDeclarations();
-    let classDeclarations = this.getClassDeclarations();
+    const functionDeclarations = this.getFunctionDeclarations();
+    const interfaceDeclarations = this.getInterfaceDeclarations();
+    const classDeclarations = this.getClassDeclarations();
 
-    let typescriptDeclaration = this.getTypescriptDeclaration(runTimeInfo);
+    const typescriptDeclaration = this.getTypescriptDeclaration(runTimeInfo);
 
     typescriptDeclaration.module = moduleName;
     typescriptDeclaration.classes = classDeclarations;
@@ -96,14 +96,14 @@ export class TypescriptDeclarationBuilder {
   private processRunTimeInfoElement(
     functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo,
   ): FunctionDeclaration[] {
-    let functionDeclarations: FunctionDeclaration[] = [];
+    const functionDeclarations: FunctionDeclaration[] = [];
 
     if (
       this.extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName ||
       functionRunTimeInfo.constructedBy in this.classes
     ) {
       for (const traceId in functionRunTimeInfo.returnTypeOfs) {
-        let functionDeclaration = this.getFunctionDeclaration(
+        const functionDeclaration = this.getFunctionDeclaration(
           functionDeclarations,
           functionRunTimeInfo,
           traceId,
@@ -112,7 +112,7 @@ export class TypescriptDeclarationBuilder {
         if (functionRunTimeInfo.args.hasOwnProperty(traceId)) {
           const argumentInfo = functionRunTimeInfo.args[traceId];
           argumentInfo.forEach((argument) => {
-            let argumentDeclaration = new ArgumentDeclaration(
+            const argumentDeclaration = new ArgumentDeclaration(
               argument.argumentIndex,
               argument.argumentName,
             );
@@ -138,7 +138,7 @@ export class TypescriptDeclarationBuilder {
     functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo,
     traceId: string,
   ): FunctionDeclaration {
-    let functionDeclaration = new FunctionDeclaration();
+    const functionDeclaration = new FunctionDeclaration();
     functionDeclaration.name = functionRunTimeInfo.functionName;
     functionDeclaration.addReturnTypeOf(
       this.matchReturnTypeOfs(functionRunTimeInfo.returnTypeOfs[traceId]),
@@ -146,7 +146,7 @@ export class TypescriptDeclarationBuilder {
     functionDeclaration.isExported = functionRunTimeInfo.isExported;
 
     if (functionRunTimeInfo.isConstructor) {
-      let c = new ClassDeclaration();
+      const c = new ClassDeclaration();
       c.setConstructor(functionDeclaration);
 
       this.classes[functionRunTimeInfo.functionId] = c;
@@ -226,7 +226,7 @@ export class TypescriptDeclarationBuilder {
   }
 
   private removeInterfaceDeclaration(name: string) {
-    for (let k in this.interfaceDeclarations) {
+    for (const k in this.interfaceDeclarations) {
       if (this.interfaceDeclarations[k].name === name) {
         delete this.interfaceDeclarations[k];
       }
@@ -243,10 +243,10 @@ export class TypescriptDeclarationBuilder {
     argument: RunTimeInfoUtils.ArgumentRuntimeInfo,
     functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo,
   ): InterfaceDeclaration {
-    let interfaceDeclaration = new InterfaceDeclaration();
+    const interfaceDeclaration = new InterfaceDeclaration();
 
     interactions.forEach((interaction) => {
-      let interfaceAttribute: InterfaceAttributeDeclaration = {
+      const interfaceAttribute: InterfaceAttributeDeclaration = {
         name: interaction.field,
         type: [],
       };
@@ -259,7 +259,7 @@ export class TypescriptDeclarationBuilder {
       }
 
       if (filteredFollowingInteractions.length > 0) {
-        let followingInterfaceDeclaration = this.buildInterfaceDeclaration(
+        const followingInterfaceDeclaration = this.buildInterfaceDeclaration(
           filteredFollowingInteractions,
           this.getInterfaceName(interaction.field),
           argument,
@@ -287,7 +287,7 @@ export class TypescriptDeclarationBuilder {
     argument: RunTimeInfoUtils.ArgumentRuntimeInfo,
     functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo,
   ): void {
-    let serializedInterface = [
+    const serializedInterface = [
       interfaceDeclaration.name,
       argument.argumentIndex,
       argument.argumentName,
@@ -321,7 +321,7 @@ export class TypescriptDeclarationBuilder {
   }
 
   private matchToTypescriptType(t: string): string {
-    let m: { [id: string]: string } = {
+    const m: { [id: string]: string } = {
       string: 'string',
       number: 'number',
       undefined: 'undefined',
@@ -340,7 +340,7 @@ export class TypescriptDeclarationBuilder {
   }
 
   private matchReturnTypeOfs(t: string): string {
-    let m: { [id: string]: string } = {
+    const m: { [id: string]: string } = {
       string: 'string',
       number: 'number',
       undefined: 'void',
@@ -361,8 +361,8 @@ export class TypescriptDeclarationBuilder {
   private getTypescriptDeclaration(runTimeInfo: {
     [id: string]: RunTimeInfoUtils.FunctionRuntimeInfo;
   }): BaseModuleTypescriptDeclaration {
-    for (let key in runTimeInfo) {
-      let functionRunTimeInfo = runTimeInfo[key];
+    for (const key in runTimeInfo) {
+      const functionRunTimeInfo = runTimeInfo[key];
 
       if (this.extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName) {
         if (functionRunTimeInfo.isExported === true) {

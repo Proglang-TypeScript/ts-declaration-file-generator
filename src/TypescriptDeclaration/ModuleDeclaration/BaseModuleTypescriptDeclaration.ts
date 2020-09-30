@@ -6,13 +6,13 @@ import { TypescriptDeclarationWriter } from '../TypescriptDeclarationWriter/Type
 export abstract class BaseModuleTypescriptDeclaration {
   protected abstract getTypescriptDeclarationWriter(): TypescriptDeclarationWriter;
 
-  module: string = '';
+  module = '';
   methods: FunctionDeclaration[] = [];
   interfaces: InterfaceDeclaration[] = [];
   classes: ClassDeclaration[] = [];
 
   getFileContents(): string {
-    let writer = this.getTypescriptDeclarationWriter();
+    const writer = this.getTypescriptDeclarationWriter();
     return writer.write(this, './');
   }
 }

@@ -28,7 +28,8 @@ export class ArgumentDeclaration {
   }
 
   serialize(): string {
-    let a: { [k: string]: any } = { ...this };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const a: { [k: string]: any } = { ...this };
     a.typeOfs = this.getTypeOfs().sort();
 
     return JSON.stringify(a);
@@ -36,8 +37,8 @@ export class ArgumentDeclaration {
 }
 
 export class FunctionDeclaration {
-  name: string = '';
-  isExported: boolean = false;
+  name = '';
+  isExported = false;
   private arguments: ArgumentDeclaration[] = [];
   private returnTypeOfs: { [typeOf: string]: boolean } = {};
 

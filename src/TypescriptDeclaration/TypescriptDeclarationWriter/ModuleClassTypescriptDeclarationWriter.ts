@@ -16,7 +16,7 @@ export class ModuleClassTypescriptDeclarationWriter extends BaseTypescriptDeclar
   }
 
   private writeClass(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
-    let classDeclaration = typescriptModuleDeclaration.classes[0];
+    const classDeclaration = typescriptModuleDeclaration.classes[0];
 
     this.fileContents += 'declare class ' + classDeclaration.name + ' {\n';
     this.fileContents +=

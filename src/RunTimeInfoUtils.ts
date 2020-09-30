@@ -35,13 +35,13 @@ export class RuntimeInfoReader {
   }
 
   read(): { [id: string]: FunctionRuntimeInfo } {
-    let jsonFile = fs.readFileSync(this.fileName);
-    let runTimeInfo: { [id: string]: FunctionRuntimeInfo } = {};
+    const jsonFile = fs.readFileSync(this.fileName);
+    const runTimeInfo: { [id: string]: FunctionRuntimeInfo } = {};
 
-    let jsonInfo = JSON.parse(jsonFile.toString());
+    const jsonInfo = JSON.parse(jsonFile.toString());
 
-    for (let functionId in jsonInfo) {
-      let functionInfo: FunctionRuntimeInfo = jsonInfo[functionId];
+    for (const functionId in jsonInfo) {
+      const functionInfo: FunctionRuntimeInfo = jsonInfo[functionId];
       functionInfo.args = this.getArgumentsInfo(functionInfo);
       functionInfo.returnTypeOfs = this.getReturnTypeOfsByTraceId(jsonInfo[functionId]);
 
@@ -51,16 +51,17 @@ export class RuntimeInfoReader {
     return runTimeInfo;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getArgumentsInfo(functionInfo: any): { [traceId: string]: ArgumentRuntimeInfo[] } {
-    let attributesAggregatedByTraceId = this.aggregateArgumentsByTraceId(functionInfo);
+    const attributesAggregatedByTraceId = this.aggregateArgumentsByTraceId(functionInfo);
 
-    let args: { [traceId: string]: ArgumentRuntimeInfo[] } = {};
-    for (let traceId in attributesAggregatedByTraceId) {
+    const args: { [traceId: string]: ArgumentRuntimeInfo[] } = {};
+    for (const traceId in attributesAggregatedByTraceId) {
       if (!(traceId in args)) {
         args[traceId] = [];
       }
 
-      for (let argumentIndex in attributesAggregatedByTraceId[traceId]) {
+      for (const argumentIndex in attributesAggregatedByTraceId[traceId]) {
         args[traceId].push(attributesAggregatedByTraceId[traceId][argumentIndex]);
       }
     }
@@ -69,17 +70,19 @@ export class RuntimeInfoReader {
   }
 
   private aggregateArgumentsByTraceId(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     functionInfo: any,
   ): { [traceId: string]: { [argumentIndex: string]: ArgumentRuntimeInfo } } {
-    let attributesAggregatedByTraceId: {
+    const attributesAggregatedByTraceId: {
       [traceId: string]: {
         [argumentIndex: string]: ArgumentRuntimeInfo;
       };
     } = {};
 
-    for (let argumentId in functionInfo.args) {
-      let argumentInfo = functionInfo.args[argumentId];
+    for (const argumentId in functionInfo.args) {
+      const argumentInfo = functionInfo.args[argumentId];
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       argumentInfo.interactions.forEach((interaction: any) => {
         if (!(interaction.traceId in attributesAggregatedByTraceId)) {
           attributesAggregatedByTraceId[interaction.traceId] = {};
@@ -93,7 +96,7 @@ export class RuntimeInfoReader {
           };
         }
 
-        let argument = attributesAggregatedByTraceId[interaction.traceId][argumentId];
+        const argument = attributesAggregatedByTraceId[interaction.traceId][argumentId];
         argument.interactions.push(interaction);
       });
     }
@@ -101,8 +104,10 @@ export class RuntimeInfoReader {
     return attributesAggregatedByTraceId;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private getReturnTypeOfsByTraceId(functionInfo: any): { [traceId: string]: string } {
-    let returnTypeOfsInfo: { [traceId: string]: string } = {};
+    const returnTypeOfsInfo: { [traceId: string]: string } = {};
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     functionInfo.returnTypeOfs.forEach((returnTypeOf: any) => {
       returnTypeOfsInfo[returnTypeOf.traceId] = returnTypeOf.typeOf;
     });

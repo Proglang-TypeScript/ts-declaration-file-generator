@@ -66,10 +66,10 @@ export class FunctionDeclarationCleaner {
   }
 
   private combineReturnValues() {
-    let uniqueDeclarationNameAndArguments: { [id: string]: FunctionDeclaration } = {};
+    const uniqueDeclarationNameAndArguments: { [id: string]: FunctionDeclaration } = {};
 
     this.functionDeclarations.forEach((declaration) => {
-      let serializedDeclaration =
+      const serializedDeclaration =
         declaration.name +
         '__' +
         declaration
@@ -80,14 +80,14 @@ export class FunctionDeclarationCleaner {
       if (!(serializedDeclaration in uniqueDeclarationNameAndArguments)) {
         uniqueDeclarationNameAndArguments[serializedDeclaration] = declaration;
       } else {
-        let d = uniqueDeclarationNameAndArguments[serializedDeclaration];
+        const d = uniqueDeclarationNameAndArguments[serializedDeclaration];
         declaration.getReturnTypeOfs().forEach((returnTypeOf) => {
           d.addReturnTypeOf(returnTypeOf);
         });
       }
     });
 
-    let declarationWithCombinedReturnValues: FunctionDeclaration[] = [];
+    const declarationWithCombinedReturnValues: FunctionDeclaration[] = [];
 
     for (const serializedDeclaration in uniqueDeclarationNameAndArguments) {
       if (uniqueDeclarationNameAndArguments.hasOwnProperty(serializedDeclaration)) {

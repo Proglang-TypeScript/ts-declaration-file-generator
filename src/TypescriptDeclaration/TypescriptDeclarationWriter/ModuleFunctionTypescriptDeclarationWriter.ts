@@ -20,7 +20,7 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
   }
 
   protected getExportedName(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): string {
-    let n = typescriptModuleDeclaration.module.replace(/([-_][a-z])/gi, ($1: string) => {
+    const n = typescriptModuleDeclaration.module.replace(/([-_][a-z])/gi, ($1: string) => {
       return $1.toUpperCase().replace('-', '').replace('_', '');
     });
 
@@ -28,7 +28,7 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
   }
 
   private writeFunction(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
-    let exportedFunctionDeclarations = typescriptModuleDeclaration.methods.filter(
+    const exportedFunctionDeclarations = typescriptModuleDeclaration.methods.filter(
       (t) => t.isExported === true,
     );
 

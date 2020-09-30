@@ -44,13 +44,13 @@ export abstract class BaseTypescriptDeclarationWriter {
   }
 
   protected getConstructorSignature(f: FunctionDeclaration) {
-    let argumentsWithType = this.buildArgumentsWithType(f);
+    const argumentsWithType = this.buildArgumentsWithType(f);
 
     return 'constructor(' + argumentsWithType + ')';
   }
 
   protected getFunctionNameWithTypes(f: FunctionDeclaration) {
-    let argumentsWithType = this.buildArgumentsWithType(f);
+    const argumentsWithType = this.buildArgumentsWithType(f);
 
     return `${f.name}(${argumentsWithType.join(', ')}): ${f.getReturnTypeOfs().join(' | ')}`;
   }

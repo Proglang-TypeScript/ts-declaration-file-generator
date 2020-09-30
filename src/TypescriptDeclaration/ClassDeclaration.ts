@@ -1,7 +1,7 @@
 import { FunctionDeclaration } from './FunctionDeclaration';
 
 export class ClassDeclaration {
-  name: string = '';
+  name = '';
   constructorMethod: FunctionDeclaration = new FunctionDeclaration();
   methods: FunctionDeclaration[] = [];
 
