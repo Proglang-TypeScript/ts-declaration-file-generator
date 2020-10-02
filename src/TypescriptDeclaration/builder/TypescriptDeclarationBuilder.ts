@@ -12,7 +12,7 @@ import {
   FunctionRuntimeInfo,
   ArgumentRuntimeInfo,
   InteractionRuntimeInfo,
-} from '../../runtime-info/parser/types';
+} from '../../runtime-info/parser/parsedTypes';
 
 export class TypescriptDeclarationBuilder {
   interfaceNames: { [id: string]: boolean };

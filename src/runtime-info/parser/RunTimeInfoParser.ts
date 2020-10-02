@@ -1,5 +1,6 @@
 import fs from 'fs';
-import { FunctionRuntimeInfo, ArgumentRuntimeInfo } from './types';
+import { FunctionRuntimeInfo, ArgumentRuntimeInfo } from './parsedTypes';
+import { JsonRuntimeInfo, JsonFunctionContainer } from './inputTypes';
 
 export class RuntimeInfoParser {
   private fileName: string;
@@ -12,12 +13,16 @@ export class RuntimeInfoParser {
     const jsonFile = fs.readFileSync(this.fileName);
     const runTimeInfo: { [id: string]: FunctionRuntimeInfo } = {};
 
-    const jsonInfo = JSON.parse(jsonFile.toString());
+    const jsonInfo = JSON.parse(jsonFile.toString()) as JsonRuntimeInfo;
 
     for (const functionId in jsonInfo) {
-      const functionInfo: FunctionRuntimeInfo = jsonInfo[functionId];
-      functionInfo.args = this.getArgumentsInfo(functionInfo);
-      functionInfo.returnTypeOfs = this.getReturnTypeOfsByTraceId(jsonInfo[functionId]);
+      const jsonFunctionContainer: JsonFunctionContainer = jsonInfo[functionId];
+
+      const functionInfo: FunctionRuntimeInfo = {
+        ...jsonFunctionContainer,
+        args: this.getArgumentsInfo(jsonFunctionContainer),
+        returnTypeOfs: this.getReturnTypeOfsByTraceId(jsonFunctionContainer),
+      };
 
       runTimeInfo[functionId] = functionInfo;
     }
@@ -26,7 +31,7 @@ export class RuntimeInfoParser {
   }
 
   private getArgumentsInfo(
-    functionInfo: FunctionRuntimeInfo,
+    functionInfo: JsonFunctionContainer,
   ): { [traceId: string]: ArgumentRuntimeInfo[] } {
     const attributesAggregatedByTraceId = this.aggregateArgumentsByTraceId(functionInfo);
 
@@ -45,8 +50,7 @@ export class RuntimeInfoParser {
   }
 
   private aggregateArgumentsByTraceId(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    functionInfo: any,
+    functionInfo: JsonFunctionContainer,
   ): { [traceId: string]: { [argumentIndex: string]: ArgumentRuntimeInfo } } {
     const attributesAggregatedByTraceId: {
       [traceId: string]: {
@@ -57,8 +61,7 @@ export class RuntimeInfoParser {
     for (const argumentId in functionInfo.args) {
       const argumentInfo = functionInfo.args[argumentId];
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      argumentInfo.interactions.forEach((interaction: any) => {
+      argumentInfo.interactions.forEach((interaction) => {
         if (!(interaction.traceId in attributesAggregatedByTraceId)) {
           attributesAggregatedByTraceId[interaction.traceId] = {};
         }
@@ -79,11 +82,11 @@ export class RuntimeInfoParser {
     return attributesAggregatedByTraceId;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getReturnTypeOfsByTraceId(functionInfo: any): { [traceId: string]: string } {
+  private getReturnTypeOfsByTraceId(
+    functionInfo: JsonFunctionContainer,
+  ): { [traceId: string]: string } {
     const returnTypeOfsInfo: { [traceId: string]: string } = {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    functionInfo.returnTypeOfs.forEach((returnTypeOf: any) => {
+    functionInfo.returnTypeOfs.forEach((returnTypeOf) => {
       returnTypeOfsInfo[returnTypeOf.traceId] = returnTypeOf.typeOf;
     });
 
