@@ -9,11 +9,7 @@ export interface InterfaceAttributeDeclaration {
 export class InterfaceDeclaration {
   name = '';
   methods: FunctionDeclaration[] = [];
-  attributes: { [name: string]: string[] } = {};
-
-  isEmpty(): boolean {
-    return Object.keys(this.attributes).length === 0 && this.methods.length === 0;
-  }
+  private attributes = new Map<string, string[]>();
 
   concatWith(i: InterfaceDeclaration): void {
     i.getAttributes().forEach((a) => {
@@ -22,45 +18,29 @@ export class InterfaceDeclaration {
   }
 
   addAttribute(attributeDeclaration: InterfaceAttributeDeclaration): void {
-    if (!(attributeDeclaration.name in this.attributes)) {
-      this.attributes[attributeDeclaration.name] = [];
-    }
+    const alreadyAddedTypesForThisName = this.attributes.get(attributeDeclaration.name) || [];
 
-    this.attributes[attributeDeclaration.name] = this.attributes[attributeDeclaration.name].concat(
-      attributeDeclaration.type,
-    );
-    this.attributes[attributeDeclaration.name] = this.removeDuplicates(
-      this.attributes[attributeDeclaration.name],
+    this.attributes.set(
+      attributeDeclaration.name,
+      this.removeDuplicates(alreadyAddedTypesForThisName.concat(attributeDeclaration.type)),
     );
   }
 
   private removeDuplicates(target: string[]): string[] {
-    const different: { [id: string]: boolean } = {};
-    target.forEach((i) => {
-      if (!(i in different)) {
-        different[i] = true;
-      }
-    });
-
-    return Object.keys(different);
+    return Array.from(new Set(target));
   }
 
   getAttributes(): InterfaceAttributeDeclaration[] {
-    const attributes: InterfaceAttributeDeclaration[] = [];
-    for (const name in this.attributes) {
-      const attribute: InterfaceAttributeDeclaration = {
-        name: name,
-        type: this.attributes[name],
-        optional: this.attributes[name].indexOf('undefined') > -1,
+    return Array.from(this.attributes.keys()).map((name) => {
+      return {
+        name,
+        type: this.attributes.get(name) || [],
+        optional: (this.attributes.get(name) || []).indexOf('undefined') > -1,
       };
-
-      attributes.push(attribute);
-    }
-
-    return attributes;
+    });
   }
 
   getAttributesNames(): string[] {
-    return Object.keys(this.attributes).sort();
+    return Array.from(this.attributes.keys());
   }
 }

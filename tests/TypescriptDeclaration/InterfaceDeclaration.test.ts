@@ -1,14 +1,6 @@
 import { InterfaceDeclaration } from '../../src/TypescriptDeclaration/InterfaceDeclaration';
 
 describe('InterfaceDeclaration', () => {
-  describe('isEmpty', () => {
-    it('returns empty for a new instance', () => {
-      const i = new InterfaceDeclaration();
-
-      expect(i.isEmpty()).toBe(true);
-    });
-  });
-
   describe('addAttribue', () => {
     it('adds attributes with different types', () => {
       const i = new InterfaceDeclaration();
@@ -57,6 +49,22 @@ describe('InterfaceDeclaration', () => {
 
       expect(attributes[1].name).toBe('another-attribute');
       expect(attributes[1].type).toStrictEqual(['number', 'boolean']);
+    });
+
+    it('adds attributes with name of properties of Object (name in Object === true)', () => {
+      const i = new InterfaceDeclaration();
+
+      i.addAttribute({
+        name: 'constructor',
+        type: ['string'],
+      });
+
+      i.addAttribute({
+        name: 'hasOwnProperty',
+        type: ['number'],
+      });
+
+      expect(i.getAttributes()).toHaveLength(2);
     });
   });
 });
