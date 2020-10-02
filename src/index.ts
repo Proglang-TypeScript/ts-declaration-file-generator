@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { RuntimeInfoReader } from './RunTimeInfoUtils';
-import { TypescriptDeclarationBuilder } from './TypescriptDeclarationBuilder';
-import { FunctionDeclarationCleaner } from './FunctionDeclarationCleaner';
+import { RuntimeInfoParser } from './runtime-info/parser/RunTimeInfoParser';
+import { TypescriptDeclarationBuilder } from './TypescriptDeclaration/builder/TypescriptDeclarationBuilder';
+import { FunctionDeclarationCleaner } from './utils/FunctionDeclarationCleaner';
 import commandLineArgs from 'command-line-args';
 import fs from 'fs';
 
@@ -16,7 +16,7 @@ const options = commandLineArgs(optionDefinitions);
 
 const builder = new TypescriptDeclarationBuilder(new FunctionDeclarationCleaner());
 const typescriptModuleDeclaration = builder.build(
-  new RuntimeInfoReader(options['runtime-info']).read(),
+  new RuntimeInfoParser(options['runtime-info']).parse(),
   options['module-name'],
 );
 

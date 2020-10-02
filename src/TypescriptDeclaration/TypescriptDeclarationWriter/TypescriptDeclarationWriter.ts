@@ -1,8 +1,8 @@
-import { BaseModuleTypescriptDeclaration } from '../ModuleDeclaration/BaseModuleTypescriptDeclaration';
+import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
 
 export interface TypescriptDeclarationWriter {
   write(
-    typescriptModuleDeclaration: BaseModuleTypescriptDeclaration,
+    typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration,
     outputDirectory: string,
   ): string;
 }

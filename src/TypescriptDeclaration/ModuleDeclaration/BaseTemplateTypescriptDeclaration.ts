@@ -1,10 +1,10 @@
 import { FunctionDeclaration } from '../FunctionDeclaration';
 import { InterfaceDeclaration } from '../InterfaceDeclaration';
 import { ClassDeclaration } from '../ClassDeclaration';
-import { TypescriptDeclarationWriter } from '../TypescriptDeclarationWriter/TypescriptDeclarationWriter';
+import { BaseTypescriptDeclarationWriter } from '../TypescriptDeclarationWriter/BaseTypescriptDeclarationWriter';
 
-export abstract class BaseModuleTypescriptDeclaration {
-  protected abstract getTypescriptDeclarationWriter(): TypescriptDeclarationWriter;
+export abstract class BaseTemplateTypescriptDeclaration {
+  protected abstract getTypescriptDeclarationWriter(): BaseTypescriptDeclarationWriter;
 
   module = '';
   methods: FunctionDeclaration[] = [];
@@ -13,6 +13,6 @@ export abstract class BaseModuleTypescriptDeclaration {
 
   getFileContents(): string {
     const writer = this.getTypescriptDeclarationWriter();
-    return writer.write(this, './');
+    return writer.write(this);
   }
 }

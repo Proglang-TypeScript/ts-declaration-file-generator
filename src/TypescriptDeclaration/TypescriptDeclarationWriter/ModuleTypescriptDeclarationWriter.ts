@@ -1,8 +1,8 @@
 import { BaseTypescriptDeclarationWriter } from './BaseTypescriptDeclarationWriter';
-import { BaseModuleTypescriptDeclaration } from '../ModuleDeclaration/BaseModuleTypescriptDeclaration';
+import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
 
 export class ModuleTypescriptDeclarationWriter extends BaseTypescriptDeclarationWriter {
-  doWrite(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration) {
+  doWrite(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration) {
     this.writeInterfaces(typescriptModuleDeclaration);
     this.writeFunctions(typescriptModuleDeclaration);
     this.writeClasses(typescriptModuleDeclaration);
@@ -12,7 +12,7 @@ export class ModuleTypescriptDeclarationWriter extends BaseTypescriptDeclaration
     return '';
   }
 
-  private writeInterfaces(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
+  private writeInterfaces(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void {
     typescriptModuleDeclaration.interfaces.forEach((i) => {
       this.fileContents += 'export interface ' + i.name + ' {\n';
 
@@ -28,14 +28,14 @@ export class ModuleTypescriptDeclarationWriter extends BaseTypescriptDeclaration
     });
   }
 
-  private writeFunctions(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
+  private writeFunctions(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void {
     typescriptModuleDeclaration.methods.forEach((functionDeclaration) => {
       this.fileContents +=
         'export function ' + this.getFunctionNameWithTypes(functionDeclaration) + ';\n';
     });
   }
 
-  private writeClasses(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
+  private writeClasses(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void {
     typescriptModuleDeclaration.classes.forEach((classDeclaration) => {
       this.fileContents += 'export class ' + classDeclaration.name + ' {\n';
 

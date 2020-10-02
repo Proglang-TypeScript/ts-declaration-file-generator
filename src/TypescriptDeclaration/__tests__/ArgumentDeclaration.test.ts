@@ -1,4 +1,4 @@
-import { ArgumentDeclaration } from '../src/TypescriptDeclaration/FunctionDeclaration';
+import ArgumentDeclaration from '../ArgumentDeclaration';
 
 describe('ArgumentDeclaration', () => {
   it('should be serialized correctly taking into account the different types', () => {

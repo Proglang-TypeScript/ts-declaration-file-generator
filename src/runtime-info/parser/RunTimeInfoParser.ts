@@ -1,40 +1,14 @@
-import * as fs from 'fs';
+import fs from 'fs';
+import { FunctionRuntimeInfo, ArgumentRuntimeInfo } from './types';
 
-export interface FunctionRuntimeInfo {
-  functionId: string;
-  functionName: string;
-  args: { [traceId: string]: ArgumentRuntimeInfo[] };
-  returnTypeOfs: { [traceId: string]: string };
-  functionIid: number;
-  requiredModule: string;
-  isExported: boolean;
-  isConstructor: boolean;
-  constructedBy: string;
-}
-
-export interface ArgumentRuntimeInfo {
-  argumentIndex: number;
-  argumentName: string;
-  interactions: InteractionRuntimeInfo[];
-}
-
-export interface InteractionRuntimeInfo {
-  code: string;
-  typeof: string;
-  returnTypeOf: string;
-  field: string;
-  followingInteractions?: InteractionRuntimeInfo[];
-  traceId: string;
-}
-
-export class RuntimeInfoReader {
+export class RuntimeInfoParser {
   private fileName: string;
 
   constructor(fileName: string) {
     this.fileName = fileName;
   }
 
-  read(): { [id: string]: FunctionRuntimeInfo } {
+  parse(): { [id: string]: FunctionRuntimeInfo } {
     const jsonFile = fs.readFileSync(this.fileName);
     const runTimeInfo: { [id: string]: FunctionRuntimeInfo } = {};
 
@@ -51,8 +25,9 @@ export class RuntimeInfoReader {
     return runTimeInfo;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getArgumentsInfo(functionInfo: any): { [traceId: string]: ArgumentRuntimeInfo[] } {
+  private getArgumentsInfo(
+    functionInfo: FunctionRuntimeInfo,
+  ): { [traceId: string]: ArgumentRuntimeInfo[] } {
     const attributesAggregatedByTraceId = this.aggregateArgumentsByTraceId(functionInfo);
 
     const args: { [traceId: string]: ArgumentRuntimeInfo[] } = {};

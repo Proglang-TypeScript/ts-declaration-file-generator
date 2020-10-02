@@ -1,16 +1,18 @@
+import ArgumentDeclaration from '../ArgumentDeclaration';
+import { FunctionDeclaration } from '../FunctionDeclaration';
+import { InterfaceDeclaration } from '../InterfaceDeclaration';
+import { ClassDeclaration } from '../ClassDeclaration';
+import { FunctionDeclarationCleaner } from '../../utils/FunctionDeclarationCleaner';
+import { ModuleTypescriptDeclaration } from '../ModuleDeclaration/ModuleTypescriptDeclaration';
+import { ModuleClassTypescriptDeclaration } from '../ModuleDeclaration/ModuleClassTypescriptDeclaration';
+import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
+import { ModuleFunctionTypescriptDeclaration } from '../ModuleDeclaration/ModuleFunctionTypescriptDeclaration';
+import { InterfaceSubsetPrimitiveValidator } from '../../utils/InterfaceSubsetPrimitiveValidator';
 import {
-  FunctionDeclaration,
-  ArgumentDeclaration,
-} from './TypescriptDeclaration/FunctionDeclaration';
-import * as RunTimeInfoUtils from './RunTimeInfoUtils';
-import { InterfaceDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
-import { ClassDeclaration } from './TypescriptDeclaration/ClassDeclaration';
-import { FunctionDeclarationCleaner } from './FunctionDeclarationCleaner';
-import { ModuleTypescriptDeclaration } from './TypescriptDeclaration/ModuleDeclaration/ModuleTypescriptDeclaration';
-import { ModuleClassTypescriptDeclaration } from './TypescriptDeclaration/ModuleDeclaration/ModuleClassTypescriptDeclaration';
-import { BaseModuleTypescriptDeclaration } from './TypescriptDeclaration/ModuleDeclaration/BaseModuleTypescriptDeclaration';
-import { ModuleFunctionTypescriptDeclaration } from './TypescriptDeclaration/ModuleDeclaration/ModuleFunctionTypescriptDeclaration';
-import { InterfaceSubsetPrimitiveValidator } from './utils/InterfaceSubsetPrimitiveValidator';
+  FunctionRuntimeInfo,
+  ArgumentRuntimeInfo,
+  InteractionRuntimeInfo,
+} from '../../runtime-info/parser/types';
 
 export class TypescriptDeclarationBuilder {
   interfaceNames: { [id: string]: boolean };
@@ -65,9 +67,9 @@ export class TypescriptDeclarationBuilder {
   }
 
   build(
-    runTimeInfo: { [id: string]: RunTimeInfoUtils.FunctionRuntimeInfo },
+    runTimeInfo: { [id: string]: FunctionRuntimeInfo },
     moduleName: string,
-  ): BaseModuleTypescriptDeclaration {
+  ): BaseTemplateTypescriptDeclaration {
     this.moduleName = moduleName;
 
     for (const key in runTimeInfo) {
@@ -91,7 +93,7 @@ export class TypescriptDeclarationBuilder {
   }
 
   private processRunTimeInfoElement(
-    functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo,
+    functionRunTimeInfo: FunctionRuntimeInfo,
   ): FunctionDeclaration[] {
     const functionDeclarations: FunctionDeclaration[] = [];
 
@@ -132,7 +134,7 @@ export class TypescriptDeclarationBuilder {
 
   private getFunctionDeclaration(
     functionDeclarations: FunctionDeclaration[],
-    functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo,
+    functionRunTimeInfo: FunctionRuntimeInfo,
     traceId: string,
   ): FunctionDeclaration {
     const functionDeclaration = new FunctionDeclaration();
@@ -163,8 +165,8 @@ export class TypescriptDeclarationBuilder {
   }
 
   private getInterfacesForArgument(
-    argument: RunTimeInfoUtils.ArgumentRuntimeInfo,
-    functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo,
+    argument: ArgumentRuntimeInfo,
+    functionRunTimeInfo: FunctionRuntimeInfo,
   ): InterfaceDeclaration[] {
     const interfaces: InterfaceDeclaration[] = [];
     const interactionsConsideredForInterfaces = this.filterInteractionsForComputingInterfaces(
@@ -185,9 +187,7 @@ export class TypescriptDeclarationBuilder {
     return interfaces;
   }
 
-  private filterInteractionsForComputingInterfaces(
-    interactions: RunTimeInfoUtils.InteractionRuntimeInfo[],
-  ) {
+  private filterInteractionsForComputingInterfaces(interactions: InteractionRuntimeInfo[]) {
     return interactions.filter((v) => {
       return v.code === 'getField';
     });
@@ -235,15 +235,15 @@ export class TypescriptDeclarationBuilder {
   }
 
   private buildInterfaceDeclaration(
-    interactions: RunTimeInfoUtils.InteractionRuntimeInfo[],
+    interactions: InteractionRuntimeInfo[],
     name: string,
-    argument: RunTimeInfoUtils.ArgumentRuntimeInfo,
-    functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo,
+    argument: ArgumentRuntimeInfo,
+    functionRunTimeInfo: FunctionRuntimeInfo,
   ): InterfaceDeclaration {
     const interfaceDeclaration = new InterfaceDeclaration();
 
     interactions.forEach((interaction) => {
-      let filteredFollowingInteractions: RunTimeInfoUtils.InteractionRuntimeInfo[] = [];
+      let filteredFollowingInteractions: InteractionRuntimeInfo[] = [];
       if (interaction.followingInteractions) {
         filteredFollowingInteractions = this.filterInteractionsForComputingInterfaces(
           interaction.followingInteractions,
@@ -275,8 +275,8 @@ export class TypescriptDeclarationBuilder {
 
   private addInterfaceDeclaration(
     interfaceDeclaration: InterfaceDeclaration,
-    argument: RunTimeInfoUtils.ArgumentRuntimeInfo,
-    functionRunTimeInfo: RunTimeInfoUtils.FunctionRuntimeInfo,
+    argument: ArgumentRuntimeInfo,
+    functionRunTimeInfo: FunctionRuntimeInfo,
   ): void {
     const serializedInterface = [
       interfaceDeclaration.name,
@@ -301,7 +301,7 @@ export class TypescriptDeclarationBuilder {
     }
   }
 
-  private getInputTypeOfs(argument: RunTimeInfoUtils.ArgumentRuntimeInfo): string[] {
+  private getInputTypeOfs(argument: ArgumentRuntimeInfo): string[] {
     return argument.interactions
       .filter((interaction) => {
         return interaction.code === 'inputValue';
@@ -350,8 +350,8 @@ export class TypescriptDeclarationBuilder {
   }
 
   private getTypescriptDeclaration(runTimeInfo: {
-    [id: string]: RunTimeInfoUtils.FunctionRuntimeInfo;
-  }): BaseModuleTypescriptDeclaration {
+    [id: string]: FunctionRuntimeInfo;
+  }): BaseTemplateTypescriptDeclaration {
     for (const key in runTimeInfo) {
       const functionRunTimeInfo = runTimeInfo[key];
 

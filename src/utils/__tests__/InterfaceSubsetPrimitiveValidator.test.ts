@@ -1,5 +1,5 @@
-import { InterfaceDeclaration } from '../src/TypescriptDeclaration/InterfaceDeclaration';
-import { InterfaceSubsetPrimitiveValidator } from '../src/utils/InterfaceSubsetPrimitiveValidator';
+import { InterfaceDeclaration } from '../../TypescriptDeclaration/InterfaceDeclaration';
+import { InterfaceSubsetPrimitiveValidator } from '../InterfaceSubsetPrimitiveValidator';
 
 describe('InterfaceSubsetPrimitiveValidator', () => {
   describe('String validator', () => {

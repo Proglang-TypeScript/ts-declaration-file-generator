@@ -1,7 +1,7 @@
 import { ModuleTypescriptDeclarationWriter } from '../TypescriptDeclarationWriter/ModuleTypescriptDeclarationWriter';
-import { BaseModuleTypescriptDeclaration } from './BaseModuleTypescriptDeclaration';
+import { BaseTemplateTypescriptDeclaration } from './BaseTemplateTypescriptDeclaration';
 
-export class ModuleTypescriptDeclaration extends BaseModuleTypescriptDeclaration {
+export class ModuleTypescriptDeclaration extends BaseTemplateTypescriptDeclaration {
   getTypescriptDeclarationWriter() {
     return new ModuleTypescriptDeclarationWriter();
   }

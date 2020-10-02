@@ -1,8 +1,8 @@
 import { BaseTypescriptDeclarationWriter } from './BaseTypescriptDeclarationWriter';
-import { BaseModuleTypescriptDeclaration } from '../ModuleDeclaration/BaseModuleTypescriptDeclaration';
+import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
 
 export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDeclarationWriter {
-  protected doWrite(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration) {
+  protected doWrite(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration) {
     this.writeExportModule();
     this.writeFunction(typescriptModuleDeclaration);
 
@@ -19,7 +19,9 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
     }
   }
 
-  protected getExportedName(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): string {
+  protected getExportedName(
+    typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration,
+  ): string {
     const n = typescriptModuleDeclaration.module.replace(/([-_][a-z])/gi, ($1: string) => {
       return $1.toUpperCase().replace('-', '').replace('_', '');
     });
@@ -27,7 +29,7 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
     return n.charAt(0).toUpperCase() + n.slice(1);
   }
 
-  private writeFunction(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
+  private writeFunction(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void {
     const exportedFunctionDeclarations = typescriptModuleDeclaration.methods.filter(
       (t) => t.isExported === true,
     );
@@ -40,7 +42,7 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
     });
   }
 
-  private writeFunctions(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
+  private writeFunctions(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void {
     typescriptModuleDeclaration.methods
       .filter((t) => t.isExported !== true)
       .forEach((innerNotExportedFunction) => {
@@ -49,7 +51,7 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
       });
   }
 
-  private writeInterfaces(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
+  private writeInterfaces(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void {
     typescriptModuleDeclaration.interfaces.forEach((i) => {
       this.fileContents += '\texport interface ' + i.name + ' {\n';
 
@@ -65,7 +67,7 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
     });
   }
 
-  private writeClasses(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void {
+  private writeClasses(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void {
     typescriptModuleDeclaration.classes.forEach((classDeclaration) => {
       this.fileContents += '\texport class ' + classDeclaration.name + ' {\n';
 

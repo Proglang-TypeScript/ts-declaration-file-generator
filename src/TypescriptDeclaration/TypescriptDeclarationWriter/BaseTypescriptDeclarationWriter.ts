@@ -1,15 +1,15 @@
 import { FunctionDeclaration } from '../FunctionDeclaration';
 import { InterfaceAttributeDeclaration } from '../InterfaceDeclaration';
-import { BaseModuleTypescriptDeclaration } from '../ModuleDeclaration/BaseModuleTypescriptDeclaration';
+import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
 
 export abstract class BaseTypescriptDeclarationWriter {
   interfaceNames: string[];
   protected exportNamespace: string;
   protected fileContents: string;
 
-  protected abstract doWrite(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): void;
+  protected abstract doWrite(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void;
   protected abstract getExportedName(
-    typescriptModuleDeclaration: BaseModuleTypescriptDeclaration,
+    typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration,
   ): string;
 
   constructor() {
@@ -18,7 +18,7 @@ export abstract class BaseTypescriptDeclarationWriter {
     this.fileContents = '';
   }
 
-  write(typescriptModuleDeclaration: BaseModuleTypescriptDeclaration): string {
+  write(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): string {
     this.fileContents = '';
 
     this.interfaceNames = typescriptModuleDeclaration.interfaces.map((i) => {

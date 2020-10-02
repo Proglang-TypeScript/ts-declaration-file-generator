@@ -1,4 +1,4 @@
-import { InterfaceDeclaration } from '../../src/TypescriptDeclaration/InterfaceDeclaration';
+import { InterfaceDeclaration } from '../InterfaceDeclaration';
 
 describe('InterfaceDeclaration', () => {
   describe('addAttribue', () => {

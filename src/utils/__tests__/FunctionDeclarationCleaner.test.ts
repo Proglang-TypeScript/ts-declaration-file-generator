@@ -1,8 +1,6 @@
-import { FunctionDeclarationCleaner } from '../src/FunctionDeclarationCleaner';
-import {
-  FunctionDeclaration,
-  ArgumentDeclaration,
-} from '../src/TypescriptDeclaration/FunctionDeclaration';
+import { FunctionDeclarationCleaner } from '../FunctionDeclarationCleaner';
+import { FunctionDeclaration } from '../../TypescriptDeclaration/FunctionDeclaration';
+import ArgumentDeclaration from '../../TypescriptDeclaration/ArgumentDeclaration';
 
 describe('FunctionDeclarationCleaner', () => {
   describe('UnionTypes', () => {
