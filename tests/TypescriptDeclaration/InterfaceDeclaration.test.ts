@@ -5,15 +5,9 @@ describe('InterfaceDeclaration', () => {
     it('adds attributes with different types', () => {
       const i = new InterfaceDeclaration();
 
-      i.addAttribute({
-        name: 'some-attribute',
-        type: ['string'],
-      });
+      i.addAttribute('some-attribute', ['string']);
 
-      i.addAttribute({
-        name: 'another-attribute',
-        type: ['number'],
-      });
+      i.addAttribute('another-attribute', ['number']);
 
       const attributes = i.getAttributes();
       expect(attributes).toHaveLength(2);
@@ -27,20 +21,11 @@ describe('InterfaceDeclaration', () => {
     it('concatenates the types of same attribute with different type', () => {
       const i = new InterfaceDeclaration();
 
-      i.addAttribute({
-        name: 'some-attribute',
-        type: ['string'],
-      });
+      i.addAttribute('some-attribute', ['string']);
 
-      i.addAttribute({
-        name: 'another-attribute',
-        type: ['number'],
-      });
+      i.addAttribute('another-attribute', ['number']);
 
-      i.addAttribute({
-        name: 'another-attribute',
-        type: ['boolean'],
-      });
+      i.addAttribute('another-attribute', ['boolean']);
 
       const attributes = i.getAttributes();
       expect(attributes).toHaveLength(2);
@@ -54,17 +39,36 @@ describe('InterfaceDeclaration', () => {
     it('adds attributes with name of properties of Object (name in Object === true)', () => {
       const i = new InterfaceDeclaration();
 
-      i.addAttribute({
-        name: 'constructor',
-        type: ['string'],
-      });
+      i.addAttribute('constructor', ['string']);
 
-      i.addAttribute({
-        name: 'hasOwnProperty',
-        type: ['number'],
-      });
+      i.addAttribute('hasOwnProperty', ['number']);
 
       expect(i.getAttributes()).toHaveLength(2);
+    });
+  });
+
+  describe('mergeWith', () => {
+    it('does not change the attributes when merging with a new InterfaceDeclaration', () => {
+      const i = new InterfaceDeclaration();
+      i.addAttribute('a', ['string']);
+      i.addAttribute('b', ['string']);
+
+      i.mergeWith(new InterfaceDeclaration());
+      expect(i.getAttributes()).toHaveLength(2);
+    });
+
+    it('adds the attributes of the merged interface', () => {
+      const i = new InterfaceDeclaration();
+      i.addAttribute('a', ['string']);
+      i.addAttribute('b', ['string']);
+
+      expect(i.getAttributes()).toHaveLength(2);
+
+      const concatenatedInterfaceDeclaration = new InterfaceDeclaration();
+      concatenatedInterfaceDeclaration.addAttribute('c', ['string']);
+
+      i.mergeWith(concatenatedInterfaceDeclaration);
+      expect(i.getAttributes()).toHaveLength(3);
     });
   });
 });

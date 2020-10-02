@@ -11,19 +11,16 @@ export class InterfaceDeclaration {
   methods: FunctionDeclaration[] = [];
   private attributes = new Map<string, string[]>();
 
-  concatWith(i: InterfaceDeclaration): void {
+  mergeWith(i: InterfaceDeclaration): void {
     i.getAttributes().forEach((a) => {
-      this.addAttribute(a);
+      this.addAttribute(a.name, a.type);
     });
   }
 
-  addAttribute(attributeDeclaration: InterfaceAttributeDeclaration): void {
-    const alreadyAddedTypesForThisName = this.attributes.get(attributeDeclaration.name) || [];
+  addAttribute(name: string, types: string[]): void {
+    const alreadyAddedTypesForThisName = this.attributes.get(name) || [];
 
-    this.attributes.set(
-      attributeDeclaration.name,
-      this.removeDuplicates(alreadyAddedTypesForThisName.concat(attributeDeclaration.type)),
-    );
+    this.attributes.set(name, this.removeDuplicates(alreadyAddedTypesForThisName.concat(types)));
   }
 
   private removeDuplicates(target: string[]): string[] {

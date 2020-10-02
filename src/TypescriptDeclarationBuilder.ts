@@ -246,11 +246,6 @@ export class TypescriptDeclarationBuilder {
     const interfaceDeclaration = new InterfaceDeclaration();
 
     interactions.forEach((interaction) => {
-      const interfaceAttribute: InterfaceAttributeDeclaration = {
-        name: interaction.field,
-        type: [],
-      };
-
       let filteredFollowingInteractions: RunTimeInfoUtils.InteractionRuntimeInfo[] = [];
       if (interaction.followingInteractions) {
         filteredFollowingInteractions = this.filterInteractionsForComputingInterfaces(
@@ -258,6 +253,7 @@ export class TypescriptDeclarationBuilder {
         );
       }
 
+      let attributeType: string;
       if (filteredFollowingInteractions.length > 0) {
         const followingInterfaceDeclaration = this.buildInterfaceDeclaration(
           filteredFollowingInteractions,
@@ -266,14 +262,12 @@ export class TypescriptDeclarationBuilder {
           functionRunTimeInfo,
         );
 
-        interfaceAttribute.type.push(
-          this.matchToTypescriptType(followingInterfaceDeclaration.name),
-        );
+        attributeType = this.matchToTypescriptType(followingInterfaceDeclaration.name);
       } else {
-        interfaceAttribute.type.push(this.matchToTypescriptType(interaction.returnTypeOf));
+        attributeType = this.matchToTypescriptType(interaction.returnTypeOf);
       }
 
-      interfaceDeclaration.addAttribute(interfaceAttribute);
+      interfaceDeclaration.addAttribute(interaction.field, [attributeType]);
     });
 
     interfaceDeclaration.name = name;
@@ -295,7 +289,7 @@ export class TypescriptDeclarationBuilder {
     ].join('__');
 
     if (serializedInterface in this.interfaceDeclarations) {
-      this.interfaceDeclarations[serializedInterface].concatWith(interfaceDeclaration);
+      this.interfaceDeclarations[serializedInterface].mergeWith(interfaceDeclaration);
     } else {
       let interfaceName = interfaceDeclaration.name;
       while (interfaceName in this.interfaceNames) {
