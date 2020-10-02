@@ -3,10 +3,7 @@ import {
   ArgumentDeclaration,
 } from './TypescriptDeclaration/FunctionDeclaration';
 import * as RunTimeInfoUtils from './RunTimeInfoUtils';
-import {
-  InterfaceDeclaration,
-  InterfaceAttributeDeclaration,
-} from './TypescriptDeclaration/InterfaceDeclaration';
+import { InterfaceDeclaration } from './TypescriptDeclaration/InterfaceDeclaration';
 import { ClassDeclaration } from './TypescriptDeclaration/ClassDeclaration';
 import { FunctionDeclarationCleaner } from './FunctionDeclarationCleaner';
 import { ModuleTypescriptDeclaration } from './TypescriptDeclaration/ModuleDeclaration/ModuleTypescriptDeclaration';

@@ -14,8 +14,8 @@
     "prebuild": "rm -rf dist",
     "build": "tsc",
     "test": "jest",
-    "lint": "eslint --max-warnings 0 'src/**/*.ts'",
-    "prettier": "prettier --write 'src/**/*.ts'"
+    "lint": "eslint --max-warnings 0 'src/**/*.ts' 'tests/**/*.ts'",
+    "prettier": "prettier --write 'src/**/*.ts' 'tests/**/*.ts'"
   },
   "husky": {
     "hooks": {
