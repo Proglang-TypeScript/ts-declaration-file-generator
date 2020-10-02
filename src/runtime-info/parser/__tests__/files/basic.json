@@ -1,0 +1,14 @@
+{
+  "functionId_1": {
+    "functionId": "functionId_1",
+    "functionName": "foo",
+    "isConstructor": false,
+    "args": {},
+    "declarationEnclosingFunctionId": -1,
+    "returnTypeOfs": [],
+    "functionIid": "some-functionIid",
+    "requiredModule": "./bar",
+    "isExported": true,
+    "constructedBy": ""
+  }
+}

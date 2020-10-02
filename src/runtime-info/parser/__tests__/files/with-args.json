@@ -1,0 +1,116 @@
+{
+  "functionId_3": {
+    "functionId": "functionId_3",
+    "functionName": "buildName",
+    "isConstructor": false,
+    "args": {
+      "0": {
+        "argumentIndex": 0,
+        "argumentName": "firstName",
+        "interactions": [
+          {
+            "code": "inputValue",
+            "traceId": "trace__2",
+            "typeof": "string"
+          },
+          {
+            "code": "inputValue",
+            "traceId": "trace__4",
+            "typeof": "string"
+          },
+          {
+            "code": "convertedTo",
+            "traceId": "trace__4",
+            "convertedTo": "string",
+            "isNaN": false,
+            "toPrimitive": null,
+            "operator": "+",
+            "originalTypeof": "string"
+          },
+          {
+            "code": "operator",
+            "traceId": "trace__4",
+            "leftType": "string",
+            "rightType": "string",
+            "leftIsNaN": true,
+            "rightIsNan": false,
+            "leftToPrimitiveType": "string",
+            "rightToPrimitiveType": "string",
+            "leftToPrimitiveIsNaN": true,
+            "rightToPrimitiveIsNaN": false,
+            "operator": "+",
+            "operandForInteraction": "left"
+          }
+        ]
+      },
+      "1": {
+        "argumentIndex": 1,
+        "argumentName": "lastName",
+        "interactions": [
+          {
+            "code": "inputValue",
+            "traceId": "trace__2",
+            "typeof": "undefined"
+          },
+          {
+            "code": "inputValue",
+            "traceId": "trace__4",
+            "typeof": "string"
+          },
+          {
+            "code": "operator",
+            "traceId": "trace__4",
+            "leftType": "string",
+            "rightType": "undefined",
+            "leftIsNaN": true,
+            "rightIsNan": true,
+            "leftToPrimitiveType": "string",
+            "rightToPrimitiveType": "undefined",
+            "leftToPrimitiveIsNaN": true,
+            "rightToPrimitiveIsNaN": true,
+            "operator": "conditional",
+            "operandForInteraction": "left"
+          },
+          {
+            "code": "convertedTo",
+            "traceId": "trace__4",
+            "convertedTo": "string",
+            "isNaN": false,
+            "toPrimitive": null,
+            "operator": "+",
+            "originalTypeof": "string"
+          },
+          {
+            "code": "operator",
+            "traceId": "trace__4",
+            "leftType": "string",
+            "rightType": "string",
+            "leftIsNaN": true,
+            "rightIsNan": true,
+            "leftToPrimitiveType": "string",
+            "rightToPrimitiveType": "string",
+            "leftToPrimitiveIsNaN": true,
+            "rightToPrimitiveIsNaN": true,
+            "operator": "+",
+            "operandForInteraction": "right"
+          }
+        ]
+      }
+    },
+    "declarationEnclosingFunctionId": -1,
+    "returnTypeOfs": [
+      {
+        "typeOf": "string",
+        "traceId": "trace__2"
+      },
+      {
+        "typeOf": "string",
+        "traceId": "trace__4"
+      }
+    ],
+    "functionIid": 81,
+    "requiredModule": "./build-name",
+    "isExported": true,
+    "constructedBy": ""
+  }
+}
