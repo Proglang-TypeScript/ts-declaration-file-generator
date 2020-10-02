@@ -1,6 +1,13 @@
 import fs from 'fs';
-import { FunctionRuntimeInfo, ArgumentRuntimeInfo } from './parsedTypes';
+import { FunctionRuntimeInfo, ArgumentRuntimeInfo, RuntimeInfo } from './parsedTypes';
 import { JsonRuntimeInfo, JsonFunctionContainer } from './inputTypes';
+
+type AttributesByTraceIdMap = Map<
+  string,
+  {
+    [argumentIndex: string]: ArgumentRuntimeInfo;
+  }
+>;
 
 export class RuntimeInfoParser {
   private fileName: string;
@@ -9,9 +16,9 @@ export class RuntimeInfoParser {
     this.fileName = fileName;
   }
 
-  parse(): { [id: string]: FunctionRuntimeInfo } {
+  parse(): RuntimeInfo {
     const jsonFile = fs.readFileSync(this.fileName);
-    const runTimeInfo: { [id: string]: FunctionRuntimeInfo } = {};
+    const runTimeInfo: RuntimeInfo = {};
 
     const jsonInfo = JSON.parse(jsonFile.toString()) as JsonRuntimeInfo;
 
@@ -36,45 +43,45 @@ export class RuntimeInfoParser {
     const attributesAggregatedByTraceId = this.aggregateArgumentsByTraceId(functionInfo);
 
     const args: { [traceId: string]: ArgumentRuntimeInfo[] } = {};
-    for (const traceId in attributesAggregatedByTraceId) {
+    Array.from(attributesAggregatedByTraceId.keys()).forEach((traceId) => {
       if (!(traceId in args)) {
         args[traceId] = [];
       }
 
-      for (const argumentIndex in attributesAggregatedByTraceId[traceId]) {
-        args[traceId].push(attributesAggregatedByTraceId[traceId][argumentIndex]);
+      for (const argumentIndex in attributesAggregatedByTraceId.get(traceId) || {}) {
+        args[traceId].push((attributesAggregatedByTraceId.get(traceId) || {})[argumentIndex]);
       }
-    }
+    });
 
     return args;
   }
 
-  private aggregateArgumentsByTraceId(
-    functionInfo: JsonFunctionContainer,
-  ): { [traceId: string]: { [argumentIndex: string]: ArgumentRuntimeInfo } } {
-    const attributesAggregatedByTraceId: {
-      [traceId: string]: {
+  private aggregateArgumentsByTraceId(functionInfo: JsonFunctionContainer): AttributesByTraceIdMap {
+    const attributesAggregatedByTraceId: AttributesByTraceIdMap = new Map<
+      string,
+      {
         [argumentIndex: string]: ArgumentRuntimeInfo;
-      };
-    } = {};
+      }
+    >();
 
     for (const argumentId in functionInfo.args) {
       const argumentInfo = functionInfo.args[argumentId];
 
       argumentInfo.interactions.forEach((interaction) => {
-        if (!(interaction.traceId in attributesAggregatedByTraceId)) {
-          attributesAggregatedByTraceId[interaction.traceId] = {};
-        }
+        const aggregatedAttributeByTraceId =
+          attributesAggregatedByTraceId.get(interaction.traceId) || {};
 
-        if (!(argumentId in attributesAggregatedByTraceId[interaction.traceId])) {
-          attributesAggregatedByTraceId[interaction.traceId][argumentId] = {
+        if (!(argumentId in aggregatedAttributeByTraceId)) {
+          aggregatedAttributeByTraceId[argumentId] = {
             argumentIndex: argumentInfo.argumentIndex,
             argumentName: argumentInfo.argumentName,
             interactions: [],
           };
         }
 
-        const argument = attributesAggregatedByTraceId[interaction.traceId][argumentId];
+        attributesAggregatedByTraceId.set(interaction.traceId, aggregatedAttributeByTraceId);
+
+        const argument = aggregatedAttributeByTraceId[argumentId];
         argument.interactions.push(interaction);
       });
     }
