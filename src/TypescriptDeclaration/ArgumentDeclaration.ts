@@ -15,7 +15,7 @@ export default class ArgumentDeclaration {
   }
 
   getTypeOfs(): string[] {
-    return Array.from(this.typeOfs);
+    return Array.from(this.typeOfs).sort();
   }
 
   makeOptional() {
@@ -28,10 +28,9 @@ export default class ArgumentDeclaration {
   }
 
   serialize(): string {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const a: { [k: string]: any } = { ...this };
-    a.typeOfs = this.getTypeOfs().sort();
-
-    return JSON.stringify(a);
+    return JSON.stringify({
+      ...this,
+      typeOfs: this.getTypeOfs(),
+    });
   }
 }

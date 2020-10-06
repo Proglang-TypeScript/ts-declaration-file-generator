@@ -4,20 +4,18 @@ export class FunctionDeclaration {
   name = '';
   isExported = false;
   private arguments: ArgumentDeclaration[] = [];
-  private returnTypeOfs: { [typeOf: string]: boolean } = {};
+  private returnTypeOfs = new Set<string>();
 
   addArgument(a: ArgumentDeclaration) {
     this.arguments.push(a);
   }
 
   addReturnTypeOf(returnTypeOf: string) {
-    if (!(returnTypeOf in this.returnTypeOfs)) {
-      this.returnTypeOfs[returnTypeOf] = true;
-    }
+    this.returnTypeOfs.add(returnTypeOf);
   }
 
   getReturnTypeOfs(): string[] {
-    return Object.keys(this.returnTypeOfs);
+    return Array.from(this.returnTypeOfs);
   }
 
   getArguments(): ArgumentDeclaration[] {
