@@ -1,4 +1,7 @@
 ## TypeScript declaration file generator | dts-generate
+![build](https://github.com/proglang/ts-declaration-file-generator/workflows/build/badge.svg?branch=master)
+
+A NodeJS tool that generates a Typescript declaration file using runtime information.
 
 ### Installation
 Clone this repository and then run:
