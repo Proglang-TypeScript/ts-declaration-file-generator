@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { RuntimeInfoParser } from './runtime-info/parser/RunTimeInfoParser';
-import { TypescriptDeclarationBuilder } from './TypescriptDeclaration/builder/TypescriptDeclarationBuilder';
+import { TypescriptDeclarationBuilder } from './typescript-declaration/builder/TypescriptDeclarationBuilder';
 import { FunctionDeclarationCleaner } from './utils/FunctionDeclarationCleaner';
 import commandLineArgs from 'command-line-args';
 import fs from 'fs';

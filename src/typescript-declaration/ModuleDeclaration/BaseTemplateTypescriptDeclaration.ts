@@ -1,7 +1,7 @@
 import { FunctionDeclaration } from '../FunctionDeclaration';
 import { InterfaceDeclaration } from '../InterfaceDeclaration';
 import { ClassDeclaration } from '../ClassDeclaration';
-import { BaseTypescriptDeclarationWriter } from '../TypescriptDeclarationWriter/BaseTypescriptDeclarationWriter';
+import { BaseTypescriptDeclarationWriter } from '../writer/BaseTypescriptDeclarationWriter';
 
 export abstract class BaseTemplateTypescriptDeclaration {
   protected abstract getTypescriptDeclarationWriter(): BaseTypescriptDeclarationWriter;
