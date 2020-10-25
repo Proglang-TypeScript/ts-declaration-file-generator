@@ -1,11 +1,11 @@
 import ts from 'typescript';
 
-export function emitAST(node: ts.Node): string {
+export function emit(node: ts.Node): string {
   const resultFile = ts.createSourceFile(
     '',
     '',
     ts.ScriptTarget.Latest,
-    /*setParentNodes*/ false,
+    /*setParentNodes*/ true,
     ts.ScriptKind.TS,
   );
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
@@ -19,12 +19,12 @@ export function createASTFromFile(file: string): ts.Node {
   );
 }
 
-export function createAST(content: string): ts.Node {
+export function createFromString(content: string): ts.Node {
   return ts.createSourceFile(
-    'content.d.ts',
+    '',
     content,
     ts.ScriptTarget.Latest,
-    /*setParentNodes*/ false,
+    /*setParentNodes*/ true,
     ts.ScriptKind.TS,
   );
 }
