@@ -34,7 +34,7 @@
   ],
   "author": "fcristiani",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/fcristiani/tsd-generator#readme",
+  "homepage": "https://github.com/proglang/ts-declaration-file-generator",
   "devDependencies": {
     "@types/command-line-args": "^5.0.0",
     "@types/jest": "^26.0.3",
