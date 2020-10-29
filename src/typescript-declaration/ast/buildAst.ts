@@ -4,10 +4,10 @@ import {
   DTSFunction,
   DTSFunctionModifiers,
   DTSTypeKinds,
-  DTSType,
   DTSTypeKeyword,
-  DTSKeywords,
+  DTSTypeKeywords,
 } from './types';
+import { createTypeNode } from './helpers/createTypeNode';
 
 export const buildAst = (declarationFile: DTS): ts.Node => {
   const ast = ts.createSourceFile(
@@ -50,22 +50,5 @@ const createReturnType = (f: DTSFunction): ts.TypeNode | undefined => {
     return undefined;
   }
 
-  switch (f.returnType.kind) {
-    case DTSTypeKinds.KEYWORD:
-      return createKeywordType(f.returnType);
-  }
-
-  return ts.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword);
-};
-
-const createKeywordType = (type: DTSTypeKeyword): ts.KeywordTypeNode | undefined => {
-  const mapTypeScriptNodes = {
-    [DTSKeywords.VOID]: ts.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword),
-    [DTSKeywords.STRING]: ts.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
-    [DTSKeywords.NUMBER]: ts.createKeywordTypeNode(ts.SyntaxKind.NumberKeyword),
-    [DTSKeywords.ANY]: ts.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword),
-    [DTSKeywords.UNKNOWN]: ts.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
-  };
-
-  return mapTypeScriptNodes[type.value];
+  return createTypeNode(f.returnType);
 };

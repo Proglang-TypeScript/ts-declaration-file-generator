@@ -1,8 +1,102 @@
 import { emit, createFromString } from '../../ts-ast-utils/utils';
-import { DTS, DTSTypeKinds, DTSKeywords } from '../types/index';
+import { DTS, DTSTypeKinds, DTSTypeKeywords } from '../types/index';
 import { buildAst } from '../buildAst';
 
-describe('Create Module AST', () => {
+describe('Types', () => {
+  it('creates a keyword type', () => {
+    const keywords = new Map<DTSTypeKeywords, string>();
+    keywords.set(DTSTypeKeywords.ANY, 'any');
+    keywords.set(DTSTypeKeywords.NUMBER, 'number');
+    keywords.set(DTSTypeKeywords.STRING, 'string');
+    keywords.set(DTSTypeKeywords.UNKNOWN, 'unknown');
+    keywords.set(DTSTypeKeywords.VOID, 'void');
+
+    Array.from(keywords.keys()).forEach((keyword) => {
+      const declaration: DTS = {
+        functions: [
+          {
+            name: 'f',
+            returnType: {
+              kind: DTSTypeKinds.KEYWORD,
+              value: keyword,
+            },
+          },
+        ],
+      };
+      const ast = buildAst(declaration);
+
+      expect(emit(ast)).toBe(emit(createFromString(`function f(): ${keywords.get(keyword)};`)));
+    });
+  });
+
+  it('creates the string literal type', () => {
+    const declaration: DTS = {
+      functions: [
+        {
+          name: 'f',
+          returnType: {
+            kind: DTSTypeKinds.LITERAL_TYPE,
+            value: 'hello',
+          },
+        },
+      ],
+    };
+    const ast = buildAst(declaration);
+
+    expect(emit(ast)).toBe(emit(createFromString(`function f(): "hello";`)));
+  });
+
+  it('creates the number literal type', () => {
+    const declaration: DTS = {
+      functions: [
+        {
+          name: 'f',
+          returnType: {
+            kind: DTSTypeKinds.LITERAL_TYPE,
+            value: 123.45,
+          },
+        },
+      ],
+    };
+    const ast = buildAst(declaration);
+
+    expect(emit(ast)).toBe(emit(createFromString(`function f(): 123.45;`)));
+  });
+
+  it('creates the boolean literal type', () => {
+    let declaration: DTS = {
+      functions: [
+        {
+          name: 'f',
+          returnType: {
+            kind: DTSTypeKinds.LITERAL_TYPE,
+            value: false,
+          },
+        },
+      ],
+    };
+    let ast = buildAst(declaration);
+
+    expect(emit(ast)).toBe(emit(createFromString(`function f(): false;`)));
+
+    declaration = {
+      functions: [
+        {
+          name: 'f',
+          returnType: {
+            kind: DTSTypeKinds.LITERAL_TYPE,
+            value: true,
+          },
+        },
+      ],
+    };
+    ast = buildAst(declaration);
+
+    expect(emit(ast)).toBe(emit(createFromString(`function f(): true;`)));
+  });
+});
+
+describe('Function', () => {
   it('creates a function', async () => {
     const declaration: DTS = {
       functions: [
@@ -23,7 +117,7 @@ describe('Create Module AST', () => {
           name: 'foo',
           returnType: {
             kind: DTSTypeKinds.KEYWORD,
-            value: DTSKeywords.VOID,
+            value: DTSTypeKeywords.VOID,
           },
         },
       ],

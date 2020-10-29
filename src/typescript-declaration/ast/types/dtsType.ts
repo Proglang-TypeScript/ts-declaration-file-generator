@@ -12,10 +12,10 @@ export const enum DTSTypeKinds {
 
 export interface DTSTypeKeyword extends BaseType {
   kind: DTSTypeKinds.KEYWORD;
-  value: DTSKeywords;
+  value: DTSTypeKeywords;
 }
 
-export const enum DTSKeywords {
+export const enum DTSTypeKeywords {
   VOID,
   STRING,
   NUMBER,
@@ -25,5 +25,5 @@ export const enum DTSKeywords {
 
 export interface DTSTypeLiteralType extends BaseType {
   kind: DTSTypeKinds.LITERAL_TYPE;
-  value: string;
+  value: number | string | boolean;
 }
