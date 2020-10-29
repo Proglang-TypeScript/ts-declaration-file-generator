@@ -3,7 +3,15 @@ import { DTSProperty } from './dtsProperty';
 import { DTSTypeParameter } from './dtsTypeParameter';
 import { DTSType } from './dtsType';
 
-export type DTS = DTSNamespace;
+export type DTS = {
+  functions?: DTSFunction[];
+  classes?: DTSClass[];
+  exportAssignments?: string[];
+  namespaces?: {
+    [namespaceName: string]: DTSNamespace;
+  };
+};
+
 export * from './dtsFunction';
 export * from './dtsType';
 
@@ -12,7 +20,6 @@ interface DTSNamespace {
   interfaces?: DTSInterface[];
   functions?: DTSFunction[];
   classes?: DTSClass[];
-  exportAssignments?: string[];
   namespaces?: {
     [namespaceName: string]: DTSNamespace;
   };
