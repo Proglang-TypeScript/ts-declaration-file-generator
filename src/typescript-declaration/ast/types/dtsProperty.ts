@@ -1,7 +1,7 @@
-import { DTSPropertyType } from './dtsPropertyTypes';
+import { DTSType } from './dtsType';
 
 export interface DTSProperty {
   name: string;
-  type: DTSPropertyType;
+  type: DTSType;
   optional: boolean;
 }

@@ -1,13 +1,13 @@
 import { DTSProperty } from './dtsProperty';
-import { DTSPropertyType } from './dtsPropertyTypes';
+import { DTSType } from './dtsType';
 import { DTSTypeParameter } from './dtsTypeParameter';
 
 export interface DTSFunction {
   name: string;
-  parameters: DTSProperty[];
-  returnType: DTSPropertyType;
-  modifiers: DTSFunctionModifiers[];
-  typeParameters: DTSTypeParameter[];
+  parameters?: DTSProperty[];
+  returnType?: DTSType;
+  modifiers?: DTSFunctionModifiers[];
+  typeParameters?: DTSTypeParameter[];
   isConstructor?: boolean;
 }
 

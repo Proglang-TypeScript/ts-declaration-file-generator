@@ -1,10 +1,11 @@
 import { DTSFunction } from './dtsFunction';
 import { DTSProperty } from './dtsProperty';
 import { DTSTypeParameter } from './dtsTypeParameter';
-import { DTSPropertyType } from './dtsPropertyTypes';
+import { DTSType } from './dtsType';
 
 export type DTS = DTSNamespace;
 export * from './dtsFunction';
+export * from './dtsType';
 
 interface DTSNamespace {
   name?: string;
@@ -28,7 +29,7 @@ interface DTSInterface {
 
 interface DTSIndexSignature {
   parameter: DTSProperty;
-  type: DTSPropertyType;
+  type: DTSType;
 }
 
 interface DTSClass {
