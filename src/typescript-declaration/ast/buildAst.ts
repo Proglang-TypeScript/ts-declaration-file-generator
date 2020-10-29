@@ -1,12 +1,5 @@
 import ts from 'typescript';
-import {
-  DTS,
-  DTSFunction,
-  DTSFunctionModifiers,
-  DTSTypeKinds,
-  DTSTypeKeyword,
-  DTSTypeKeywords,
-} from './types';
+import { DTS, DTSFunction, DTSFunctionModifiers } from './types';
 import { createTypeNode } from './helpers/createTypeNode';
 
 export const buildAst = (declarationFile: DTS): ts.Node => {
