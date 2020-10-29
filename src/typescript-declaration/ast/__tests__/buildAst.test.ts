@@ -94,6 +94,32 @@ describe('Types', () => {
 
     expect(emit(ast)).toBe(emit(createFromString(`function f(): true;`)));
   });
+
+  it('creates the union type', () => {
+    const declaration: DTS = {
+      functions: [
+        {
+          name: 'f',
+          returnType: {
+            kind: DTSTypeKinds.UNION,
+            value: [
+              {
+                kind: DTSTypeKinds.KEYWORD,
+                value: DTSTypeKeywords.NUMBER,
+              },
+              {
+                kind: DTSTypeKinds.LITERAL_TYPE,
+                value: 'hello',
+              },
+            ],
+          },
+        },
+      ],
+    };
+    const ast = buildAst(declaration);
+
+    expect(emit(ast)).toBe(emit(createFromString(`function f(): number | "hello";`)));
+  });
 });
 
 describe('Function', () => {

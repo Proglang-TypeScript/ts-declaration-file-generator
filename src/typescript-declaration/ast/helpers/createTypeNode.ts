@@ -14,9 +14,10 @@ export const createTypeNode = (type: DTSType): ts.TypeNode => {
 
     case DTSTypeKinds.LITERAL_TYPE:
       return createLiteralType(type);
-  }
 
-  return ts.createKeywordTypeNode(ts.SyntaxKind.VoidKeyword);
+    case DTSTypeKinds.UNION:
+      return ts.createUnionTypeNode(type.value.map((v) => createTypeNode(v)));
+  }
 };
 
 const createKeywordType = (type: DTSTypeKeyword): ts.KeywordTypeNode => {
