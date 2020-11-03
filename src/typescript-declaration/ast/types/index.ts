@@ -34,3 +34,8 @@ export interface DTSClass {
   typeParameters?: DTSTypeParameter[];
   export?: boolean;
 }
+
+export const enum DTSModifiers {
+  EXPORT,
+  DECLARE,
+}

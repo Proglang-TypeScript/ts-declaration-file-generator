@@ -1,4 +1,4 @@
-import { DTSInterface, DTSFunctionModifiers } from '../types';
+import { DTSInterface, DTSModifiers } from '../types';
 import ts from 'typescript';
 import { createModifiers } from './createModifiers';
 import { createTypeNode } from './createTypeNode';
@@ -6,7 +6,7 @@ import { createTypeNode } from './createTypeNode';
 export const createInterfaceDeclaration = (dtsInterface: DTSInterface): ts.InterfaceDeclaration => {
   return ts.createInterfaceDeclaration(
     undefined,
-    createModifiers([DTSFunctionModifiers.EXPORT]),
+    createModifiers([DTSModifiers.EXPORT]),
     dtsInterface.name,
     undefined,
     undefined,

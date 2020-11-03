@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { DTS, DTSFunctionModifiers } from './types';
+import { DTS, DTSModifiers } from './types';
 import { createFunctionDeclaration } from './helpers/createFunctionDeclaration';
 import { createNamespaceDeclaration } from './helpers/createNamespaceDeclaration';
 import { createInterfaceDeclaration } from './helpers/createInterfaceDeclaration';
@@ -14,9 +14,7 @@ export const buildAst = (declarationFile: DTS): ts.Node => {
   );
 
   const statements = [
-    ...(declarationFile.functions?.map((f) =>
-      createFunctionDeclaration(f, [DTSFunctionModifiers.EXPORT]),
-    ) || []),
+    ...(declarationFile.functions?.map((f) => createFunctionDeclaration(f)) || []),
     ...(declarationFile.namespace ? [createNamespaceDeclaration(declarationFile.namespace)] : []),
     ...(declarationFile.interfaces?.map((i) => createInterfaceDeclaration(i)) || []),
   ];
