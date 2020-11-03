@@ -1,5 +1,5 @@
 import ts from 'typescript';
-import { DTS, DTSModifiers } from './types';
+import { DTS } from './types';
 import { createFunctionDeclaration } from './helpers/createFunctionDeclaration';
 import { createNamespaceDeclaration } from './helpers/createNamespaceDeclaration';
 import { createInterfaceDeclaration } from './helpers/createInterfaceDeclaration';
@@ -8,7 +8,7 @@ export const buildAst = (declarationFile: DTS): ts.Node => {
   const ast = ts.createSourceFile(
     'module-ast.d.ts',
     '',
-    ts.ScriptTarget.Latest,
+    ts.ScriptTarget.ES2020,
     true,
     ts.ScriptKind.TS,
   );

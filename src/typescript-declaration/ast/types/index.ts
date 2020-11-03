@@ -1,7 +1,6 @@
 import { DTSFunction } from './dtsFunction';
 import { DTSProperty } from './dtsProperty';
 import { DTSTypeParameter } from './dtsTypeParameter';
-import { DTSType } from './dtsType';
 
 export type DTS = {
   functions?: DTSFunction[];
