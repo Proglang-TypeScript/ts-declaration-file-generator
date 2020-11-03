@@ -6,43 +6,31 @@ import { DTSType } from './dtsType';
 export type DTS = {
   functions?: DTSFunction[];
   classes?: DTSClass[];
-  exportAssignments?: string[];
-  namespaces?: {
-    [namespaceName: string]: DTSNamespace;
-  };
+  interfaces?: DTSInterface[];
+  exportAssignment?: string;
+  namespace?: DTSNamespace;
 };
 
 export * from './dtsFunction';
 export * from './dtsType';
 
-interface DTSNamespace {
-  name?: string;
+export interface DTSNamespace {
+  name: string;
   interfaces?: DTSInterface[];
   functions?: DTSFunction[];
   classes?: DTSClass[];
-  namespaces?: {
-    [namespaceName: string]: DTSNamespace;
-  };
 }
 
-interface DTSInterface {
+export interface DTSInterface {
   name: string;
-  properties: DTSProperty[];
-  methods: DTSFunction[];
-  callSignatures: DTSFunction[];
-  indexSignatures: DTSIndexSignature[];
-  typeParameters: DTSTypeParameter[];
+  properties?: DTSProperty[];
 }
 
-interface DTSIndexSignature {
-  parameter: DTSProperty;
-  type: DTSType;
-}
-
-interface DTSClass {
+export interface DTSClass {
   name: string;
-  properties: DTSProperty[];
-  methods: DTSFunction[];
-  constructors: DTSFunction[];
-  typeParameters: DTSTypeParameter[];
+  properties?: DTSProperty[];
+  methods?: DTSFunction[];
+  constructors?: Omit<DTSFunction, 'name'>[];
+  typeParameters?: DTSTypeParameter[];
+  export?: boolean;
 }

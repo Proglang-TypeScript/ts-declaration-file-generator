@@ -4,7 +4,7 @@ export function emit(node: ts.Node): string {
   const resultFile = ts.createSourceFile(
     '',
     '',
-    ts.ScriptTarget.Latest,
+    ts.ScriptTarget.ES2020,
     /*setParentNodes*/ true,
     ts.ScriptKind.TS,
   );
@@ -21,9 +21,9 @@ export function createASTFromFile(file: string): ts.Node {
 
 export function createFromString(content: string): ts.Node {
   return ts.createSourceFile(
-    '',
+    'create-from-string.ts',
     content,
-    ts.ScriptTarget.Latest,
+    ts.ScriptTarget.ES2020,
     /*setParentNodes*/ true,
     ts.ScriptKind.TS,
   );

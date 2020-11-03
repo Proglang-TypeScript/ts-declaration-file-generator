@@ -9,8 +9,10 @@ export interface DTSFunction {
   modifiers?: DTSFunctionModifiers[];
   typeParameters?: DTSTypeParameter[];
   isConstructor?: boolean;
+  export?: boolean;
 }
 
 export const enum DTSFunctionModifiers {
   EXPORT,
+  DECLARE,
 }
