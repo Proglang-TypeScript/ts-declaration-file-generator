@@ -64,4 +64,81 @@ describe('Interface', () => {
       ),
     );
   });
+
+  it('creates interfaces inside of a namepsace', () => {
+    const declaration: DTS = {
+      namespace: {
+        name: 'MyNamespace',
+        interfaces: [{ name: 'MyInterface' }, { name: 'MyOtherInterface' }],
+      },
+    };
+
+    const ast = buildAst(declaration);
+
+    expect(emit(ast)).toBe(
+      emit(
+        createFromString(`
+          declare namespace MyNamespace {
+            export interface MyInterface {}
+            export interface MyOtherInterface {}
+          }
+        `),
+      ),
+    );
+  });
+});
+
+describe('Class', () => {
+  it('creates class outside of a namepsace', () => {
+    const declaration: DTS = {
+      classes: [
+        {
+          name: 'ClassA',
+        },
+        {
+          name: 'ClassB',
+        },
+      ],
+    };
+
+    const ast = buildAst(declaration);
+
+    expect(emit(ast)).toBe(
+      emit(
+        createFromString(`
+          export class ClassA{}
+          export class ClassB{}
+        `),
+      ),
+    );
+  });
+
+  it('creates class inside a namepsace', () => {
+    const declaration: DTS = {
+      namespace: {
+        name: 'MyNamespace',
+        classes: [
+          {
+            name: 'ClassA',
+          },
+          {
+            name: 'ClassB',
+          },
+        ],
+      },
+    };
+
+    const ast = buildAst(declaration);
+
+    expect(emit(ast)).toBe(
+      emit(
+        createFromString(`
+          declare namespace MyNamespace {
+            export class ClassA{}
+            export class ClassB{}
+          }
+          `),
+      ),
+    );
+  });
 });

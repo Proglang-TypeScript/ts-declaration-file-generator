@@ -1,4 +1,4 @@
-export type DTSType = DTSTypeKeyword | DTSTypeLiteralType | DTSTypeUnion;
+export type DTSType = DTSTypeKeyword | DTSTypeLiteralType | DTSTypeUnion | DTSTypeReference;
 
 interface BaseType {
   kind: DTSTypeKinds;
@@ -9,6 +9,7 @@ export const enum DTSTypeKinds {
   KEYWORD,
   LITERAL_TYPE,
   UNION,
+  TYPE_REFERENCE,
 }
 
 export interface DTSTypeKeyword extends BaseType {
@@ -22,6 +23,7 @@ export const enum DTSTypeKeywords {
   NUMBER,
   ANY,
   UNKNOWN,
+  BOOLEAN,
 }
 
 export interface DTSTypeLiteralType extends BaseType {
@@ -32,4 +34,12 @@ export interface DTSTypeLiteralType extends BaseType {
 export interface DTSTypeUnion extends BaseType {
   kind: DTSTypeKinds.UNION;
   value: DTSType[];
+}
+
+export interface DTSTypeReference extends BaseType {
+  kind: DTSTypeKinds.TYPE_REFERENCE;
+  value: {
+    referenceName: string;
+    namespace?: string;
+  };
 }

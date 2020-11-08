@@ -1,7 +1,6 @@
 import { DTSTypeKinds, DTSTypeKeywords, DTSInterface } from '../../types';
-import { emit, createFromString } from '../../../ts-ast-utils/utils';
 import { createInterfaceDeclaration } from '../createInterfaceDeclaration';
-import ts from 'typescript';
+import { assertNodeEqualsString } from './assertNodeEqualsString';
 
 describe('createInterface', () => {
   it('creates an interface with parameters', async () => {
@@ -27,13 +26,6 @@ describe('createInterface', () => {
 
     const ast = createInterfaceDeclaration(interfaceDeclaration);
 
-    assertInterfaceDeclarationEqualsString(ast, `export interface Foo {a: string; b: number;}`);
+    assertNodeEqualsString(ast, `export interface Foo {a: string; b: number;}`);
   });
 });
-
-const assertInterfaceDeclarationEqualsString = (
-  interfaceDeclaration: ts.InterfaceDeclaration,
-  code: string,
-) => {
-  expect(emit(createFromString(emit(interfaceDeclaration)))).toBe(emit(createFromString(code)));
-};

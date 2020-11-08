@@ -60,8 +60,11 @@ const dts: DTS = {
             {
               name: 'optionalParameter',
               type: {
-                kind: DTSTypeKinds.KEYWORD,
-                value: DTSTypeKeywords.NUMBER,
+                kind: DTSTypeKinds.TYPE_REFERENCE,
+                value: {
+                  referenceName: 'I__optionalParameter',
+                  namespace: 'Calculator',
+                },
               },
               optional: true,
             },

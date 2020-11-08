@@ -1,7 +1,8 @@
 import { DTSFunction, DTSModifiers } from '../types';
 import ts from 'typescript';
-import { createTypeNode } from './createTypeNode';
 import { createModifiers } from './createModifiers';
+import { createParameter } from './createParameter';
+import { createReturnType } from './createReturnType';
 
 export const createFunctionDeclaration = (dtsFunction: DTSFunction): ts.FunctionDeclaration => {
   return ts.createFunctionDeclaration(
@@ -16,26 +17,6 @@ export const createFunctionDeclaration = (dtsFunction: DTSFunction): ts.Function
   );
 };
 
-const createReturnType = (f: DTSFunction): ts.TypeNode | undefined => {
-  if (f.returnType === undefined) {
-    return undefined;
-  }
-
-  return createTypeNode(f.returnType);
-};
-
 const createParameters = (f: DTSFunction): ts.ParameterDeclaration[] => {
-  return (
-    f.parameters?.map((p) =>
-      ts.createParameter(
-        undefined,
-        undefined,
-        undefined,
-        p.name,
-        p.optional === true ? ts.createToken(ts.SyntaxKind.QuestionToken) : undefined,
-        createTypeNode(p.type),
-        undefined,
-      ),
-    ) || []
-  );
+  return f.parameters?.map((p) => createParameter(p)) || [];
 };

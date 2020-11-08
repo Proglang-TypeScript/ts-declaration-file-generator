@@ -4,8 +4,9 @@ import {
   DTSTypeKeyword,
   DTSTypeKeywords,
   DTSTypeLiteralType,
+  DTSTypeReference,
 } from '../types';
-import ts from 'typescript';
+import ts, { createIdentifier } from 'typescript';
 
 export const createTypeNode = (type: DTSType): ts.TypeNode => {
   switch (type.kind) {
@@ -17,6 +18,9 @@ export const createTypeNode = (type: DTSType): ts.TypeNode => {
 
     case DTSTypeKinds.UNION:
       return ts.createUnionTypeNode(type.value.map((v) => createTypeNode(v)));
+
+    case DTSTypeKinds.TYPE_REFERENCE:
+      return createReferenceType(type);
   }
 };
 
@@ -26,7 +30,8 @@ const createKeywordType = (type: DTSTypeKeyword): ts.KeywordTypeNode => {
     | ts.SyntaxKind.StringKeyword
     | ts.SyntaxKind.NumberKeyword
     | ts.SyntaxKind.AnyKeyword
-    | ts.SyntaxKind.UnknownKeyword;
+    | ts.SyntaxKind.UnknownKeyword
+    | ts.SyntaxKind.BooleanKeyword;
 
   const mapTypeScriptNodes: { [k in DTSTypeKeywords]: SupportedKeywords } = {
     [DTSTypeKeywords.VOID]: ts.SyntaxKind.VoidKeyword,
@@ -34,6 +39,7 @@ const createKeywordType = (type: DTSTypeKeyword): ts.KeywordTypeNode => {
     [DTSTypeKeywords.NUMBER]: ts.SyntaxKind.NumberKeyword,
     [DTSTypeKeywords.ANY]: ts.SyntaxKind.AnyKeyword,
     [DTSTypeKeywords.UNKNOWN]: ts.SyntaxKind.UnknownKeyword,
+    [DTSTypeKeywords.BOOLEAN]: ts.SyntaxKind.BooleanKeyword,
   };
 
   return ts.createKeywordTypeNode(mapTypeScriptNodes[type.value]);
@@ -52,4 +58,13 @@ const createLiteralType = (type: DTSTypeLiteralType): ts.LiteralTypeNode => {
         ? ts.createLiteralTypeNode(ts.createTrue())
         : ts.createLiteralTypeNode(ts.createFalse());
   }
+};
+
+const createReferenceType = (type: DTSTypeReference): ts.TypeReferenceNode => {
+  const referenceTypeName = createIdentifier(type.value.referenceName);
+  const typeName = type.value.namespace
+    ? ts.createQualifiedName(createIdentifier(type.value.namespace), referenceTypeName)
+    : referenceTypeName;
+
+  return ts.createTypeReferenceNode(typeName, undefined);
 };

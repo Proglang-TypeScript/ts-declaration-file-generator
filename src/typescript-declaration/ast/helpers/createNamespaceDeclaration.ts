@@ -1,7 +1,7 @@
 import { DTSNamespace, DTSModifiers } from '../types';
 import ts from 'typescript';
 import { createModifiers } from './createModifiers';
-import { createFunctionDeclaration } from './createFunctionDeclaration';
+import { createStatements } from './createStatements';
 
 export const createNamespaceDeclaration = (namespace: DTSNamespace): ts.ModuleDeclaration => {
   return ts.createModuleDeclaration(
@@ -14,7 +14,7 @@ export const createNamespaceDeclaration = (namespace: DTSNamespace): ts.ModuleDe
 };
 
 const createModuleBlock = (namespace: DTSNamespace): ts.ModuleBlock => {
-  const statements = [...(namespace.functions?.map((f) => createFunctionDeclaration(f)) || [])];
+  const statements = createStatements(namespace);
 
   return ts.createModuleBlock(statements);
 };
