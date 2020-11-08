@@ -1,22 +1,24 @@
 import { BaseTypescriptDeclarationWriter } from './BaseTypescriptDeclarationWriter';
 import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
+import { buildAst } from '../ast/buildAst';
+import { DTS, DTSTypeKinds, DTSTypeKeywords } from '../ast/types';
+import { emit } from '../ts-ast-utils/utils';
+import { FunctionDeclaration } from '../FunctionDeclaration';
+import { DTSProperty } from '../ast/types/dtsProperty';
 
 export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDeclarationWriter {
   protected doWrite(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration) {
-    this.writeExportModule();
-    this.writeFunction(typescriptModuleDeclaration);
+    const dtsFile: DTS = {
+      exportAssignment: this.getExportedName(typescriptModuleDeclaration),
+      functions: typescriptModuleDeclaration.methods
+        .filter((t) => t.isExported === true)
+        .map(() => ({
+          name: this.getExportedName(typescriptModuleDeclaration),
+          export: false,
+        })),
+    };
 
-    if (
-      typescriptModuleDeclaration.interfaces.length > 0 ||
-      typescriptModuleDeclaration.classes.length > 0 ||
-      typescriptModuleDeclaration.methods.length > 1
-    ) {
-      this.openNamespace();
-      this.writeInterfaces(typescriptModuleDeclaration);
-      this.writeClasses(typescriptModuleDeclaration);
-      this.writeFunctions(typescriptModuleDeclaration);
-      this.closeNamespace();
-    }
+    this.fileContents = emit(buildAst(dtsFile));
   }
 
   protected getExportedName(
@@ -79,6 +81,19 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
       });
 
       this.fileContents += '\t}\n\n';
+    });
+  }
+
+  private buildFunctionParameters(functionDeclaration: FunctionDeclaration): DTSProperty[] {
+    return functionDeclaration.getArguments().map((argumentDeclaration) => {
+      return {
+        name: argumentDeclaration.name,
+        optional: argumentDeclaration.isOptional(),
+        type: {
+          kind: DTSTypeKinds.KEYWORD,
+          value: DTSTypeKeywords.STRING,
+        },
+      };
     });
   }
 }

@@ -11,6 +11,9 @@ describe('createTypeNode', () => {
       keywords.set(DTSTypeKeywords.STRING, 'string');
       keywords.set(DTSTypeKeywords.UNKNOWN, 'unknown');
       keywords.set(DTSTypeKeywords.VOID, 'void');
+      keywords.set(DTSTypeKeywords.UNDEFINED, 'undefined');
+      keywords.set(DTSTypeKeywords.NULL, 'null');
+      keywords.set(DTSTypeKeywords.OBJECT, 'object');
 
       Array.from(keywords.keys()).forEach((keyword) => {
         const type: DTSType = {
@@ -109,6 +112,43 @@ describe('createTypeNode', () => {
 
       const typeNode = createTypeNode(type);
       expect(emit(typeNode)).toBe(`MyNamespace.MyInterface`);
+    });
+  });
+
+  describe('array type', () => {
+    it('creates the array type with keywords', () => {
+      const type: DTSType = {
+        kind: DTSTypeKinds.ARRAY,
+        value: {
+          kind: DTSTypeKinds.KEYWORD,
+          value: DTSTypeKeywords.NUMBER,
+        },
+      };
+
+      const typeNode = createTypeNode(type);
+      expect(emit(typeNode)).toBe(`number[]`);
+    });
+
+    it('creates the array type with union type', () => {
+      const type: DTSType = {
+        kind: DTSTypeKinds.ARRAY,
+        value: {
+          kind: DTSTypeKinds.UNION,
+          value: [
+            {
+              kind: DTSTypeKinds.KEYWORD,
+              value: DTSTypeKeywords.NUMBER,
+            },
+            {
+              kind: DTSTypeKinds.LITERAL_TYPE,
+              value: 'hello',
+            },
+          ],
+        },
+      };
+
+      const typeNode = createTypeNode(type);
+      expect(emit(typeNode)).toBe(`(number | "hello")[]`);
     });
   });
 });

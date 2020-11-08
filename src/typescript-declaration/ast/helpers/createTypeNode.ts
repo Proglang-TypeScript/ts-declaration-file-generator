@@ -21,6 +21,15 @@ export const createTypeNode = (type: DTSType): ts.TypeNode => {
 
     case DTSTypeKinds.TYPE_REFERENCE:
       return createReferenceType(type);
+
+    case DTSTypeKinds.ARRAY:
+      return ts.createArrayTypeNode(createTypeNode(type.value));
+
+    default:
+      return createKeywordType({
+        kind: DTSTypeKinds.KEYWORD,
+        value: DTSTypeKeywords.UNKNOWN,
+      });
   }
 };
 
@@ -31,7 +40,10 @@ const createKeywordType = (type: DTSTypeKeyword): ts.KeywordTypeNode => {
     | ts.SyntaxKind.NumberKeyword
     | ts.SyntaxKind.AnyKeyword
     | ts.SyntaxKind.UnknownKeyword
-    | ts.SyntaxKind.BooleanKeyword;
+    | ts.SyntaxKind.BooleanKeyword
+    | ts.SyntaxKind.UndefinedKeyword
+    | ts.SyntaxKind.NullKeyword
+    | ts.SyntaxKind.ObjectKeyword;
 
   const mapTypeScriptNodes: { [k in DTSTypeKeywords]: SupportedKeywords } = {
     [DTSTypeKeywords.VOID]: ts.SyntaxKind.VoidKeyword,
@@ -40,6 +52,9 @@ const createKeywordType = (type: DTSTypeKeyword): ts.KeywordTypeNode => {
     [DTSTypeKeywords.ANY]: ts.SyntaxKind.AnyKeyword,
     [DTSTypeKeywords.UNKNOWN]: ts.SyntaxKind.UnknownKeyword,
     [DTSTypeKeywords.BOOLEAN]: ts.SyntaxKind.BooleanKeyword,
+    [DTSTypeKeywords.UNDEFINED]: ts.SyntaxKind.UndefinedKeyword,
+    [DTSTypeKeywords.NULL]: ts.SyntaxKind.NullKeyword,
+    [DTSTypeKeywords.OBJECT]: ts.SyntaxKind.ObjectKeyword,
   };
 
   return ts.createKeywordTypeNode(mapTypeScriptNodes[type.value]);
