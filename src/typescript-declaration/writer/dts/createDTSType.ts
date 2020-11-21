@@ -1,7 +1,14 @@
 import { DTSType, DTSTypeKinds, DTSTypeKeywords } from '../../ast/types';
 
-export const createDTSType = (type: string): DTSType => {
-  switch (type) {
+export const createDTSType = (types: (SupportedTypes | string)[]): DTSType => {
+  if (types.length > 1) {
+    return {
+      kind: DTSTypeKinds.UNION,
+      value: types.map((type) => createDTSType([type])),
+    };
+  }
+
+  switch (types[0]) {
     case 'string':
       return {
         kind: DTSTypeKinds.KEYWORD,
@@ -60,11 +67,21 @@ export const createDTSType = (type: string): DTSType => {
           value: DTSTypeKeywords.ANY,
         },
       };
-
-    default:
-      return {
-        kind: DTSTypeKinds.KEYWORD,
-        value: DTSTypeKeywords.UNKNOWN,
-      };
   }
+
+  return {
+    kind: DTSTypeKinds.KEYWORD,
+    value: DTSTypeKeywords.UNKNOWN,
+  };
 };
+
+type SupportedTypes =
+  | 'string'
+  | 'number'
+  | 'undefined'
+  | 'void'
+  | 'null'
+  | 'object'
+  | 'boolean'
+  | 'Function'
+  | 'Array<any>';
