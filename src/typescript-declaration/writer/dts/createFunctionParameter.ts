@@ -6,6 +6,14 @@ export const createFunctionParameter = (argumentDeclaration: ArgumentDeclaration
   return {
     name: argumentDeclaration.name,
     optional: argumentDeclaration.isOptional(),
-    type: createDTSType(argumentDeclaration.getTypeOfs()),
+    type: createDTSType(filterTypeOfs(argumentDeclaration.getTypeOfs())),
   };
+};
+
+const filterTypeOfs = (typeOfs: string[]): string[] => {
+  if (typeOfs.length === 1) {
+    return typeOfs;
+  }
+
+  return typeOfs.filter((t) => t !== 'undefined');
 };
