@@ -142,3 +142,15 @@ describe('Class', () => {
     );
   });
 });
+
+describe('Export assignment', () => {
+  it('creates the export assignment', () => {
+    const declaration: DTS = {
+      exportAssignment: 'Foo',
+    };
+
+    const ast = buildAst(declaration);
+
+    expect(emit(ast)).toBe(emit(createFromString(`export = Foo`)));
+  });
+});

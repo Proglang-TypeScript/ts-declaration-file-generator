@@ -1,6 +1,5 @@
 import { createDTSType } from '../createDTSType';
 import { DTSTypeKinds, DTSTypeKeywords, DTSTypeUnion } from '../../../ast/types';
-import { type } from 'os';
 
 describe('createDTSType', () => {
   it('creates the string type', () => {

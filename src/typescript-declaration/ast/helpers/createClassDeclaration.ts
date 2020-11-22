@@ -1,5 +1,5 @@
 import { DTSClass, DTSModifiers } from '../types';
-import ts, { createIdentifier } from 'typescript';
+import ts from 'typescript';
 import { createModifiers } from './createModifiers';
 import { createParameter } from './createParameter';
 import { createReturnType } from './createReturnType';
@@ -8,7 +8,7 @@ export const createClassDeclaration = (dtsClass: DTSClass): ts.ClassDeclaration 
   return ts.createClassDeclaration(
     undefined,
     createModifiers([dtsClass.export !== false ? DTSModifiers.EXPORT : DTSModifiers.DECLARE]),
-    createIdentifier(dtsClass.name),
+    ts.createIdentifier(dtsClass.name),
     undefined,
     undefined,
     [...createConstructors(dtsClass), ...createMethods(dtsClass)],
@@ -35,7 +35,7 @@ const createMethods = (dtsClass: DTSClass): ts.MethodDeclaration[] => {
         undefined,
         undefined,
         undefined,
-        createIdentifier(m.name),
+        ts.createIdentifier(m.name),
         undefined,
         undefined,
         m.parameters?.map((p) => createParameter(p)) || [],
