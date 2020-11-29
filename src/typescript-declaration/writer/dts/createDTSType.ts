@@ -1,6 +1,10 @@
 import { DTSType, DTSTypeKinds, DTSTypeKeywords } from '../../ast/types';
 
 export const createDTSType = (types: (SupportedTypes | string)[]): DTSType => {
+  if (types.length === 0) {
+    throw new Error('Types cannot be empty');
+  }
+
   if (types.length > 1) {
     return {
       kind: DTSTypeKinds.UNION,
@@ -8,7 +12,8 @@ export const createDTSType = (types: (SupportedTypes | string)[]): DTSType => {
     };
   }
 
-  switch (types[0]) {
+  const type = types[0];
+  switch (type) {
     case 'string':
       return {
         kind: DTSTypeKinds.KEYWORD,
@@ -54,9 +59,7 @@ export const createDTSType = (types: (SupportedTypes | string)[]): DTSType => {
     case 'Function':
       return {
         kind: DTSTypeKinds.TYPE_REFERENCE,
-        value: {
-          referenceName: 'Function',
-        },
+        value: 'Function',
       };
 
     case 'Array<any>':
@@ -70,8 +73,8 @@ export const createDTSType = (types: (SupportedTypes | string)[]): DTSType => {
   }
 
   return {
-    kind: DTSTypeKinds.KEYWORD,
-    value: DTSTypeKeywords.UNKNOWN,
+    kind: DTSTypeKinds.INTERFACE,
+    value: type,
   };
 };
 

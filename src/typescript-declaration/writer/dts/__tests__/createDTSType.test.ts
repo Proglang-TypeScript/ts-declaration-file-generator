@@ -1,5 +1,5 @@
 import { createDTSType } from '../createDTSType';
-import { DTSTypeKinds, DTSTypeKeywords, DTSTypeUnion } from '../../../ast/types';
+import { DTSTypeKinds, DTSTypeKeywords, DTSTypeUnion, DTSTypeReference } from '../../../ast/types';
 
 describe('createDTSType', () => {
   it('creates the string type', () => {
@@ -54,9 +54,7 @@ describe('createDTSType', () => {
   it('creates the Function type', () => {
     expect(createDTSType(['Function'])).toStrictEqual({
       kind: DTSTypeKinds.TYPE_REFERENCE,
-      value: {
-        referenceName: 'Function',
-      },
+      value: 'Function',
     });
   });
 
@@ -89,5 +87,14 @@ describe('createDTSType', () => {
     };
 
     expect(createDTSType(['Array<any>', 'string'])).toStrictEqual(expectedType);
+  });
+
+  it('creates the Type Reference', () => {
+    const expectedType: DTSTypeReference = {
+      kind: DTSTypeKinds.TYPE_REFERENCE,
+      value: 'SomeType',
+    };
+
+    expect(createDTSType(['SomeType'])).toStrictEqual(expectedType);
   });
 });

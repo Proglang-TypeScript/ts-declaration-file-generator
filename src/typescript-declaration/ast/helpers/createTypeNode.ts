@@ -5,10 +5,12 @@ import {
   DTSTypeKeywords,
   DTSTypeLiteralType,
   DTSTypeReference,
+  DTS,
+  DTSTypeInterface,
 } from '../types';
-import ts, { createIdentifier } from 'typescript';
+import ts from 'typescript';
 
-export const createTypeNode = (type: DTSType): ts.TypeNode => {
+export const createTypeNode = (type: DTSType, context?: DTS): ts.TypeNode => {
   switch (type.kind) {
     case DTSTypeKinds.KEYWORD:
       return createKeywordType(type);
@@ -17,10 +19,13 @@ export const createTypeNode = (type: DTSType): ts.TypeNode => {
       return createLiteralType(type);
 
     case DTSTypeKinds.UNION:
-      return ts.createUnionTypeNode(type.value.map((v) => createTypeNode(v)));
+      return ts.createUnionTypeNode(type.value.map((v) => createTypeNode(v, context)));
 
     case DTSTypeKinds.TYPE_REFERENCE:
       return createReferenceType(type);
+
+    case DTSTypeKinds.INTERFACE:
+      return createInterfaceType(type, context);
 
     case DTSTypeKinds.ARRAY:
       return ts.createArrayTypeNode(createTypeNode(type.value));
@@ -75,11 +80,23 @@ const createLiteralType = (type: DTSTypeLiteralType): ts.LiteralTypeNode => {
   }
 };
 
-const createReferenceType = (type: DTSTypeReference): ts.TypeReferenceNode => {
-  const referenceTypeName = createIdentifier(type.value.referenceName);
-  const typeName = type.value.namespace
-    ? ts.createQualifiedName(createIdentifier(type.value.namespace), referenceTypeName)
-    : referenceTypeName;
+const createInterfaceType = (type: DTSTypeInterface, context?: DTS): ts.TypeReferenceNode => {
+  const interfacesInNamespace = context?.namespace?.interfaces || [];
 
-  return ts.createTypeReferenceNode(typeName, undefined);
+  let typeReferenceValue: string | ts.QualifiedName = type.value;
+  if (
+    interfacesInNamespace.length > 0 &&
+    interfacesInNamespace.some((i) => i.name === type.value)
+  ) {
+    typeReferenceValue = ts.createQualifiedName(
+      ts.createIdentifier(context?.namespace?.name || ''),
+      type.value,
+    );
+  }
+
+  return ts.createTypeReferenceNode(typeReferenceValue, undefined);
+};
+
+const createReferenceType = (type: DTSTypeReference): ts.TypeReferenceNode => {
+  return ts.createTypeReferenceNode(type.value, undefined);
 };

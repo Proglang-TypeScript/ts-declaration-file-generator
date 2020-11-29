@@ -1,9 +1,9 @@
 import ArgumentDeclaration from '../../../ArgumentDeclaration';
-import { createFunctionParameter } from '../createFunctionParameter';
+import { createDTSProperty } from '../createDTSProperty';
 import { DTSProperty } from '../../../ast/types/dtsProperty';
 import { DTSTypeKinds, DTSTypeKeywords } from '../../../ast/types';
 
-describe('createFunctionParameter', () => {
+describe('createDTSProperty', () => {
   it('creates the parameter from an argument', () => {
     const a = new ArgumentDeclaration(0, 'a');
     ['string', 'number'].map((type) => a.addTypeOf(type));
@@ -26,7 +26,7 @@ describe('createFunctionParameter', () => {
       },
     };
 
-    expect(createFunctionParameter(a)).toStrictEqual(parameter);
+    expect(createDTSProperty(a)).toStrictEqual(parameter);
   });
 
   it('ignores the `undefined` type if there are other types', () => {
@@ -42,7 +42,7 @@ describe('createFunctionParameter', () => {
       },
     };
 
-    expect(createFunctionParameter(a)).toStrictEqual(parameter);
+    expect(createDTSProperty(a)).toStrictEqual(parameter);
   });
 
   it('does not ignore the `undefined` type if there is no other type', () => {
@@ -58,6 +58,6 @@ describe('createFunctionParameter', () => {
       },
     };
 
-    expect(createFunctionParameter(a)).toStrictEqual(parameter);
+    expect(createDTSProperty(a)).toStrictEqual(parameter);
   });
 });

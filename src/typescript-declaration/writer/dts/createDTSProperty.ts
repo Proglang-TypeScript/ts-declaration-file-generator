@@ -1,8 +1,13 @@
-import ArgumentDeclaration from '../../ArgumentDeclaration';
 import { DTSProperty } from '../../ast/types/dtsProperty';
 import { createDTSType } from './createDTSType';
 
-export const createFunctionParameter = (argumentDeclaration: ArgumentDeclaration): DTSProperty => {
+type PropertyDeclaration = {
+  name: string;
+  isOptional(): boolean;
+  getTypeOfs(): string[];
+};
+
+export const createDTSProperty = (argumentDeclaration: PropertyDeclaration): DTSProperty => {
   return {
     name: argumentDeclaration.name,
     optional: argumentDeclaration.isOptional(),

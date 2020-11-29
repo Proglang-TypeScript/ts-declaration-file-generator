@@ -3,7 +3,7 @@ import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemp
 import { buildAst } from '../ast/buildAst';
 import { DTS } from '../ast/types';
 import { emit } from '../ts-ast-utils/utils';
-import { createFunctionParameter } from './dts/createFunctionParameter';
+import { createDTSProperty } from './dts/createDTSProperty';
 
 export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDeclarationWriter {
   protected doWrite(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration) {
@@ -14,8 +14,25 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
         .map((method) => ({
           name: this.getExportedName(typescriptModuleDeclaration),
           export: false,
-          parameters: method.getArguments().map((argument) => createFunctionParameter(argument)),
+          parameters: method.getArguments().map((argument) => createDTSProperty(argument)),
         })),
+      namespace: {
+        name: this.getExportedName(typescriptModuleDeclaration),
+        interfaces: typescriptModuleDeclaration.interfaces.map((interfaceDeclaration) => ({
+          name: interfaceDeclaration.name,
+          properties: interfaceDeclaration.getAttributes().map((attributeDeclaration) =>
+            createDTSProperty({
+              name: attributeDeclaration.name,
+              getTypeOfs() {
+                return attributeDeclaration.type;
+              },
+              isOptional() {
+                return attributeDeclaration.optional === true;
+              },
+            }),
+          ),
+        })),
+      },
     };
 
     this.fileContents = emit(buildAst(dtsFile));

@@ -92,26 +92,11 @@ describe('createTypeNode', () => {
     it('creates the type reference type', () => {
       const type: DTSType = {
         kind: DTSTypeKinds.TYPE_REFERENCE,
-        value: {
-          referenceName: 'MyInterface',
-        },
+        value: 'MyInterface',
       };
 
       const typeNode = createTypeNode(type);
       expect(emit(typeNode)).toBe(`MyInterface`);
-    });
-
-    it('creates the type reference type with qualified name', () => {
-      const type: DTSType = {
-        kind: DTSTypeKinds.TYPE_REFERENCE,
-        value: {
-          referenceName: 'MyInterface',
-          namespace: 'MyNamespace',
-        },
-      };
-
-      const typeNode = createTypeNode(type);
-      expect(emit(typeNode)).toBe(`MyNamespace.MyInterface`);
     });
   });
 

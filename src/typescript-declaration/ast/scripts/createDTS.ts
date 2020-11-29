@@ -26,6 +26,7 @@ const dts: DTS = {
   classes: [
     {
       name: 'Calculator',
+      export: false,
       constructors: [
         {
           parameters: [
@@ -60,11 +61,8 @@ const dts: DTS = {
             {
               name: 'optionalParameter',
               type: {
-                kind: DTSTypeKinds.TYPE_REFERENCE,
-                value: {
-                  referenceName: 'I__optionalParameter',
-                  namespace: 'Calculator',
-                },
+                kind: DTSTypeKinds.INTERFACE,
+                value: 'I__optionalParameter',
               },
               optional: true,
             },

@@ -1,34 +1,34 @@
-import { DTSClass, DTSModifiers } from '../types';
+import { DTSClass, DTSModifiers, DTS } from '../types';
 import ts from 'typescript';
 import { createModifiers } from './createModifiers';
 import { createParameter } from './createParameter';
 import { createReturnType } from './createReturnType';
 
-export const createClassDeclaration = (dtsClass: DTSClass): ts.ClassDeclaration => {
+export const createClassDeclaration = (dtsClass: DTSClass, context?: DTS): ts.ClassDeclaration => {
   return ts.createClassDeclaration(
     undefined,
     createModifiers([dtsClass.export !== false ? DTSModifiers.EXPORT : DTSModifiers.DECLARE]),
     ts.createIdentifier(dtsClass.name),
     undefined,
     undefined,
-    [...createConstructors(dtsClass), ...createMethods(dtsClass)],
+    [...createConstructors(dtsClass, context), ...createMethods(dtsClass, context)],
   );
 };
 
-const createConstructors = (dtsClass: DTSClass): ts.ConstructorDeclaration[] => {
+const createConstructors = (dtsClass: DTSClass, context?: DTS): ts.ConstructorDeclaration[] => {
   return (
     dtsClass.constructors?.map((constructor) =>
       ts.createConstructor(
         undefined,
         undefined,
-        constructor.parameters?.map((parameter) => createParameter(parameter)) || [],
+        constructor.parameters?.map((parameter) => createParameter(parameter, context)) || [],
         undefined,
       ),
     ) || []
   );
 };
 
-const createMethods = (dtsClass: DTSClass): ts.MethodDeclaration[] => {
+const createMethods = (dtsClass: DTSClass, context?: DTS): ts.MethodDeclaration[] => {
   return (
     dtsClass.methods?.map((m) =>
       ts.createMethod(
@@ -38,8 +38,8 @@ const createMethods = (dtsClass: DTSClass): ts.MethodDeclaration[] => {
         ts.createIdentifier(m.name),
         undefined,
         undefined,
-        m.parameters?.map((p) => createParameter(p)) || [],
-        createReturnType(m),
+        m.parameters?.map((p) => createParameter(p, context)) || [],
+        createReturnType(m, context),
         undefined,
       ),
     ) || []
