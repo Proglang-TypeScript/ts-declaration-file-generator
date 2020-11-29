@@ -32,6 +32,20 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
             }),
           ),
         })),
+        classes: typescriptModuleDeclaration.classes.map((c) => ({
+          name: c.name,
+          constructors: [
+            {
+              parameters: c.constructorMethod
+                .getArguments()
+                .map((argument) => createDTSProperty(argument)),
+            },
+          ],
+          methods: c.getMethods().map((method) => ({
+            name: method.name,
+            parameters: method.getArguments().map((argument) => createDTSProperty(argument)),
+          })),
+        })),
       },
     };
 
