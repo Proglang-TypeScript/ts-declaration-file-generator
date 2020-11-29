@@ -20,17 +20,9 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
         name: this.getExportedName(typescriptModuleDeclaration),
         interfaces: typescriptModuleDeclaration.interfaces.map((interfaceDeclaration) => ({
           name: interfaceDeclaration.name,
-          properties: interfaceDeclaration.getAttributes().map((attributeDeclaration) =>
-            createDTSProperty({
-              name: attributeDeclaration.name,
-              getTypeOfs() {
-                return attributeDeclaration.type;
-              },
-              isOptional() {
-                return attributeDeclaration.optional === true;
-              },
-            }),
-          ),
+          properties: interfaceDeclaration
+            .getAttributes()
+            .map((attributeDeclaration) => createDTSProperty(attributeDeclaration)),
         })),
         classes: typescriptModuleDeclaration.classes.map((c) => ({
           name: c.name,

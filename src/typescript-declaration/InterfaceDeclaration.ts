@@ -2,8 +2,8 @@ import { FunctionDeclaration } from './FunctionDeclaration';
 
 export interface InterfaceAttributeDeclaration {
   name: string;
-  type: string[];
-  optional?: boolean;
+  getTypeOfs(): string[];
+  isOptional(): boolean;
 }
 
 export class InterfaceDeclaration {
@@ -13,7 +13,7 @@ export class InterfaceDeclaration {
 
   mergeWith(i: InterfaceDeclaration): void {
     i.getAttributes().forEach((a) => {
-      this.addAttribute(a.name, a.type);
+      this.addAttribute(a.name, a.getTypeOfs());
     });
   }
 
@@ -29,10 +29,12 @@ export class InterfaceDeclaration {
 
   getAttributes(): InterfaceAttributeDeclaration[] {
     return Array.from(this.attributes.keys()).map((name) => {
+      const typeOfs = this.attributes.get(name) || [];
+      const isOptional = typeOfs.indexOf('undefined') > -1;
       return {
         name,
-        type: this.attributes.get(name) || [],
-        optional: (this.attributes.get(name) || []).indexOf('undefined') > -1,
+        getTypeOfs: () => typeOfs,
+        isOptional: () => isOptional,
       };
     });
   }

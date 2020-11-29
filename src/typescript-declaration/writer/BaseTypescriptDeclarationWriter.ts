@@ -72,12 +72,12 @@ export abstract class BaseTypescriptDeclarationWriter {
   }
 
   protected buildInterfaceAttribute(a: InterfaceAttributeDeclaration): string {
-    let types = a.type;
+    let types = a.getTypeOfs();
     if (types.length > 1) {
       types = types.filter((t) => t !== 'undefined');
     }
 
-    return `'${a.name}'${a.optional ? '?' : ''}: ${types.join(' | ')}`;
+    return `'${a.name}'${a.isOptional() ? '?' : ''}: ${types.join(' | ')}`;
   }
 
   protected getMapping(): (s: string) => string {

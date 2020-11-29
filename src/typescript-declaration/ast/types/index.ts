@@ -27,7 +27,7 @@ export interface DTSInterface {
 export interface DTSClass {
   name: string;
   properties?: DTSProperty[];
-  methods?: DTSFunction[];
+  methods?: Omit<DTSFunction, 'export'>[];
   constructors?: { parameters?: DTSProperty[] }[];
   export?: boolean;
 }

@@ -1,4 +1,10 @@
-export default class ArgumentDeclaration {
+export interface PropertyDeclaration {
+  name: string;
+  isOptional(): boolean;
+  getTypeOfs(): string[];
+}
+
+export default class ArgumentDeclaration implements PropertyDeclaration {
   index: number;
   name: string;
   private typeOfs: Set<string>;
