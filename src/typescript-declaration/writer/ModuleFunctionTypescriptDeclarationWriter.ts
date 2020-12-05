@@ -1,9 +1,11 @@
 import { BaseTypescriptDeclarationWriter } from './BaseTypescriptDeclarationWriter';
 import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
 import { buildAst } from '../ast/buildAst';
-import { DTS } from '../ast/types';
+import { DTS, DTSNamespace } from '../ast/types';
 import { emit } from '../ts-ast-utils/utils';
 import { createDTSProperty } from './dts/createDTSProperty';
+import { createDTSType } from './dts/createDTSType';
+import { createDTSInterface } from './dts/createDTSInterface';
 
 export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDeclarationWriter {
   protected doWrite(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration) {
@@ -15,30 +17,9 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
           name: this.getExportedName(typescriptModuleDeclaration),
           export: false,
           parameters: method.getArguments().map((argument) => createDTSProperty(argument)),
+          returnType: createDTSType(method.getReturnTypeOfs()),
         })),
-      namespace: {
-        name: this.getExportedName(typescriptModuleDeclaration),
-        interfaces: typescriptModuleDeclaration.interfaces.map((interfaceDeclaration) => ({
-          name: interfaceDeclaration.name,
-          properties: interfaceDeclaration
-            .getAttributes()
-            .map((attributeDeclaration) => createDTSProperty(attributeDeclaration)),
-        })),
-        classes: typescriptModuleDeclaration.classes.map((c) => ({
-          name: c.name,
-          constructors: [
-            {
-              parameters: c.constructorMethod
-                .getArguments()
-                .map((argument) => createDTSProperty(argument)),
-            },
-          ],
-          methods: c.getMethods().map((method) => ({
-            name: method.name,
-            parameters: method.getArguments().map((argument) => createDTSProperty(argument)),
-          })),
-        })),
-      },
+      namespace: this.getNamespace(typescriptModuleDeclaration),
     };
 
     this.fileContents = emit(buildAst(dtsFile));
@@ -52,5 +33,37 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
     });
 
     return n.charAt(0).toUpperCase() + n.slice(1);
+  }
+
+  private getNamespace(
+    typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration,
+  ): DTSNamespace | undefined {
+    const interfaces = typescriptModuleDeclaration.interfaces;
+    const classes = typescriptModuleDeclaration.classes;
+
+    if (interfaces.length === 0 && classes.length === 0) {
+      return undefined;
+    }
+
+    return {
+      name: this.getExportedName(typescriptModuleDeclaration),
+      interfaces: interfaces.map((interfaceDeclaration) =>
+        createDTSInterface(interfaceDeclaration),
+      ),
+      classes: classes.map((c) => ({
+        name: c.name,
+        constructors: [
+          {
+            parameters: c.constructorMethod
+              .getArguments()
+              .map((argument) => createDTSProperty(argument)),
+          },
+        ],
+        methods: c.getMethods().map((method) => ({
+          name: method.name,
+          parameters: method.getArguments().map((argument) => createDTSProperty(argument)),
+        })),
+      })),
+    };
   }
 }
