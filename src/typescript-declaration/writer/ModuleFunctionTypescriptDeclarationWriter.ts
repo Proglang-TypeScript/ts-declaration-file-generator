@@ -6,6 +6,7 @@ import { emit } from '../ts-ast-utils/utils';
 import { createDTSProperty } from './dts/createDTSProperty';
 import { createDTSType } from './dts/createDTSType';
 import { createDTSInterface } from './dts/createDTSInterface';
+import { createDTSClass } from './dts/createDTSClass';
 
 export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDeclarationWriter {
   protected doWrite(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration) {
@@ -50,20 +51,7 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
       interfaces: interfaces.map((interfaceDeclaration) =>
         createDTSInterface(interfaceDeclaration),
       ),
-      classes: classes.map((c) => ({
-        name: c.name,
-        constructors: [
-          {
-            parameters: c.constructorMethod
-              .getArguments()
-              .map((argument) => createDTSProperty(argument)),
-          },
-        ],
-        methods: c.getMethods().map((method) => ({
-          name: method.name,
-          parameters: method.getArguments().map((argument) => createDTSProperty(argument)),
-        })),
-      })),
+      classes: classes.map((c) => createDTSClass(c)),
     };
   }
 }
