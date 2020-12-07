@@ -254,7 +254,7 @@ export class TypescriptDeclarationBuilder {
       if (filteredFollowingInteractions.length > 0) {
         const followingInterfaceDeclaration = this.buildInterfaceDeclaration(
           filteredFollowingInteractions,
-          this.getInterfaceName(interaction.field),
+          this.getInterfaceName(`${interaction.field}`),
           argument,
           functionRunTimeInfo,
         );
@@ -264,7 +264,7 @@ export class TypescriptDeclarationBuilder {
         attributeType = this.matchToTypescriptType(interaction.returnTypeOf);
       }
 
-      interfaceDeclaration.addAttribute(interaction.field, [attributeType]);
+      interfaceDeclaration.addAttribute(`${interaction.field}`, [attributeType]);
     });
 
     interfaceDeclaration.name = name;

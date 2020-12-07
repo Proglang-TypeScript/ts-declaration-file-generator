@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { FunctionRuntimeInfo, ArgumentRuntimeInfo, RuntimeInfo } from './parsedTypes';
 import { JsonRuntimeInfo, JsonFunctionContainer } from './inputTypes';
+import { parseJson } from './parseJson';
 
 type AttributesByTraceIdMap = Map<
   string,
@@ -20,7 +21,7 @@ export class RuntimeInfoParser {
     const jsonFile = fs.readFileSync(this.fileName);
     const runTimeInfo: RuntimeInfo = {};
 
-    const jsonInfo = JSON.parse(jsonFile.toString()) as JsonRuntimeInfo;
+    const jsonInfo = parseJson<JsonRuntimeInfo>(jsonFile.toString());
 
     for (const functionId in jsonInfo) {
       const jsonFunctionContainer: JsonFunctionContainer = jsonInfo[functionId];

@@ -22,7 +22,7 @@ export interface JsonInteraction {
   code: string;
   typeof: string;
   returnTypeOf: string;
-  field: string;
+  field: string | number; // To deal with fields with type number, i.e. when accessing an element of an array (myArray[1]).
   followingInteractions?: JsonInteraction[];
   traceId: string;
 }
