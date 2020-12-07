@@ -7,6 +7,7 @@ import { createDTSProperty } from './dts/createDTSProperty';
 import { createDTSType } from './dts/createDTSType';
 import { createDTSInterface } from './dts/createDTSInterface';
 import { createDTSClass } from './dts/createDTSClass';
+import { createDTSFunction } from './dts/createDTSFunction';
 
 export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDeclarationWriter {
   protected doWrite(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration) {
@@ -15,10 +16,9 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
       functions: typescriptModuleDeclaration.methods
         .filter((method) => method.isExported === true)
         .map((method) => ({
+          ...createDTSFunction(method),
           name: this.getExportedName(typescriptModuleDeclaration),
           export: false,
-          parameters: method.getArguments().map((argument) => createDTSProperty(argument)),
-          returnType: createDTSType(method.getReturnTypeOfs()),
         })),
       namespace: this.getNamespace(typescriptModuleDeclaration),
     };
@@ -41,13 +41,18 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
   ): DTSNamespace | undefined {
     const interfaces = typescriptModuleDeclaration.interfaces;
     const classes = typescriptModuleDeclaration.classes;
+    const functions = typescriptModuleDeclaration.methods.filter((m) => !m.isExported);
 
-    if (interfaces.length === 0 && classes.length === 0) {
+    if ([...interfaces, ...classes, ...functions].length === 0) {
       return undefined;
     }
 
     return {
       name: this.getExportedName(typescriptModuleDeclaration),
+      functions: functions.map((method) => ({
+        ...createDTSFunction(method),
+        export: true,
+      })),
       interfaces: interfaces.map((interfaceDeclaration) =>
         createDTSInterface(interfaceDeclaration),
       ),
