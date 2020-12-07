@@ -16,6 +16,7 @@ describe('createInterface', () => {
         },
         {
           name: 'b',
+          optional: true,
           type: {
             kind: DTSTypeKinds.KEYWORD,
             value: DTSTypeKeywords.NUMBER,
@@ -26,6 +27,6 @@ describe('createInterface', () => {
 
     const ast = createInterfaceDeclaration(interfaceDeclaration);
 
-    assertNodeEqualsString(ast, `export interface Foo {a: string; b: number;}`);
+    assertNodeEqualsString(ast, `export interface Foo {a: string; b?: number;}`);
   });
 });

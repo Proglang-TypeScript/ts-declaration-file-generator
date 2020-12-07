@@ -90,8 +90,8 @@ describe('createDTSType', () => {
   });
 
   it('creates the Type Reference', () => {
-    const expectedType: DTSTypeReference = {
-      kind: DTSTypeKinds.TYPE_REFERENCE,
+    const expectedType = {
+      kind: DTSTypeKinds.INTERFACE,
       value: 'SomeType',
     };
 

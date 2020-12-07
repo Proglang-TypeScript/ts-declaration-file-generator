@@ -3,8 +3,6 @@ import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemp
 import { buildAst } from '../ast/buildAst';
 import { DTS, DTSNamespace } from '../ast/types';
 import { emit } from '../ts-ast-utils/utils';
-import { createDTSProperty } from './dts/createDTSProperty';
-import { createDTSType } from './dts/createDTSType';
 import { createDTSInterface } from './dts/createDTSInterface';
 import { createDTSClass } from './dts/createDTSClass';
 import { createDTSFunction } from './dts/createDTSFunction';

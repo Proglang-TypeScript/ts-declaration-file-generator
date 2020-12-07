@@ -1,6 +1,20 @@
 import { InterfaceDeclaration } from '../InterfaceDeclaration';
 
 describe('InterfaceDeclaration', () => {
+  describe('optional', () => {
+    it('correctly flags an attribute as optional', () => {
+      const i = new InterfaceDeclaration();
+
+      i.addAttribute('some-attribute', ['undefined, number']);
+      expect(
+        i
+          .getAttributes()
+          .find((v) => v.name === 'some-attribute')
+          ?.isOptional(),
+      ).toBe(true);
+    });
+  });
+
   describe('addAttribue', () => {
     it('adds attributes with different types', () => {
       const i = new InterfaceDeclaration();
@@ -12,10 +26,10 @@ describe('InterfaceDeclaration', () => {
       const attributes = i.getAttributes();
       expect(attributes).toHaveLength(2);
       expect(attributes[0].name).toBe('some-attribute');
-      expect(attributes[0].type).toStrictEqual(['string']);
+      expect(attributes[0].getTypeOfs()).toStrictEqual(['string']);
 
       expect(attributes[1].name).toBe('another-attribute');
-      expect(attributes[1].type).toStrictEqual(['number']);
+      expect(attributes[1].getTypeOfs()).toStrictEqual(['number']);
     });
 
     it('concatenates the types of same attribute with different type', () => {
@@ -30,10 +44,10 @@ describe('InterfaceDeclaration', () => {
       const attributes = i.getAttributes();
       expect(attributes).toHaveLength(2);
       expect(attributes[0].name).toBe('some-attribute');
-      expect(attributes[0].type).toStrictEqual(['string']);
+      expect(attributes[0].getTypeOfs()).toStrictEqual(['string']);
 
       expect(attributes[1].name).toBe('another-attribute');
-      expect(attributes[1].type).toStrictEqual(['number', 'boolean']);
+      expect(attributes[1].getTypeOfs()).toStrictEqual(['number', 'boolean']);
     });
 
     it('adds attributes with name of properties of Object (name in Object === true)', () => {

@@ -23,7 +23,7 @@ const createProperties = (dtsInterface: DTSInterface, context?: DTS): ts.Propert
       return ts.createPropertySignature(
         undefined,
         p.name,
-        undefined,
+        p.optional === true ? ts.createToken(ts.SyntaxKind.QuestionToken) : undefined,
         createTypeNode(p.type, context),
         undefined,
       );

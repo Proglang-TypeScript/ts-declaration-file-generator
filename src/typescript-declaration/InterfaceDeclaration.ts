@@ -30,11 +30,10 @@ export class InterfaceDeclaration {
   getAttributes(): InterfaceAttributeDeclaration[] {
     return Array.from(this.attributes.keys()).map((name) => {
       const typeOfs = this.attributes.get(name) || [];
-      const isOptional = typeOfs.indexOf('undefined') > -1;
       return {
         name,
         getTypeOfs: () => typeOfs,
-        isOptional: () => isOptional,
+        isOptional: () => typeOfs.includes('undefined'),
       };
     });
   }
