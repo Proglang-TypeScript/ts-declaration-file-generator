@@ -5,7 +5,7 @@ describe('InterfaceDeclaration', () => {
     it('correctly flags an attribute as optional', () => {
       const i = new InterfaceDeclaration();
 
-      i.addAttribute('some-attribute', ['undefined, number']);
+      i.addAttribute('some-attribute', ['undefined', 'number']);
       expect(
         i
           .getAttributes()
