@@ -17,7 +17,14 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
           name: this.exportNamespace,
           export: false,
         })),
-      namespace: createDTSNamespace(typescriptModuleDeclaration, this.exportNamespace),
+      namespace: createDTSNamespace(
+        {
+          interfaces: typescriptModuleDeclaration.interfaces,
+          classes: typescriptModuleDeclaration.classes,
+          functions: typescriptModuleDeclaration.methods.filter((m) => !m.isExported),
+        },
+        this.exportNamespace,
+      ),
     };
 
     this.fileContents = emit(buildAst(dtsFile));

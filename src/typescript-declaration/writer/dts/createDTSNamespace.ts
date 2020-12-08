@@ -1,17 +1,23 @@
-import { BaseTemplateTypescriptDeclaration } from '../../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
 import { DTSNamespace } from '../../ast/types';
 import { createDTSFunction } from './createDTSFunction';
 import { createDTSInterface } from './createDTSInterface';
 import { createDTSClass } from './createDTSClass';
+import { ClassDeclaration } from '../../ClassDeclaration';
+import { FunctionDeclaration } from '../../FunctionDeclaration';
+import { InterfaceDeclaration } from '../../InterfaceDeclaration';
 
 export const createDTSNamespace = (
-  typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration,
+  {
+    interfaces,
+    classes,
+    functions,
+  }: {
+    interfaces: InterfaceDeclaration[];
+    classes: ClassDeclaration[];
+    functions: FunctionDeclaration[];
+  },
   name: string,
 ): DTSNamespace | undefined => {
-  const interfaces = typescriptModuleDeclaration.interfaces;
-  const classes = typescriptModuleDeclaration.classes;
-  const functions = typescriptModuleDeclaration.methods.filter((m) => !m.isExported);
-
   if ([...interfaces, ...classes, ...functions].length === 0) {
     return undefined;
   }
