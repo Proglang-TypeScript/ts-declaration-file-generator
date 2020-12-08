@@ -1,24 +1,23 @@
 import { BaseTypescriptDeclarationWriter } from './BaseTypescriptDeclarationWriter';
 import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
 import { buildAst } from '../ast/buildAst';
-import { DTS, DTSNamespace } from '../ast/types';
+import { DTS } from '../ast/types';
 import { emit } from '../ts-ast-utils/utils';
-import { createDTSInterface } from './dts/createDTSInterface';
-import { createDTSClass } from './dts/createDTSClass';
 import { createDTSFunction } from './dts/createDTSFunction';
+import { createDTSNamespace } from './dts/createDTSNamespace';
 
 export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDeclarationWriter {
   protected doWrite(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration) {
     const dtsFile: DTS = {
-      exportAssignment: this.getExportedName(typescriptModuleDeclaration),
+      exportAssignment: this.exportNamespace,
       functions: typescriptModuleDeclaration.methods
         .filter((method) => method.isExported === true)
         .map((method) => ({
           ...createDTSFunction(method),
-          name: this.getExportedName(typescriptModuleDeclaration),
+          name: this.exportNamespace,
           export: false,
         })),
-      namespace: this.getNamespace(typescriptModuleDeclaration),
+      namespace: createDTSNamespace(typescriptModuleDeclaration, this.exportNamespace),
     };
 
     this.fileContents = emit(buildAst(dtsFile));
@@ -32,29 +31,5 @@ export class ModuleFunctionTypescriptDeclarationWriter extends BaseTypescriptDec
     });
 
     return n.charAt(0).toUpperCase() + n.slice(1);
-  }
-
-  private getNamespace(
-    typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration,
-  ): DTSNamespace | undefined {
-    const interfaces = typescriptModuleDeclaration.interfaces;
-    const classes = typescriptModuleDeclaration.classes;
-    const functions = typescriptModuleDeclaration.methods.filter((m) => !m.isExported);
-
-    if ([...interfaces, ...classes, ...functions].length === 0) {
-      return undefined;
-    }
-
-    return {
-      name: this.getExportedName(typescriptModuleDeclaration),
-      functions: functions.map((method) => ({
-        ...createDTSFunction(method),
-        export: true,
-      })),
-      interfaces: interfaces.map((interfaceDeclaration) =>
-        createDTSInterface(interfaceDeclaration),
-      ),
-      classes: classes.map((c) => createDTSClass(c)),
-    };
   }
 }
