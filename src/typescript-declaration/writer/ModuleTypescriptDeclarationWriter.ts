@@ -1,52 +1,24 @@
 import { BaseTypescriptDeclarationWriter } from './BaseTypescriptDeclarationWriter';
 import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
+import { DTS } from '../ast/types';
+import { createDTSClass } from './dts/createDTSClass';
+import { emit } from '../ts-ast-utils/utils';
+import { buildAst } from '../ast/buildAst';
+import { createDTSFunction } from './dts/createDTSFunction';
+import { createDTSInterface } from './dts/createDTSInterface';
 
 export class ModuleTypescriptDeclarationWriter extends BaseTypescriptDeclarationWriter {
   doWrite(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration) {
-    this.writeInterfaces(typescriptModuleDeclaration);
-    this.writeFunctions(typescriptModuleDeclaration);
-    this.writeClasses(typescriptModuleDeclaration);
+    const dtsFile: DTS = {
+      classes: typescriptModuleDeclaration.classes.map((c) => createDTSClass(c)),
+      functions: typescriptModuleDeclaration.methods.map((m) => createDTSFunction(m)),
+      interfaces: typescriptModuleDeclaration.interfaces.map((i) => createDTSInterface(i)),
+    };
+
+    this.fileContents = emit(buildAst(dtsFile));
   }
 
   protected getExportedName(): string {
     return '';
-  }
-
-  private writeInterfaces(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void {
-    typescriptModuleDeclaration.interfaces.forEach((i) => {
-      this.fileContents += 'export interface ' + i.name + ' {\n';
-
-      i.getAttributes().forEach((a) => {
-        this.fileContents += `\t${this.buildInterfaceAttribute(a)};\n`;
-      });
-
-      i.methods.forEach((m) => {
-        this.fileContents += '\t' + this.getFunctionNameWithTypes(m) + ';\n';
-      });
-
-      this.fileContents += '}\n\n';
-    });
-  }
-
-  private writeFunctions(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void {
-    typescriptModuleDeclaration.methods.forEach((functionDeclaration) => {
-      this.fileContents +=
-        'export function ' + this.getFunctionNameWithTypes(functionDeclaration) + ';\n';
-    });
-  }
-
-  private writeClasses(typescriptModuleDeclaration: BaseTemplateTypescriptDeclaration): void {
-    typescriptModuleDeclaration.classes.forEach((classDeclaration) => {
-      this.fileContents += 'export class ' + classDeclaration.name + ' {\n';
-
-      this.fileContents +=
-        '\t' + this.getConstructorSignature(classDeclaration.constructorMethod) + ';\n';
-
-      classDeclaration.getMethods().forEach((m) => {
-        this.fileContents += '\t' + this.getFunctionNameWithTypes(m) + ';\n';
-      });
-
-      this.fileContents += '}\n\n';
-    });
   }
 }
