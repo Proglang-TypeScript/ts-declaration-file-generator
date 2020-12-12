@@ -13,8 +13,9 @@
     "start": "node dist/index.js",
     "prebuild": "rm -rf dist",
     "build": "tsc",
-    "test": "jest",
+    "test": "jest src/",
     "test:clear-cache": "jest --clearCache",
+    "test:e2e": "jest e2e/",
     "lint": "eslint --max-warnings 0 'src/**/*.ts'",
     "prettier": "prettier --write 'src/**/*.ts'",
     "script": "ts-node"
