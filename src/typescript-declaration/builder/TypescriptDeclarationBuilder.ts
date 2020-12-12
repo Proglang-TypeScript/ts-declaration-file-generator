@@ -3,40 +3,29 @@ import { FunctionDeclaration } from '../FunctionDeclaration';
 import { InterfaceDeclaration } from '../InterfaceDeclaration';
 import { ClassDeclaration } from '../ClassDeclaration';
 import { FunctionDeclarationCleaner } from '../../utils/FunctionDeclarationCleaner';
-import { ModuleTypescriptDeclaration } from '../ModuleDeclaration/ModuleTypescriptDeclaration';
-import { ModuleClassTypescriptDeclaration } from '../ModuleDeclaration/ModuleClassTypescriptDeclaration';
-import { BaseTemplateTypescriptDeclaration } from '../ModuleDeclaration/BaseTemplateTypescriptDeclaration';
-import { ModuleFunctionTypescriptDeclaration } from '../ModuleDeclaration/ModuleFunctionTypescriptDeclaration';
 import { InterfaceSubsetPrimitiveValidator } from '../../utils/InterfaceSubsetPrimitiveValidator';
 import {
   FunctionRuntimeInfo,
   ArgumentRuntimeInfo,
   InteractionRuntimeInfo,
 } from '../../runtime-info/parser/parsedTypes';
+import { DTS } from '../ast/types';
+import { TypescriptDeclaration } from './types/TypescriptDeclaration';
+import { createDTSModuleClass } from './moduleClass';
+import { createDTSModuleFunction } from './moduleFunction';
+import { createDTSModule } from './module';
+
+type CreateDTS = (typescriptDeclaration: TypescriptDeclaration) => DTS;
 
 export class TypescriptDeclarationBuilder {
-  interfaceNames: { [id: string]: boolean };
-  interfaceDeclarations: { [id: string]: InterfaceDeclaration };
-  interfaceNameCounter: number;
-  moduleName: string;
-  classes: { [id: string]: ClassDeclaration };
-  functionDeclarations: FunctionDeclaration[];
-  cleaner: FunctionDeclarationCleaner;
-  interfaceSubsetPrimitiveValidator: InterfaceSubsetPrimitiveValidator;
-
-  constructorFunctionId: string;
-
-  constructor(cleaner: FunctionDeclarationCleaner) {
-    this.cleaner = cleaner;
-    this.interfaceNames = {};
-    this.interfaceDeclarations = {};
-    this.interfaceNameCounter = 0;
-    this.moduleName = '';
-    this.classes = {};
-    this.functionDeclarations = [];
-    this.constructorFunctionId = '';
-    this.interfaceSubsetPrimitiveValidator = new InterfaceSubsetPrimitiveValidator();
-  }
+  private interfaceNames: Record<string, boolean> = {};
+  private interfaceDeclarations: Record<string, InterfaceDeclaration> = {};
+  private interfaceNameCounter = 0;
+  private moduleName = '';
+  private classes: Record<string, ClassDeclaration> = {};
+  private functionDeclarations: FunctionDeclaration[] = [];
+  private cleaner = new FunctionDeclarationCleaner();
+  private interfaceSubsetPrimitiveValidator = new InterfaceSubsetPrimitiveValidator();
 
   private getInterfaceDeclarations(): InterfaceDeclaration[] {
     const i: InterfaceDeclaration[] = [];
@@ -66,10 +55,7 @@ export class TypescriptDeclarationBuilder {
     return this.cleaner.clean(this.functionDeclarations);
   }
 
-  build(
-    runTimeInfo: { [id: string]: FunctionRuntimeInfo },
-    moduleName: string,
-  ): BaseTemplateTypescriptDeclaration {
+  build(runTimeInfo: { [id: string]: FunctionRuntimeInfo }, moduleName: string): DTS {
     this.moduleName = moduleName;
 
     for (const key in runTimeInfo) {
@@ -82,14 +68,15 @@ export class TypescriptDeclarationBuilder {
     const interfaceDeclarations = this.getInterfaceDeclarations();
     const classDeclarations = this.getClassDeclarations();
 
-    const typescriptDeclaration = this.getTypescriptDeclaration(runTimeInfo);
+    const typescripDeclaration: TypescriptDeclaration = {
+      module: moduleName,
+      classes: classDeclarations,
+      methods: functionDeclarations,
+      interfaces: interfaceDeclarations,
+    };
 
-    typescriptDeclaration.module = moduleName;
-    typescriptDeclaration.classes = classDeclarations;
-    typescriptDeclaration.methods = functionDeclarations;
-    typescriptDeclaration.interfaces = interfaceDeclarations;
-
-    return typescriptDeclaration;
+    const createDTS = this.getCreateDTS(runTimeInfo);
+    return createDTS(typescripDeclaration);
   }
 
   private processRunTimeInfoElement(
@@ -349,23 +336,21 @@ export class TypescriptDeclarationBuilder {
     return m[t];
   }
 
-  private getTypescriptDeclaration(runTimeInfo: {
-    [id: string]: FunctionRuntimeInfo;
-  }): BaseTemplateTypescriptDeclaration {
+  private getCreateDTS(runTimeInfo: { [id: string]: FunctionRuntimeInfo }): CreateDTS {
     for (const key in runTimeInfo) {
       const functionRunTimeInfo = runTimeInfo[key];
 
       if (this.extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName) {
         if (functionRunTimeInfo.isExported === true) {
           if (functionRunTimeInfo.isConstructor === true) {
-            return new ModuleClassTypescriptDeclaration();
+            return createDTSModuleClass;
           } else {
-            return new ModuleFunctionTypescriptDeclaration();
+            return createDTSModuleFunction;
           }
         }
       }
     }
 
-    return new ModuleTypescriptDeclaration();
+    return createDTSModule;
   }
 }
