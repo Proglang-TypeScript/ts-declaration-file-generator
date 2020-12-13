@@ -19,7 +19,7 @@ type CreateDTS = (typescriptDeclaration: TypescriptDeclaration) => DTS;
 
 export class TypescriptDeclarationBuilder {
   private interfaceNames: Record<string, boolean> = {};
-  private interfaceDeclarations: Record<string, InterfaceDeclaration> = {};
+  private interfaceDeclarations = new Map<string, InterfaceDeclaration>();
   private interfaceNameCounter = 0;
   private moduleName = '';
   private classes: Record<string, ClassDeclaration> = {};
@@ -28,13 +28,7 @@ export class TypescriptDeclarationBuilder {
   private interfaceSubsetPrimitiveValidator = new InterfaceSubsetPrimitiveValidator();
 
   private getInterfaceDeclarations(): InterfaceDeclaration[] {
-    const i: InterfaceDeclaration[] = [];
-
-    for (const k in this.interfaceDeclarations) {
-      i.push(this.interfaceDeclarations[k]);
-    }
-
-    return i;
+    return Array.from(this.interfaceDeclarations.values());
   }
 
   private getClassDeclarations(): ClassDeclaration[] {
@@ -210,11 +204,11 @@ export class TypescriptDeclarationBuilder {
   }
 
   private removeInterfaceDeclaration(name: string) {
-    for (const k in this.interfaceDeclarations) {
-      if (this.interfaceDeclarations[k].name === name) {
-        delete this.interfaceDeclarations[k];
+    Array.from(this.interfaceDeclarations.entries()).forEach(([key, interfaceDeclaration]) => {
+      if (interfaceDeclaration.name === name) {
+        this.interfaceDeclarations.delete(key);
       }
-    }
+    });
   }
 
   private getInterfaceName(name: string): string {
@@ -272,8 +266,9 @@ export class TypescriptDeclarationBuilder {
       functionRunTimeInfo.functionId,
     ].join('__');
 
-    if (serializedInterface in this.interfaceDeclarations) {
-      this.interfaceDeclarations[serializedInterface].mergeWith(interfaceDeclaration);
+    const existingInterface = this.interfaceDeclarations.get(serializedInterface);
+    if (existingInterface) {
+      existingInterface.mergeWith(interfaceDeclaration);
     } else {
       let interfaceName = interfaceDeclaration.name;
       while (interfaceName in this.interfaceNames) {
@@ -284,7 +279,7 @@ export class TypescriptDeclarationBuilder {
       interfaceDeclaration.name = interfaceName;
 
       this.interfaceNames[interfaceDeclaration.name] = true;
-      this.interfaceDeclarations[serializedInterface] = interfaceDeclaration;
+      this.interfaceDeclarations.set(serializedInterface, interfaceDeclaration);
     }
   }
 
