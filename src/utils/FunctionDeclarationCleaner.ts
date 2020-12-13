@@ -1,4 +1,4 @@
-import { FunctionDeclaration } from '../TypescriptDeclaration/FunctionDeclaration';
+import { FunctionDeclaration } from '../typescript-declaration/FunctionDeclaration';
 
 export class FunctionDeclarationCleaner {
   functionDeclarations: FunctionDeclaration[] = [];

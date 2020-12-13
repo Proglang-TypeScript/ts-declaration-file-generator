@@ -1,4 +1,4 @@
-import { InterfaceDeclaration } from '../TypescriptDeclaration/InterfaceDeclaration';
+import { InterfaceDeclaration } from '../typescript-declaration/InterfaceDeclaration';
 
 export class InterfaceSubsetPrimitiveValidator {
   private STRING_ATTRIBUTES = ['length'];

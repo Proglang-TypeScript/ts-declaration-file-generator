@@ -13,14 +13,17 @@
     "start": "node dist/index.js",
     "prebuild": "rm -rf dist",
     "build": "tsc",
-    "test": "jest",
+    "test": "jest src/",
     "test:clear-cache": "jest --clearCache",
+    "test:e2e": "jest e2e/",
     "lint": "eslint --max-warnings 0 'src/**/*.ts'",
-    "prettier": "prettier --write 'src/**/*.ts'"
+    "prettier": "prettier --write 'src/**/*.ts'",
+    "script": "ts-node"
   },
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged"
+      "pre-commit": "pretty-quick --staged",
+      "pre-push": "npm run lint"
     }
   },
   "repository": {
@@ -34,7 +37,7 @@
   ],
   "author": "fcristiani",
   "license": "MIT",
-  "homepage": "https://bitbucket.org/fcristiani/tsd-generator#readme",
+  "homepage": "https://github.com/proglang/ts-declaration-file-generator",
   "devDependencies": {
     "@types/command-line-args": "^5.0.0",
     "@types/jest": "^26.0.3",
@@ -49,9 +52,10 @@
     "prettier": "^2.1.2",
     "pretty-quick": "^3.0.2",
     "ts-jest": "^26.1.1",
-    "typescript": "^3.9.7"
+    "ts-node": "^9.0.0"
   },
   "dependencies": {
+    "typescript": "^3.9.7",
     "command-line-args": "^5.0.2"
   },
   "engines": {
