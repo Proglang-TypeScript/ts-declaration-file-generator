@@ -22,7 +22,7 @@ export class TypescriptDeclarationBuilder {
   private interfaceDeclarations = new Map<string, InterfaceDeclaration>();
   private interfaceNameCounter = 0;
   private moduleName = '';
-  private classes: Record<string, ClassDeclaration> = {};
+  private classes = new Map<string, ClassDeclaration>();
   private functionDeclarations: FunctionDeclaration[] = [];
   private cleaner = new FunctionDeclarationCleaner();
   private interfaceSubsetPrimitiveValidator = new InterfaceSubsetPrimitiveValidator();
@@ -32,17 +32,10 @@ export class TypescriptDeclarationBuilder {
   }
 
   private getClassDeclarations(): ClassDeclaration[] {
-    const classes: ClassDeclaration[] = [];
-
-    for (const k in this.classes) {
-      classes.push(this.classes[k]);
-    }
-
-    classes.forEach((c) => {
+    return Array.from(this.classes.values()).map((c) => {
       c.methods = this.cleaner.clean(c.methods);
+      return c;
     });
-
-    return classes;
   }
 
   private getFunctionDeclarations(): FunctionDeclaration[] {
@@ -80,7 +73,7 @@ export class TypescriptDeclarationBuilder {
 
     if (
       this.extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName ||
-      functionRunTimeInfo.constructedBy in this.classes
+      this.classes.has(functionRunTimeInfo.constructedBy)
     ) {
       for (const traceId in functionRunTimeInfo.returnTypeOfs) {
         const functionDeclaration = this.getFunctionDeclaration(
@@ -129,10 +122,10 @@ export class TypescriptDeclarationBuilder {
       const c = new ClassDeclaration();
       c.setConstructor(functionDeclaration);
 
-      this.classes[functionRunTimeInfo.functionId] = c;
+      this.classes.set(functionRunTimeInfo.functionId, c);
     } else {
-      if (functionRunTimeInfo.constructedBy in this.classes) {
-        this.classes[functionRunTimeInfo.constructedBy].addMethod(functionDeclaration);
+      if (this.classes.has(functionRunTimeInfo.constructedBy)) {
+        this.classes.get(functionRunTimeInfo.constructedBy)?.addMethod(functionDeclaration);
       } else {
         functionDeclarations.push(functionDeclaration);
       }
