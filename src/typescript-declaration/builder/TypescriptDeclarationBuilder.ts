@@ -18,7 +18,7 @@ import { createDTSModule } from './module';
 type CreateDTS = (typescriptDeclaration: TypescriptDeclaration) => DTS;
 
 export class TypescriptDeclarationBuilder {
-  private interfaceNames: Record<string, boolean> = {};
+  private interfaceNames = new Set<string>();
   private interfaceDeclarations = new Map<string, InterfaceDeclaration>();
   private interfaceNameCounter = 0;
   private moduleName = '';
@@ -264,14 +264,14 @@ export class TypescriptDeclarationBuilder {
       existingInterface.mergeWith(interfaceDeclaration);
     } else {
       let interfaceName = interfaceDeclaration.name;
-      while (interfaceName in this.interfaceNames) {
+      while (this.interfaceNames.has(interfaceName)) {
         this.interfaceNameCounter++;
         interfaceName = interfaceDeclaration.name + '__' + this.interfaceNameCounter;
       }
 
       interfaceDeclaration.name = interfaceName;
 
-      this.interfaceNames[interfaceDeclaration.name] = true;
+      this.interfaceNames.add(interfaceDeclaration.name);
       this.interfaceDeclarations.set(serializedInterface, interfaceDeclaration);
     }
   }
