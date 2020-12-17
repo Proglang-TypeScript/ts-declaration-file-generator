@@ -1,5 +1,5 @@
 import { createDTSProperty } from './createDTSProperty';
-import { FunctionDeclaration } from '../../FunctionDeclaration';
+import { FunctionDeclaration } from '../../builder/FunctionDeclaration';
 import { createDTSType } from './createDTSType';
 import { DTSFunction } from '../../ast/types';
 

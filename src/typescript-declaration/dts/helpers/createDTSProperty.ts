@@ -1,6 +1,6 @@
 import { DTSProperty } from '../../ast/types/dtsProperty';
 import { createDTSType } from './createDTSType';
-import { PropertyDeclaration } from '../../ArgumentDeclaration';
+import { PropertyDeclaration } from '../../builder/ArgumentDeclaration';
 
 export const createDTSProperty = (argumentDeclaration: PropertyDeclaration): DTSProperty => {
   return {

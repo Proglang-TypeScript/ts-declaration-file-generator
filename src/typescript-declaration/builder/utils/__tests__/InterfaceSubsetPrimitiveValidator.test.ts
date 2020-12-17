@@ -1,4 +1,4 @@
-import { InterfaceDeclaration } from '../../typescript-declaration/InterfaceDeclaration';
+import { InterfaceDeclaration } from '../../InterfaceDeclaration';
 import { InterfaceSubsetPrimitiveValidator } from '../InterfaceSubsetPrimitiveValidator';
 
 describe('InterfaceSubsetPrimitiveValidator', () => {

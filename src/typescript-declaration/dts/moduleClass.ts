@@ -1,6 +1,6 @@
-import { TypescriptDeclaration } from './types/TypescriptDeclaration';
-import { createDTSNamespace } from './dts-helpers/createDTSNamespace';
-import { createDTSClass } from './dts-helpers/createDTSClass';
+import { TypescriptDeclaration } from '../builder/types/TypescriptDeclaration';
+import { createDTSNamespace } from './helpers/createDTSNamespace';
+import { createDTSClass } from './helpers/createDTSClass';
 import { DTS } from '../ast/types';
 
 export const createDTSModuleClass = (typescriptDeclaration: TypescriptDeclaration): DTS => ({

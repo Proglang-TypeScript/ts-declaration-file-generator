@@ -2,9 +2,9 @@ import { DTSNamespace } from '../../ast/types';
 import { createDTSFunction } from './createDTSFunction';
 import { createDTSInterface } from './createDTSInterface';
 import { createDTSClass } from './createDTSClass';
-import { ClassDeclaration } from '../../ClassDeclaration';
-import { FunctionDeclaration } from '../../FunctionDeclaration';
-import { InterfaceDeclaration } from '../../InterfaceDeclaration';
+import { ClassDeclaration } from '../../builder/ClassDeclaration';
+import { FunctionDeclaration } from '../../builder/FunctionDeclaration';
+import { InterfaceDeclaration } from '../../builder/InterfaceDeclaration';
 
 export const createDTSNamespace = (
   {

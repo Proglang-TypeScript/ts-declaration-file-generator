@@ -1,8 +1,8 @@
-import { TypescriptDeclaration } from './types/TypescriptDeclaration';
+import { TypescriptDeclaration } from '../builder/types/TypescriptDeclaration';
 import { DTS } from '../ast/types';
-import { createDTSFunction } from './dts-helpers/createDTSFunction';
-import { createDTSClass } from './dts-helpers/createDTSClass';
-import { createDTSInterface } from './dts-helpers/createDTSInterface';
+import { createDTSFunction } from './helpers/createDTSFunction';
+import { createDTSClass } from './helpers/createDTSClass';
+import { createDTSInterface } from './helpers/createDTSInterface';
 
 export const createDTSModule = (typescriptDeclaration: TypescriptDeclaration): DTS => ({
   classes: typescriptDeclaration.classes.map((c) => createDTSClass(c)),

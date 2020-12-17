@@ -1,4 +1,4 @@
-import { InterfaceDeclaration } from '../../InterfaceDeclaration';
+import { InterfaceDeclaration } from '../../builder/InterfaceDeclaration';
 import { createDTSProperty } from './createDTSProperty';
 import { DTSInterface } from '../../ast/types';
 

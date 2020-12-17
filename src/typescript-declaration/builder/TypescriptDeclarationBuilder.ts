@@ -1,9 +1,9 @@
-import ArgumentDeclaration from '../ArgumentDeclaration';
-import { FunctionDeclaration } from '../FunctionDeclaration';
-import { InterfaceDeclaration } from '../InterfaceDeclaration';
-import { ClassDeclaration } from '../ClassDeclaration';
-import { FunctionDeclarationCleaner } from '../../utils/FunctionDeclarationCleaner';
-import { InterfaceSubsetPrimitiveValidator } from '../../utils/InterfaceSubsetPrimitiveValidator';
+import ArgumentDeclaration from './ArgumentDeclaration';
+import { FunctionDeclaration } from './FunctionDeclaration';
+import { InterfaceDeclaration } from './InterfaceDeclaration';
+import { ClassDeclaration } from './ClassDeclaration';
+import { FunctionDeclarationCleaner } from './utils/FunctionDeclarationCleaner';
+import { InterfaceSubsetPrimitiveValidator } from './utils/InterfaceSubsetPrimitiveValidator';
 import {
   FunctionRuntimeInfo,
   ArgumentRuntimeInfo,
@@ -11,9 +11,9 @@ import {
 } from '../../runtime-info/parser/parsedTypes';
 import { DTS } from '../ast/types';
 import { TypescriptDeclaration } from './types/TypescriptDeclaration';
-import { createDTSModuleClass } from './moduleClass';
-import { createDTSModuleFunction } from './moduleFunction';
-import { createDTSModule } from './module';
+import { createDTSModuleClass } from '../dts/moduleClass';
+import { createDTSModuleFunction } from '../dts/moduleFunction';
+import { createDTSModule } from '../dts/module';
 
 type CreateDTS = (typescriptDeclaration: TypescriptDeclaration) => DTS;
 

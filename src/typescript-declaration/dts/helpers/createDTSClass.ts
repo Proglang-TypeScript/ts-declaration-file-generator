@@ -1,6 +1,6 @@
 import { createDTSProperty } from './createDTSProperty';
 import { DTSClass } from '../../ast/types';
-import { ClassDeclaration } from '../../ClassDeclaration';
+import { ClassDeclaration } from '../../builder/ClassDeclaration';
 import { createDTSType } from './createDTSType';
 
 export const createDTSClass = (classDeclaration: ClassDeclaration): DTSClass => ({

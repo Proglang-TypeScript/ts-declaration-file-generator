@@ -1,4 +1,4 @@
-import ArgumentDeclaration from '../../../ArgumentDeclaration';
+import ArgumentDeclaration from '../../../builder/ArgumentDeclaration';
 import { createDTSProperty } from '../createDTSProperty';
 import { DTSProperty } from '../../../ast/types/dtsProperty';
 import { DTSTypeKinds, DTSTypeKeywords } from '../../../ast/types';
