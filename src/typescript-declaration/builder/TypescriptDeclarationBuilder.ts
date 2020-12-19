@@ -170,21 +170,22 @@ export class TypescriptDeclarationBuilder {
       });
     }
 
-    return inputTypeOfs.concat(
-      interfacesTypeOfs
-        .filter((i) => {
-          if (
-            inputTypeOfs.includes('string') &&
-            this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(i)
-          ) {
-            this.removeInterfaceDeclaration(i.name);
-            return false;
-          }
+    if (inputTypeOfs.includes('string')) {
+      return inputTypeOfs.concat(
+        interfacesTypeOfs
+          .filter((i) => {
+            if (this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(i)) {
+              this.removeInterfaceDeclaration(i.name);
+              return false;
+            }
 
-          return true;
-        })
-        .map((i) => i.name),
-    );
+            return true;
+          })
+          .map((i) => i.name),
+      );
+    }
+
+    return inputTypeOfs.concat(interfacesTypeOfs.map((i) => i.name));
   }
 
   private removeInterfaceDeclaration(name: string) {
