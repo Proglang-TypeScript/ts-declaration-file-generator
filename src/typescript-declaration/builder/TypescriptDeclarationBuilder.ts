@@ -15,7 +15,7 @@ import { extractModuleName } from './helpers/extractModuleName';
 import { getCreateDTSFn } from './helpers/getCreateDTSFn';
 
 export class TypescriptDeclarationBuilder {
-  private interfaceNames = new Set<string>();
+  private interfaceNames = new Map<string, InterfaceDeclaration>();
   private interfaceDeclarations = new Map<string, InterfaceDeclaration>();
   private interfaceNameCounter = 0;
   private moduleName = '';
@@ -263,7 +263,7 @@ export class TypescriptDeclarationBuilder {
 
       interfaceDeclaration.name = interfaceName;
 
-      this.interfaceNames.add(interfaceDeclaration.name);
+      this.interfaceNames.set(interfaceDeclaration.name, interfaceDeclaration);
       this.interfaceDeclarations.set(serializedInterface, interfaceDeclaration);
     }
   }
