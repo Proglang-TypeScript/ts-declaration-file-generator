@@ -11,11 +11,8 @@ import {
 } from '../../runtime-info/parser/parsedTypes';
 import { DTS } from '../ast/types';
 import { TypescriptDeclaration } from './types/TypescriptDeclaration';
-import { createDTSModuleClass } from '../dts/moduleClass';
-import { createDTSModuleFunction } from '../dts/moduleFunction';
-import { createDTSModule } from '../dts/module';
-
-type CreateDTS = (typescriptDeclaration: TypescriptDeclaration) => DTS;
+import { extractModuleName } from './helpers/extractModuleName';
+import { getCreateDTSFn } from './helpers/getCreateDTSFn';
 
 export class TypescriptDeclarationBuilder {
   private interfaceNames = new Set<string>();
@@ -62,7 +59,7 @@ export class TypescriptDeclarationBuilder {
       interfaces: interfaceDeclarations,
     };
 
-    const createDTS = this.getCreateDTS(runTimeInfo);
+    const createDTS = getCreateDTSFn(runTimeInfo, this.moduleName);
     return createDTS(typescripDeclaration);
   }
 
@@ -72,7 +69,7 @@ export class TypescriptDeclarationBuilder {
     const functionDeclarations: FunctionDeclaration[] = [];
 
     if (
-      this.extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName ||
+      extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName ||
       this.classes.has(functionRunTimeInfo.constructedBy)
     ) {
       for (const traceId in functionRunTimeInfo.returnTypeOfs) {
@@ -134,10 +131,6 @@ export class TypescriptDeclarationBuilder {
     return functionDeclaration;
   }
 
-  private extractModuleName(m: string) {
-    return m.replace(/^.*[\/]/, '').replace(/\.[^/.]+$/, '');
-  }
-
   private getInterfacesForArgument(
     argument: ArgumentRuntimeInfo,
     functionRunTimeInfo: FunctionRuntimeInfo,
@@ -177,13 +170,11 @@ export class TypescriptDeclarationBuilder {
       });
     }
 
-    const inputHasString = inputTypeOfs.includes('string');
-
     return inputTypeOfs.concat(
       interfacesTypeOfs
         .filter((i) => {
           if (
-            inputHasString &&
+            inputTypeOfs.includes('string') &&
             this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(i)
           ) {
             this.removeInterfaceDeclaration(i.name);
@@ -200,6 +191,7 @@ export class TypescriptDeclarationBuilder {
     Array.from(this.interfaceDeclarations.entries()).forEach(([key, interfaceDeclaration]) => {
       if (interfaceDeclaration.name === name) {
         this.interfaceDeclarations.delete(key);
+        this.interfaceNames.delete(name);
       }
     });
   }
@@ -322,23 +314,5 @@ export class TypescriptDeclarationBuilder {
     }
 
     return m[t];
-  }
-
-  private getCreateDTS(runTimeInfo: { [id: string]: FunctionRuntimeInfo }): CreateDTS {
-    for (const key in runTimeInfo) {
-      const functionRunTimeInfo = runTimeInfo[key];
-
-      if (this.extractModuleName(functionRunTimeInfo.requiredModule) === this.moduleName) {
-        if (functionRunTimeInfo.isExported === true) {
-          if (functionRunTimeInfo.isConstructor === true) {
-            return createDTSModuleClass;
-          } else {
-            return createDTSModuleFunction;
-          }
-        }
-      }
-    }
-
-    return createDTSModule;
   }
 }
