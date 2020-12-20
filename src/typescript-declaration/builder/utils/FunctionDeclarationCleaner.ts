@@ -1,4 +1,5 @@
 import { FunctionDeclaration } from '../FunctionDeclaration';
+import objectHash from 'object-hash';
 
 export class FunctionDeclarationCleaner {
   functionDeclarations: FunctionDeclaration[] = [];
@@ -17,10 +18,8 @@ export class FunctionDeclarationCleaner {
     const functionsByNameAndReturnType = new Map<string, FunctionDeclaration>();
 
     this.functionDeclarations.forEach((functionDeclaration) => {
-      const key = `${functionDeclaration.name}:${functionDeclaration
-        .getReturnTypeOfs()
-        .sort()
-        .join('|')}`;
+      const key = this.getKeyWithReturnTypeOfs(functionDeclaration);
+
       const functionInMap = functionsByNameAndReturnType.get(key);
       if (!functionInMap) {
         functionsByNameAndReturnType.set(key, functionDeclaration);
@@ -98,5 +97,13 @@ export class FunctionDeclarationCleaner {
     }
 
     this.functionDeclarations = declarationWithCombinedReturnValues;
+  }
+
+  private getKeyWithReturnTypeOfs(functionDeclaration: FunctionDeclaration): string {
+    const returnTypeOfsSerialized = objectHash(
+      JSON.stringify(functionDeclaration.getReturnTypeOfs()),
+    );
+
+    return `${functionDeclaration.name}:${returnTypeOfsSerialized}`;
   }
 }

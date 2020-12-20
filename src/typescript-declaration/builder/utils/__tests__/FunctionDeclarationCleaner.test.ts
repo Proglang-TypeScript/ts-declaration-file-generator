@@ -16,17 +16,17 @@ describe('FunctionDeclarationCleaner', () => {
       const function1 = new FunctionDeclaration();
       function1.name = 'MyFunction';
       function1.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createNumber()));
-      function1.addReturnTypeOf('string');
+      function1.addReturnTypeOf(createString());
 
       const function2 = new FunctionDeclaration();
       function2.name = 'MyFunction';
       function2.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createString()));
-      function2.addReturnTypeOf('string');
+      function2.addReturnTypeOf(createString());
 
       const function3 = new FunctionDeclaration();
       function3.name = 'MyFunction';
       function3.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createBoolean()));
-      function3.addReturnTypeOf('number');
+      function3.addReturnTypeOf(createNumber());
 
       const functions = [function1, function2, function3];
 
@@ -35,7 +35,7 @@ describe('FunctionDeclarationCleaner', () => {
       expectedFunction.addArgument(
         new ArgumentDeclaration(0, 'a').addTypeOf(createString()).addTypeOf(createNumber()),
       );
-      expectedFunction.addReturnTypeOf('string');
+      expectedFunction.addReturnTypeOf(createString());
 
       const cleanedFunctions = cleaner.clean(functions);
       expect(cleanedFunctions).toContainEqual(expectedFunction);
@@ -49,17 +49,17 @@ describe('FunctionDeclarationCleaner', () => {
       const function1 = new FunctionDeclaration();
       function1.name = 'MyFunction';
       function1.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createNumber()));
-      function1.addReturnTypeOf('string');
+      function1.addReturnTypeOf(createString());
 
       const function2 = new FunctionDeclaration();
       function2.name = 'MyFunction';
       function2.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createString()));
-      function2.addReturnTypeOf('string');
+      function2.addReturnTypeOf(createString());
 
       const functionWithOtherName = new FunctionDeclaration();
       functionWithOtherName.name = 'MyOtherFunction';
       functionWithOtherName.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createString()));
-      functionWithOtherName.addReturnTypeOf('string');
+      functionWithOtherName.addReturnTypeOf(createString());
 
       const functions = [function1, function2, functionWithOtherName];
 
@@ -68,7 +68,7 @@ describe('FunctionDeclarationCleaner', () => {
       expectedFunction.addArgument(
         new ArgumentDeclaration(0, 'a').addTypeOf(createString()).addTypeOf(createNumber()),
       );
-      expectedFunction.addReturnTypeOf('string');
+      expectedFunction.addReturnTypeOf(createString());
 
       const cleanedFunctions = cleaner.clean(functions);
       expect(cleanedFunctions).toContainEqual(expectedFunction);
@@ -82,17 +82,17 @@ describe('FunctionDeclarationCleaner', () => {
       const function1 = new FunctionDeclaration();
       function1.name = 'MyFunction';
       function1.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createNumber()));
-      function1.addReturnTypeOf('string');
+      function1.addReturnTypeOf(createString());
 
       const function2 = new FunctionDeclaration();
       function2.name = 'MyFunction';
       function2.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createString()));
-      function2.addReturnTypeOf('string');
+      function2.addReturnTypeOf(createString());
 
       const function3 = new FunctionDeclaration();
       function3.name = 'MyFunction';
       function3.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createUndefined()));
-      function3.addReturnTypeOf('string');
+      function3.addReturnTypeOf(createString());
 
       const functions = [function1, function2, function3];
 
@@ -104,7 +104,7 @@ describe('FunctionDeclarationCleaner', () => {
           .addTypeOf(createNumber())
           .makeOptional(),
       );
-      expectedFunction.addReturnTypeOf('string');
+      expectedFunction.addReturnTypeOf(createString());
 
       const cleanedFunctions = cleaner.clean(functions);
       expect(cleanedFunctions).toContainEqual(expectedFunction);

@@ -1,5 +1,6 @@
 import { DTSType, DTSTypeKinds, DTSTypeKeywords } from '../ast/types';
 import hash from 'object-hash';
+import objectHash from 'object-hash';
 
 export interface PropertyDeclaration {
   name: string;
@@ -45,9 +46,11 @@ export default class ArgumentDeclaration implements PropertyDeclaration {
   }
 
   serialize(): string {
-    return JSON.stringify({
-      ...this,
-      typeOfs: this.getTypeOfs(),
-    });
+    return objectHash(
+      JSON.stringify({
+        ...this,
+        typeOfs: this.getTypeOfs(),
+      }),
+    );
   }
 }

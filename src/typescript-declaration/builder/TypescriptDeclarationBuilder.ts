@@ -25,6 +25,7 @@ import {
   createAny,
   createBoolean,
   createFunction,
+  createVoid,
 } from '../dts/helpers/createDTSType';
 import objectHash from 'object-hash';
 
@@ -355,22 +356,22 @@ export class TypescriptDeclarationBuilder {
     return createInterface(t);
   }
 
-  private matchReturnTypeOfs(t: string): string {
-    const m: { [id: string]: string } = {
-      string: 'string',
-      number: 'number',
-      undefined: 'void',
-      null: 'null',
-      object: 'object',
-      array: 'Array<any>',
-      boolean: 'boolean',
-      function: 'Function',
-    };
+  private matchReturnTypeOfs(t: string): DTSType {
+    const map = new Map<string, DTSType>()
+      .set('string', createString())
+      .set('number', createNumber())
+      .set('undefined', createVoid())
+      .set('null', createNull())
+      .set('object', createObject())
+      .set('array', createArray(createAny()))
+      .set('boolean', createBoolean())
+      .set('function', createFunction());
 
-    if (!(t in m)) {
-      return t;
+    const match = map.get(t);
+    if (match) {
+      return match;
     }
 
-    return m[t];
+    return createInterface(t);
   }
 }

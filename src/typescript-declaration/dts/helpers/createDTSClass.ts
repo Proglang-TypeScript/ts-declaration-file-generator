@@ -1,7 +1,7 @@
 import { createDTSProperty } from './createDTSProperty';
 import { DTSClass } from '../../ast/types';
 import { ClassDeclaration } from '../../builder/ClassDeclaration';
-import { createDTSTypeFromString } from './createDTSType';
+import { mergeDTSTypes } from './createDTSType';
 
 export const createDTSClass = (classDeclaration: ClassDeclaration): DTSClass => ({
   name: classDeclaration.name,
@@ -15,6 +15,6 @@ export const createDTSClass = (classDeclaration: ClassDeclaration): DTSClass => 
   methods: classDeclaration.getMethods().map((method) => ({
     name: method.name,
     parameters: method.getArguments().map((argument) => createDTSProperty(argument)),
-    returnType: createDTSTypeFromString(method.getReturnTypeOfs()),
+    returnType: mergeDTSTypes(method.getReturnTypeOfs()),
   })),
 });
