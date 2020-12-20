@@ -1,6 +1,12 @@
 import { FunctionDeclarationCleaner } from '../FunctionDeclarationCleaner';
 import { FunctionDeclaration } from '../../FunctionDeclaration';
 import ArgumentDeclaration from '../../ArgumentDeclaration';
+import {
+  createNumber,
+  createString,
+  createBoolean,
+  createUndefined,
+} from '../../../dts/helpers/createDTSType';
 
 describe('FunctionDeclarationCleaner', () => {
   describe('UnionTypes', () => {
@@ -9,17 +15,17 @@ describe('FunctionDeclarationCleaner', () => {
 
       const function1 = new FunctionDeclaration();
       function1.name = 'MyFunction';
-      function1.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf('number'));
+      function1.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createNumber()));
       function1.addReturnTypeOf('string');
 
       const function2 = new FunctionDeclaration();
       function2.name = 'MyFunction';
-      function2.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf('string'));
+      function2.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createString()));
       function2.addReturnTypeOf('string');
 
       const function3 = new FunctionDeclaration();
       function3.name = 'MyFunction';
-      function3.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf('boolean'));
+      function3.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createBoolean()));
       function3.addReturnTypeOf('number');
 
       const functions = [function1, function2, function3];
@@ -27,7 +33,7 @@ describe('FunctionDeclarationCleaner', () => {
       const expectedFunction = new FunctionDeclaration();
       expectedFunction.name = 'MyFunction';
       expectedFunction.addArgument(
-        new ArgumentDeclaration(0, 'a').addTypeOf('string').addTypeOf('number'),
+        new ArgumentDeclaration(0, 'a').addTypeOf(createString()).addTypeOf(createNumber()),
       );
       expectedFunction.addReturnTypeOf('string');
 
@@ -42,17 +48,17 @@ describe('FunctionDeclarationCleaner', () => {
 
       const function1 = new FunctionDeclaration();
       function1.name = 'MyFunction';
-      function1.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf('number'));
+      function1.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createNumber()));
       function1.addReturnTypeOf('string');
 
       const function2 = new FunctionDeclaration();
       function2.name = 'MyFunction';
-      function2.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf('string'));
+      function2.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createString()));
       function2.addReturnTypeOf('string');
 
       const functionWithOtherName = new FunctionDeclaration();
       functionWithOtherName.name = 'MyOtherFunction';
-      functionWithOtherName.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf('string'));
+      functionWithOtherName.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createString()));
       functionWithOtherName.addReturnTypeOf('string');
 
       const functions = [function1, function2, functionWithOtherName];
@@ -60,7 +66,7 @@ describe('FunctionDeclarationCleaner', () => {
       const expectedFunction = new FunctionDeclaration();
       expectedFunction.name = 'MyFunction';
       expectedFunction.addArgument(
-        new ArgumentDeclaration(0, 'a').addTypeOf('string').addTypeOf('number'),
+        new ArgumentDeclaration(0, 'a').addTypeOf(createString()).addTypeOf(createNumber()),
       );
       expectedFunction.addReturnTypeOf('string');
 
@@ -75,17 +81,17 @@ describe('FunctionDeclarationCleaner', () => {
 
       const function1 = new FunctionDeclaration();
       function1.name = 'MyFunction';
-      function1.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf('number'));
+      function1.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createNumber()));
       function1.addReturnTypeOf('string');
 
       const function2 = new FunctionDeclaration();
       function2.name = 'MyFunction';
-      function2.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf('string'));
+      function2.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createString()));
       function2.addReturnTypeOf('string');
 
       const function3 = new FunctionDeclaration();
       function3.name = 'MyFunction';
-      function3.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf('undefined'));
+      function3.addArgument(new ArgumentDeclaration(0, 'a').addTypeOf(createUndefined()));
       function3.addReturnTypeOf('string');
 
       const functions = [function1, function2, function3];
@@ -93,7 +99,10 @@ describe('FunctionDeclarationCleaner', () => {
       const expectedFunction = new FunctionDeclaration();
       expectedFunction.name = 'MyFunction';
       expectedFunction.addArgument(
-        new ArgumentDeclaration(0, 'a').addTypeOf('string').addTypeOf('number').makeOptional(),
+        new ArgumentDeclaration(0, 'a')
+          .addTypeOf(createString())
+          .addTypeOf(createNumber())
+          .makeOptional(),
       );
       expectedFunction.addReturnTypeOf('string');
 

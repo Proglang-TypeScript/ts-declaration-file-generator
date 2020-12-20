@@ -2,11 +2,12 @@ import ArgumentDeclaration from '../../../builder/ArgumentDeclaration';
 import { createDTSProperty } from '../createDTSProperty';
 import { DTSProperty } from '../../../ast/types/dtsProperty';
 import { DTSTypeKinds, DTSTypeKeywords } from '../../../ast/types';
+import { createString, createNumber, createUndefined } from '../createDTSType';
 
 describe('createDTSProperty', () => {
   it('creates the parameter from an argument', () => {
     const a = new ArgumentDeclaration(0, 'a');
-    ['string', 'number'].map((type) => a.addTypeOf(type));
+    [createString(), createNumber()].map((type) => a.addTypeOf(type));
 
     const parameter: DTSProperty = {
       name: 'a',
@@ -16,11 +17,11 @@ describe('createDTSProperty', () => {
         value: [
           {
             kind: DTSTypeKinds.KEYWORD,
-            value: DTSTypeKeywords.NUMBER,
+            value: DTSTypeKeywords.STRING,
           },
           {
             kind: DTSTypeKinds.KEYWORD,
-            value: DTSTypeKeywords.STRING,
+            value: DTSTypeKeywords.NUMBER,
           },
         ],
       },
@@ -31,7 +32,7 @@ describe('createDTSProperty', () => {
 
   it('ignores the `undefined` type if there are other types', () => {
     const a = new ArgumentDeclaration(0, 'a');
-    ['undefined', 'string'].map((type) => a.addTypeOf(type));
+    [createUndefined(), createString()].map((type) => a.addTypeOf(type));
 
     const parameter: DTSProperty = {
       name: 'a',
@@ -47,7 +48,7 @@ describe('createDTSProperty', () => {
 
   it('does not ignore the `undefined` type if there is no other type', () => {
     const a = new ArgumentDeclaration(0, 'a');
-    ['undefined'].map((type) => a.addTypeOf(type));
+    [createUndefined()].map((type) => a.addTypeOf(type));
 
     const parameter: DTSProperty = {
       name: 'a',

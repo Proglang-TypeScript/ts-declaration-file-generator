@@ -17,6 +17,15 @@ import {
   createDTSTypeFromString,
   createInterface,
   mergeDTSTypes,
+  createString,
+  createNumber,
+  createUndefined,
+  createNull,
+  createObject,
+  createArray,
+  createAny,
+  createBoolean,
+  createFunction,
 } from '../dts/helpers/createDTSType';
 import objectHash from 'object-hash';
 
@@ -330,14 +339,14 @@ export class TypescriptDeclarationBuilder {
 
   private matchToTypescriptType(t: string): DTSType {
     const map = new Map<string, DTSType>()
-      .set('string', createDTSTypeFromString(['string']))
-      .set('number', createDTSTypeFromString(['number']))
-      .set('undefined', createDTSTypeFromString(['undefined']))
-      .set('null', createDTSTypeFromString(['null']))
-      .set('object', createDTSTypeFromString(['object']))
-      .set('array', createDTSTypeFromString(['Array<any>']))
-      .set('boolean', createDTSTypeFromString(['boolean']))
-      .set('function', createDTSTypeFromString(['Function']));
+      .set('string', createString())
+      .set('number', createNumber())
+      .set('undefined', createUndefined())
+      .set('null', createNull())
+      .set('object', createObject())
+      .set('array', createArray(createAny()))
+      .set('boolean', createBoolean())
+      .set('function', createFunction());
 
     const match = map.get(t);
     if (match) {

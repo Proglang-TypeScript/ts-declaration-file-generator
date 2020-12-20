@@ -6,10 +6,7 @@ export const mergeDTSTypes = (types: DTSType[]): DTSType => {
   }
 
   if (types.length > 1) {
-    return {
-      kind: DTSTypeKinds.UNION,
-      value: types.map((type) => mergeDTSTypes([type])),
-    };
+    return createUnion(types);
   }
 
   return types[0];
@@ -64,6 +61,17 @@ export const createDTSTypeFromString = (types: (SupportedTypes | string)[]): DTS
   }
 
   return createInterface(type);
+};
+
+export const createUnion = (types: DTSType[]): DTSType => {
+  if (types.length === 0) {
+    throw new Error('Types cannot be empty');
+  }
+
+  return {
+    kind: DTSTypeKinds.UNION,
+    value: types,
+  };
 };
 
 export const createString = (): DTSType => ({

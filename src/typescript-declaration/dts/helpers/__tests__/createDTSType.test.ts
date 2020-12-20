@@ -1,65 +1,78 @@
-import { createDTSType } from '../createDTSType';
+import {
+  createString,
+  createNumber,
+  createUndefined,
+  createNull,
+  createObject,
+  createBoolean,
+  createVoid,
+  createFunction,
+  createArray,
+  createAny,
+  createInterface,
+  createUnion,
+} from '../createDTSType';
 import { DTSTypeKinds, DTSTypeKeywords, DTSTypeUnion } from '../../../ast/types';
 
 describe('createDTSType', () => {
   it('creates the string type', () => {
-    expect(createDTSType(['string'])).toStrictEqual({
+    expect(createString()).toStrictEqual({
       kind: DTSTypeKinds.KEYWORD,
       value: DTSTypeKeywords.STRING,
     });
   });
 
   it('creates the number type', () => {
-    expect(createDTSType(['number'])).toStrictEqual({
+    expect(createNumber()).toStrictEqual({
       kind: DTSTypeKinds.KEYWORD,
       value: DTSTypeKeywords.NUMBER,
     });
   });
 
   it('creates the undefined type', () => {
-    expect(createDTSType(['undefined'])).toStrictEqual({
+    expect(createUndefined()).toStrictEqual({
       kind: DTSTypeKinds.KEYWORD,
       value: DTSTypeKeywords.UNDEFINED,
     });
   });
 
   it('creates the null type', () => {
-    expect(createDTSType(['null'])).toStrictEqual({
+    expect(createNull()).toStrictEqual({
       kind: DTSTypeKinds.KEYWORD,
       value: DTSTypeKeywords.NULL,
     });
   });
 
   it('creates the object type', () => {
-    expect(createDTSType(['object'])).toStrictEqual({
+    expect(createObject()).toStrictEqual({
       kind: DTSTypeKinds.KEYWORD,
       value: DTSTypeKeywords.OBJECT,
     });
   });
 
   it('creates the boolean type', () => {
-    expect(createDTSType(['boolean'])).toStrictEqual({
+    expect(createBoolean()).toStrictEqual({
       kind: DTSTypeKinds.KEYWORD,
       value: DTSTypeKeywords.BOOLEAN,
     });
   });
 
   it('creates the void type', () => {
-    expect(createDTSType(['void'])).toStrictEqual({
+    expect(createVoid()).toStrictEqual({
       kind: DTSTypeKinds.KEYWORD,
       value: DTSTypeKeywords.VOID,
     });
   });
 
   it('creates the Function type', () => {
-    expect(createDTSType(['Function'])).toStrictEqual({
+    expect(createFunction()).toStrictEqual({
       kind: DTSTypeKinds.TYPE_REFERENCE,
       value: 'Function',
     });
   });
 
   it('creates the Array type', () => {
-    expect(createDTSType(['Array<any>'])).toStrictEqual({
+    expect(createArray(createAny())).toStrictEqual({
       kind: DTSTypeKinds.ARRAY,
       value: {
         kind: DTSTypeKinds.KEYWORD,
@@ -67,7 +80,7 @@ describe('createDTSType', () => {
       },
     });
 
-    expect(createDTSType(['Array<string>'])).toStrictEqual({
+    expect(createArray(createString())).toStrictEqual({
       kind: DTSTypeKinds.ARRAY,
       value: {
         kind: DTSTypeKinds.KEYWORD,
@@ -75,7 +88,7 @@ describe('createDTSType', () => {
       },
     });
 
-    expect(createDTSType(['Array<number>'])).toStrictEqual({
+    expect(createArray(createNumber())).toStrictEqual({
       kind: DTSTypeKinds.ARRAY,
       value: {
         kind: DTSTypeKinds.KEYWORD,
@@ -102,7 +115,7 @@ describe('createDTSType', () => {
       ],
     };
 
-    expect(createDTSType(['Array<any>', 'string'])).toStrictEqual(expectedType);
+    expect(createUnion([createArray(createAny()), createString()])).toStrictEqual(expectedType);
   });
 
   it('creates the Type Reference', () => {
@@ -111,6 +124,6 @@ describe('createDTSType', () => {
       value: 'SomeType',
     };
 
-    expect(createDTSType(['SomeType'])).toStrictEqual(expectedType);
+    expect(createInterface('SomeType')).toStrictEqual(expectedType);
   });
 });
