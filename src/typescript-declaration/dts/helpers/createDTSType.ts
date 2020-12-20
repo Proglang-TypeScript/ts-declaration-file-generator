@@ -1,6 +1,6 @@
 import { DTSType, DTSTypeKinds, DTSTypeKeywords } from '../../ast/types';
 
-export const createDTSType = (types: (SupportedTypes | string)[]): DTSType => {
+export const mergeDTSTypes = (types: DTSType[]): DTSType => {
   if (types.length === 0) {
     throw new Error('Types cannot be empty');
   }
@@ -8,81 +8,118 @@ export const createDTSType = (types: (SupportedTypes | string)[]): DTSType => {
   if (types.length > 1) {
     return {
       kind: DTSTypeKinds.UNION,
-      value: types.map((type) => createDTSType([type])),
+      value: types.map((type) => mergeDTSTypes([type])),
+    };
+  }
+
+  return types[0];
+};
+
+export const createDTSTypeFromString = (types: (SupportedTypes | string)[]): DTSType => {
+  if (types.length === 0) {
+    throw new Error('Types cannot be empty');
+  }
+
+  if (types.length > 1) {
+    return {
+      kind: DTSTypeKinds.UNION,
+      value: types.map((type) => createDTSTypeFromString([type])),
     };
   }
 
   const type = types[0];
   switch (type) {
     case 'any':
-      return {
-        kind: DTSTypeKinds.KEYWORD,
-        value: DTSTypeKeywords.ANY,
-      };
+      return createAny();
 
     case 'string':
-      return {
-        kind: DTSTypeKinds.KEYWORD,
-        value: DTSTypeKeywords.STRING,
-      };
+      return createString();
 
     case 'number':
-      return {
-        kind: DTSTypeKinds.KEYWORD,
-        value: DTSTypeKeywords.NUMBER,
-      };
+      return createNumber();
 
     case 'undefined':
-      return {
-        kind: DTSTypeKinds.KEYWORD,
-        value: DTSTypeKeywords.UNDEFINED,
-      };
+      return createUndefined();
 
     case 'void':
-      return {
-        kind: DTSTypeKinds.KEYWORD,
-        value: DTSTypeKeywords.VOID,
-      };
+      return createVoid();
 
     case 'null':
-      return {
-        kind: DTSTypeKinds.KEYWORD,
-        value: DTSTypeKeywords.NULL,
-      };
+      return createNull();
 
     case 'object':
-      return {
-        kind: DTSTypeKinds.KEYWORD,
-        value: DTSTypeKeywords.OBJECT,
-      };
+      return createObject();
 
     case 'boolean':
-      return {
-        kind: DTSTypeKinds.KEYWORD,
-        value: DTSTypeKeywords.BOOLEAN,
-      };
+      return createBoolean();
 
     case 'Function':
-      return {
-        kind: DTSTypeKinds.TYPE_REFERENCE,
-        value: 'Function',
-      };
+      return createFunction();
   }
 
   const arrayMatch = type.match(/Array<(.*)>/);
   if (arrayMatch && arrayMatch[1]) {
     const typeArrayElement = arrayMatch[1].split(',');
-    return {
-      kind: DTSTypeKinds.ARRAY,
-      value: createDTSType(typeArrayElement),
-    };
+    return createArray(createDTSTypeFromString(typeArrayElement));
   }
 
-  return {
-    kind: DTSTypeKinds.INTERFACE,
-    value: type,
-  };
+  return createInterface(type);
 };
+
+export const createString = (): DTSType => ({
+  kind: DTSTypeKinds.KEYWORD,
+  value: DTSTypeKeywords.STRING,
+});
+
+export const createNumber = (): DTSType => ({
+  kind: DTSTypeKinds.KEYWORD,
+  value: DTSTypeKeywords.NUMBER,
+});
+
+export const createUndefined = (): DTSType => ({
+  kind: DTSTypeKinds.KEYWORD,
+  value: DTSTypeKeywords.UNDEFINED,
+});
+
+export const createNull = (): DTSType => ({
+  kind: DTSTypeKinds.KEYWORD,
+  value: DTSTypeKeywords.NULL,
+});
+
+export const createObject = (): DTSType => ({
+  kind: DTSTypeKinds.KEYWORD,
+  value: DTSTypeKeywords.OBJECT,
+});
+
+export const createArray = (type: DTSType): DTSType => ({
+  kind: DTSTypeKinds.ARRAY,
+  value: type,
+});
+
+export const createBoolean = (): DTSType => ({
+  kind: DTSTypeKinds.KEYWORD,
+  value: DTSTypeKeywords.BOOLEAN,
+});
+
+export const createFunction = (): DTSType => ({
+  kind: DTSTypeKinds.TYPE_REFERENCE,
+  value: 'Function',
+});
+
+export const createAny = (): DTSType => ({
+  kind: DTSTypeKinds.KEYWORD,
+  value: DTSTypeKeywords.ANY,
+});
+
+export const createVoid = (): DTSType => ({
+  kind: DTSTypeKinds.KEYWORD,
+  value: DTSTypeKeywords.VOID,
+});
+
+export const createInterface = (name: string): DTSType => ({
+  kind: DTSTypeKinds.INTERFACE,
+  value: name,
+});
 
 type SupportedTypes =
   | 'any'

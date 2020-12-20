@@ -2,9 +2,9 @@ export type DTSType =
   | DTSTypeKeyword
   | DTSTypeLiteralType
   | DTSTypeUnion
+  | DTSTypeInterface
   | DTSTypeReference
-  | DTSTypeArray
-  | DTSTypeInterface;
+  | DTSTypeArray;
 
 interface BaseType {
   kind: DTSTypeKinds;
@@ -15,9 +15,9 @@ export const enum DTSTypeKinds {
   KEYWORD = 'KEYWORD',
   LITERAL_TYPE = 'LITERAL_TYPE',
   UNION = 'UNION',
-  TYPE_REFERENCE = 'TYPE_REFERENCE',
   ARRAY = 'ARRAY',
   INTERFACE = 'INTERFACE',
+  TYPE_REFERENCE = 'TYPE_REFERENCE',
 }
 
 export interface DTSTypeKeyword extends BaseType {

@@ -1,15 +1,17 @@
 import { FunctionDeclaration } from './FunctionDeclaration';
+import { DTSType, DTSTypeKeywords } from '../ast/types/dtsType';
+import objectHash from 'object-hash';
 
 export interface InterfaceAttributeDeclaration {
   name: string;
-  getTypeOfs(): string[];
+  getTypeOfs(): DTSType[];
   isOptional(): boolean;
 }
 
 export class InterfaceDeclaration {
   name = '';
   methods: FunctionDeclaration[] = [];
-  private attributes = new Map<string, string[]>();
+  private attributes = new Map<string, DTSType[]>();
 
   mergeWith(i: InterfaceDeclaration): void {
     i.getAttributes().forEach((a) => {
@@ -17,14 +19,17 @@ export class InterfaceDeclaration {
     });
   }
 
-  addAttribute(name: string, types: string[]): void {
+  addAttribute(name: string, types: DTSType[]): void {
     const alreadyAddedTypesForThisName = this.attributes.get(name) || [];
 
     this.attributes.set(name, this.removeDuplicates(alreadyAddedTypesForThisName.concat(types)));
   }
 
-  private removeDuplicates(target: string[]): string[] {
-    return Array.from(new Set(target));
+  private removeDuplicates(target: DTSType[]): DTSType[] {
+    const map = new Map<string, DTSType>();
+    target.forEach((t) => map.set(objectHash(t), t));
+
+    return Array.from(map.values());
   }
 
   getAttributes(): InterfaceAttributeDeclaration[] {
@@ -33,7 +38,7 @@ export class InterfaceDeclaration {
       return {
         name,
         getTypeOfs: () => typeOfs,
-        isOptional: () => typeOfs.includes('undefined'),
+        isOptional: () => typeOfs.some((t) => t.value === DTSTypeKeywords.UNDEFINED),
       };
     });
   }

@@ -9,10 +9,16 @@ import {
   ArgumentRuntimeInfo,
   InteractionRuntimeInfo,
 } from '../../runtime-info/parser/parsedTypes';
-import { DTS } from '../ast/types';
+import { DTS, DTSType, DTSTypeKeywords, DTSTypeKinds } from '../ast/types';
 import { TypescriptDeclaration } from './types/TypescriptDeclaration';
 import { extractModuleName } from './helpers/extractModuleName';
 import { getCreateDTSFn } from './helpers/getCreateDTSFn';
+import {
+  createDTSTypeFromString,
+  createInterface,
+  mergeDTSTypes,
+} from '../dts/helpers/createDTSType';
+import objectHash from 'object-hash';
 
 export class TypescriptDeclarationBuilder {
   private interfaceNames = new Map<string, InterfaceDeclaration>();
@@ -91,7 +97,7 @@ export class TypescriptDeclarationBuilder {
               this.getInputTypeOfs(argument),
               this.getInterfacesForArgument(argument, functionRunTimeInfo),
             ).forEach((typeOf) => {
-              argumentDeclaration.addTypeOf(this.matchToTypescriptType(typeOf));
+              argumentDeclaration.addTypeOf(typeOf);
             });
 
             functionDeclaration.addArgument(argumentDeclaration);
@@ -158,62 +164,77 @@ export class TypescriptDeclarationBuilder {
   }
 
   private mergeInputTypeWithInterface(
-    inputTypeOfs: string[],
+    inputTypeOfs: DTSType[],
     interfaceDeclaration?: InterfaceDeclaration,
-  ): string[] {
+  ): DTSType[] {
     if (!interfaceDeclaration) {
       return inputTypeOfs;
     }
 
-    inputTypeOfs = inputTypeOfs.filter((val) => {
-      return val !== 'object';
+    inputTypeOfs = inputTypeOfs.filter((type) => {
+      return type.value !== DTSTypeKeywords.OBJECT;
     });
 
     if (
-      inputTypeOfs.includes('string') &&
+      inputTypeOfs.some((t) => t.value === DTSTypeKeywords.STRING) &&
       this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(interfaceDeclaration)
     ) {
       this.removeInterfaceDeclaration(interfaceDeclaration);
       return inputTypeOfs;
     }
 
-    if (inputTypeOfs.includes('Array<any>')) {
+    if (inputTypeOfs.some((t) => t.kind === DTSTypeKinds.ARRAY)) {
       return this.mergeTypesForArray(inputTypeOfs, interfaceDeclaration);
     }
 
-    return [...inputTypeOfs, interfaceDeclaration.name];
+    return [...inputTypeOfs, createInterface(interfaceDeclaration.name)];
   }
 
-  private mergeTypesForArray(inputTypeOfs: string[], interfaceDeclaration: InterfaceDeclaration) {
+  private mergeTypesForArray(
+    inputTypeOfs: DTSType[],
+    interfaceDeclaration: InterfaceDeclaration,
+  ): DTSType[] {
     if (this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(interfaceDeclaration)) {
       const interfaceArrayElement = new InterfaceDeclaration();
       interfaceArrayElement.name = interfaceDeclaration.name;
 
-      const arrayElementTypes = new Set<string>();
+      const arrayElementTypes = new Map<string, DTSType>();
 
       interfaceDeclaration.getAttributes().forEach((attribute) => {
         attribute.getTypeOfs().forEach((attributeTypeOf) => {
-          const interfaceOfAttribute = this.interfaceNames.get(attributeTypeOf);
+          const interfaceOfAttribute =
+            attributeTypeOf.kind === DTSTypeKinds.INTERFACE &&
+            this.interfaceNames.get(attributeTypeOf.value);
+
           if (interfaceOfAttribute) {
             interfaceArrayElement.mergeWith(interfaceOfAttribute);
             this.removeInterfaceDeclaration(interfaceOfAttribute);
           } else {
-            arrayElementTypes.add(attributeTypeOf);
+            arrayElementTypes.set(objectHash(attributeTypeOf), attributeTypeOf);
           }
         });
       });
 
-      arrayElementTypes.add(interfaceArrayElement.name);
+      const interfaceType: DTSType = {
+        kind: DTSTypeKinds.INTERFACE,
+        value: interfaceArrayElement.name,
+      };
+      arrayElementTypes.set(objectHash(interfaceType), interfaceType);
 
       this.removeInterfaceDeclaration(interfaceDeclaration);
       this.interfaceNames.set(interfaceArrayElement.name, interfaceArrayElement);
 
-      return inputTypeOfs.map((i) =>
-        i === 'Array<any>' ? `Array<${Array.from(arrayElementTypes).join(',')}>` : i,
-      );
+      return inputTypeOfs.map((i) => {
+        if (i.kind !== DTSTypeKinds.ARRAY) {
+          return i;
+        }
+
+        i.value = mergeDTSTypes(Array.from(arrayElementTypes.values()));
+        return i;
+      });
     }
 
-    return [...inputTypeOfs, interfaceDeclaration.name];
+    return [...inputTypeOfs, createInterface(interfaceDeclaration.name)];
   }
 
   private removeInterfaceDeclaration(interfaceToBeRemoved: InterfaceDeclaration) {
@@ -245,7 +266,7 @@ export class TypescriptDeclarationBuilder {
         );
       }
 
-      let attributeType: string;
+      let attributeType: DTSType;
       if (filteredFollowingInteractions.length > 0) {
         const followingInterfaceDeclaration = this.buildInterfaceDeclaration(
           filteredFollowingInteractions,
@@ -297,7 +318,7 @@ export class TypescriptDeclarationBuilder {
     }
   }
 
-  private getInputTypeOfs(argument: ArgumentRuntimeInfo): string[] {
+  private getInputTypeOfs(argument: ArgumentRuntimeInfo): DTSType[] {
     return argument.interactions
       .filter((interaction) => {
         return interaction.code === 'inputValue';
@@ -307,23 +328,23 @@ export class TypescriptDeclarationBuilder {
       });
   }
 
-  private matchToTypescriptType(t: string): string {
-    const m: { [id: string]: string } = {
-      string: 'string',
-      number: 'number',
-      undefined: 'undefined',
-      null: 'null',
-      object: 'object',
-      array: 'Array<any>',
-      boolean: 'boolean',
-      function: 'Function',
-    };
+  private matchToTypescriptType(t: string): DTSType {
+    const map = new Map<string, DTSType>()
+      .set('string', createDTSTypeFromString(['string']))
+      .set('number', createDTSTypeFromString(['number']))
+      .set('undefined', createDTSTypeFromString(['undefined']))
+      .set('null', createDTSTypeFromString(['null']))
+      .set('object', createDTSTypeFromString(['object']))
+      .set('array', createDTSTypeFromString(['Array<any>']))
+      .set('boolean', createDTSTypeFromString(['boolean']))
+      .set('function', createDTSTypeFromString(['Function']));
 
-    if (!(t in m)) {
-      return t;
+    const match = map.get(t);
+    if (match) {
+      return match;
     }
 
-    return m[t];
+    return createInterface(t);
   }
 
   private matchReturnTypeOfs(t: string): string {

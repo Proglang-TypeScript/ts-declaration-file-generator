@@ -1,13 +1,26 @@
 import ArgumentDeclaration from '../ArgumentDeclaration';
+import { DTSType, DTSTypeKinds, DTSTypeKeywords } from '../../ast/types';
 
 describe('ArgumentDeclaration', () => {
-  it('should be serialized correctly taking into account the different types', () => {
+  it('gets serialized in the same way regardless of the position of the types', () => {
     const a = new ArgumentDeclaration(0, 'some-argument');
 
-    const types = ['undefind', 'string', 'number'];
+    let types: DTSType[] = [];
+    types = [
+      { kind: DTSTypeKinds.KEYWORD, value: DTSTypeKeywords.STRING },
+      { kind: DTSTypeKinds.KEYWORD, value: DTSTypeKeywords.UNDEFINED },
+      { kind: DTSTypeKinds.KEYWORD, value: DTSTypeKeywords.NUMBER },
+    ];
     types.forEach((t) => a.addTypeOf(t));
 
-    const serialized = a.serialize();
-    expect(JSON.parse(serialized).typeOfs).toStrictEqual(types.sort());
+    const b = new ArgumentDeclaration(0, 'some-argument');
+    types = [
+      { kind: DTSTypeKinds.KEYWORD, value: DTSTypeKeywords.NUMBER },
+      { kind: DTSTypeKinds.KEYWORD, value: DTSTypeKeywords.STRING },
+      { kind: DTSTypeKinds.KEYWORD, value: DTSTypeKeywords.UNDEFINED },
+    ];
+    types.forEach((t) => b.addTypeOf(t));
+
+    expect(a.serialize()).toBe(b.serialize());
   });
 });
