@@ -392,4 +392,57 @@ describe('Type references', () => {
       ),
     );
   });
+
+  it('writes the interface with a qualified name in an array type', () => {
+    const declaration: DTS = {
+      functions: [
+        {
+          name: 'foo',
+          parameters: [
+            {
+              name: 'a',
+              type: {
+                kind: DTSTypeKinds.ARRAY,
+                value: {
+                  kind: DTSTypeKinds.INTERFACE,
+                  value: 'MyInterface',
+                },
+              },
+            },
+          ],
+        },
+      ],
+      namespace: {
+        name: 'MyNamespace',
+        interfaces: [
+          {
+            name: 'MyInterface',
+            properties: [
+              {
+                name: 'a',
+                type: {
+                  kind: DTSTypeKinds.KEYWORD,
+                  value: DTSTypeKeywords.NUMBER,
+                },
+              },
+            ],
+          },
+        ],
+      },
+    };
+
+    const ast = buildAst(declaration);
+    expect(emit(ast)).toBe(
+      emit(
+        createFromString(`
+    export function foo(a: MyNamespace.MyInterface[]);
+    declare namespace MyNamespace {
+      export interface MyInterface {
+        a: number;
+      }
+    }
+  `),
+      ),
+    );
+  });
 });

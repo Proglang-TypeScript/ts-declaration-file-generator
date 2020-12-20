@@ -66,6 +66,22 @@ describe('createDTSType', () => {
         value: DTSTypeKeywords.ANY,
       },
     });
+
+    expect(createDTSType(['Array<string>'])).toStrictEqual({
+      kind: DTSTypeKinds.ARRAY,
+      value: {
+        kind: DTSTypeKinds.KEYWORD,
+        value: DTSTypeKeywords.STRING,
+      },
+    });
+
+    expect(createDTSType(['Array<number>'])).toStrictEqual({
+      kind: DTSTypeKinds.ARRAY,
+      value: {
+        kind: DTSTypeKinds.KEYWORD,
+        value: DTSTypeKeywords.NUMBER,
+      },
+    });
   });
 
   it('creates the Union type', () => {

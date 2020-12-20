@@ -12,12 +12,12 @@ interface BaseType {
 }
 
 export const enum DTSTypeKinds {
-  KEYWORD,
-  LITERAL_TYPE,
-  UNION,
-  TYPE_REFERENCE,
-  ARRAY,
-  INTERFACE,
+  KEYWORD = 'KEYWORD',
+  LITERAL_TYPE = 'LITERAL_TYPE',
+  UNION = 'UNION',
+  TYPE_REFERENCE = 'TYPE_REFERENCE',
+  ARRAY = 'ARRAY',
+  INTERFACE = 'INTERFACE',
 }
 
 export interface DTSTypeKeyword extends BaseType {
@@ -26,15 +26,15 @@ export interface DTSTypeKeyword extends BaseType {
 }
 
 export const enum DTSTypeKeywords {
-  VOID,
-  STRING,
-  NUMBER,
-  ANY,
-  UNKNOWN,
-  BOOLEAN,
-  UNDEFINED,
-  NULL,
-  OBJECT,
+  VOID = 'VOID',
+  STRING = 'STRING',
+  NUMBER = 'NUMBER',
+  ANY = 'ANY',
+  UNKNOWN = 'UNKNOWN',
+  BOOLEAN = 'BOOLEAN',
+  UNDEFINED = 'UNDEFINED',
+  NULL = 'NULL',
+  OBJECT = 'OBJECT',
 }
 
 export interface DTSTypeLiteralType extends BaseType {

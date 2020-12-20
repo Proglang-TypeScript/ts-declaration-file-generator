@@ -28,7 +28,7 @@ export const createTypeNode = (type: DTSType, context?: DTS): ts.TypeNode => {
       return createInterfaceType(type, context);
 
     case DTSTypeKinds.ARRAY:
-      return ts.createArrayTypeNode(createTypeNode(type.value));
+      return ts.createArrayTypeNode(createTypeNode(type.value, context));
 
     default:
       return createKeywordType({

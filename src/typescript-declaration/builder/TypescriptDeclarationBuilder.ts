@@ -25,7 +25,7 @@ export class TypescriptDeclarationBuilder {
   private interfaceSubsetPrimitiveValidator = new InterfaceSubsetPrimitiveValidator();
 
   private getInterfaceDeclarations(): InterfaceDeclaration[] {
-    return Array.from(this.interfaceDeclarations.values());
+    return Array.from(this.interfaceNames.values());
   }
 
   private getClassDeclarations(): ClassDeclaration[] {
@@ -87,7 +87,7 @@ export class TypescriptDeclarationBuilder {
               argument.argumentName,
             );
 
-            this.mergeArgumentTypeOfs(
+            this.mergeInputTypeWithInterface(
               this.getInputTypeOfs(argument),
               this.getInterfacesForArgument(argument, functionRunTimeInfo),
             ).forEach((typeOf) => {
@@ -134,24 +134,21 @@ export class TypescriptDeclarationBuilder {
   private getInterfacesForArgument(
     argument: ArgumentRuntimeInfo,
     functionRunTimeInfo: FunctionRuntimeInfo,
-  ): InterfaceDeclaration[] {
-    const interfaces: InterfaceDeclaration[] = [];
+  ): InterfaceDeclaration | undefined {
     const interactionsConsideredForInterfaces = this.filterInteractionsForComputingInterfaces(
       argument.interactions,
     );
 
-    if (interactionsConsideredForInterfaces.length > 0) {
-      interfaces.push(
-        this.buildInterfaceDeclaration(
-          interactionsConsideredForInterfaces,
-          this.getInterfaceName(argument.argumentName),
-          argument,
-          functionRunTimeInfo,
-        ),
-      );
+    if (interactionsConsideredForInterfaces.length === 0) {
+      return;
     }
 
-    return interfaces;
+    return this.buildInterfaceDeclaration(
+      interactionsConsideredForInterfaces,
+      this.getInterfaceName(argument.argumentName),
+      argument,
+      functionRunTimeInfo,
+    );
   }
 
   private filterInteractionsForComputingInterfaces(interactions: InteractionRuntimeInfo[]) {
@@ -160,39 +157,70 @@ export class TypescriptDeclarationBuilder {
     });
   }
 
-  private mergeArgumentTypeOfs(
+  private mergeInputTypeWithInterface(
     inputTypeOfs: string[],
-    interfacesTypeOfs: InterfaceDeclaration[],
+    interfaceDeclaration?: InterfaceDeclaration,
   ): string[] {
-    if (interfacesTypeOfs.length > 0) {
-      inputTypeOfs = inputTypeOfs.filter((val) => {
-        return val !== 'object';
-      });
+    if (!interfaceDeclaration) {
+      return inputTypeOfs;
     }
 
-    if (inputTypeOfs.includes('string')) {
-      return inputTypeOfs.concat(
-        interfacesTypeOfs
-          .filter((i) => {
-            if (this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(i)) {
-              this.removeInterfaceDeclaration(i.name);
-              return false;
-            }
+    inputTypeOfs = inputTypeOfs.filter((val) => {
+      return val !== 'object';
+    });
 
-            return true;
-          })
-          .map((i) => i.name),
+    if (
+      inputTypeOfs.includes('string') &&
+      this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(interfaceDeclaration)
+    ) {
+      this.removeInterfaceDeclaration(interfaceDeclaration);
+      return inputTypeOfs;
+    }
+
+    if (inputTypeOfs.includes('Array<any>')) {
+      return this.mergeTypesForArray(inputTypeOfs, interfaceDeclaration);
+    }
+
+    return [...inputTypeOfs, interfaceDeclaration.name];
+  }
+
+  private mergeTypesForArray(inputTypeOfs: string[], interfaceDeclaration: InterfaceDeclaration) {
+    if (this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(interfaceDeclaration)) {
+      const interfaceArrayElement = new InterfaceDeclaration();
+      interfaceArrayElement.name = interfaceDeclaration.name;
+
+      const arrayElementTypes = new Set<string>();
+
+      interfaceDeclaration.getAttributes().forEach((attribute) => {
+        attribute.getTypeOfs().forEach((attributeTypeOf) => {
+          const interfaceOfAttribute = this.interfaceNames.get(attributeTypeOf);
+          if (interfaceOfAttribute) {
+            interfaceArrayElement.mergeWith(interfaceOfAttribute);
+            this.removeInterfaceDeclaration(interfaceOfAttribute);
+          } else {
+            arrayElementTypes.add(attributeTypeOf);
+          }
+        });
+      });
+
+      arrayElementTypes.add(interfaceArrayElement.name);
+
+      this.removeInterfaceDeclaration(interfaceDeclaration);
+      this.interfaceNames.set(interfaceArrayElement.name, interfaceArrayElement);
+
+      return inputTypeOfs.map((i) =>
+        i === 'Array<any>' ? `Array<${Array.from(arrayElementTypes).join(',')}>` : i,
       );
     }
 
-    return inputTypeOfs.concat(interfacesTypeOfs.map((i) => i.name));
+    return [...inputTypeOfs, interfaceDeclaration.name];
   }
 
-  private removeInterfaceDeclaration(name: string) {
-    Array.from(this.interfaceDeclarations.entries()).forEach(([key, interfaceDeclaration]) => {
-      if (interfaceDeclaration.name === name) {
+  private removeInterfaceDeclaration(interfaceToBeRemoved: InterfaceDeclaration) {
+    Array.from(this.interfaceDeclarations.entries()).forEach(([key, i]) => {
+      if (i.name === interfaceToBeRemoved.name) {
         this.interfaceDeclarations.delete(key);
-        this.interfaceNames.delete(name);
+        this.interfaceNames.delete(interfaceToBeRemoved.name);
       }
     });
   }

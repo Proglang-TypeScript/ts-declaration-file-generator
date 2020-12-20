@@ -14,6 +14,12 @@ export const createDTSType = (types: (SupportedTypes | string)[]): DTSType => {
 
   const type = types[0];
   switch (type) {
+    case 'any':
+      return {
+        kind: DTSTypeKinds.KEYWORD,
+        value: DTSTypeKeywords.ANY,
+      };
+
     case 'string':
       return {
         kind: DTSTypeKinds.KEYWORD,
@@ -61,15 +67,15 @@ export const createDTSType = (types: (SupportedTypes | string)[]): DTSType => {
         kind: DTSTypeKinds.TYPE_REFERENCE,
         value: 'Function',
       };
+  }
 
-    case 'Array<any>':
-      return {
-        kind: DTSTypeKinds.ARRAY,
-        value: {
-          kind: DTSTypeKinds.KEYWORD,
-          value: DTSTypeKeywords.ANY,
-        },
-      };
+  const arrayMatch = type.match(/Array<(.*)>/);
+  if (arrayMatch && arrayMatch[1]) {
+    const typeArrayElement = arrayMatch[1].split(',');
+    return {
+      kind: DTSTypeKinds.ARRAY,
+      value: createDTSType(typeArrayElement),
+    };
   }
 
   return {
@@ -79,6 +85,7 @@ export const createDTSType = (types: (SupportedTypes | string)[]): DTSType => {
 };
 
 type SupportedTypes =
+  | 'any'
   | 'string'
   | 'number'
   | 'undefined'
@@ -86,5 +93,4 @@ type SupportedTypes =
   | 'null'
   | 'object'
   | 'boolean'
-  | 'Function'
-  | 'Array<any>';
+  | 'Function';
