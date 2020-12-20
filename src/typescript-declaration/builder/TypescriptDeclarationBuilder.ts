@@ -14,7 +14,6 @@ import { TypescriptDeclaration } from './types/TypescriptDeclaration';
 import { extractModuleName } from './helpers/extractModuleName';
 import { getCreateDTSFn } from './helpers/getCreateDTSFn';
 import {
-  createDTSTypeFromString,
   createInterface,
   mergeDTSTypes,
   createString,
