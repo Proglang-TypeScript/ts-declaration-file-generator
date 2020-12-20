@@ -1,3 +1,3 @@
 export = UnionTypeFunction;
 declare function UnionTypeFunction(a?: undefined): number;
-declare function UnionTypeFunction(a?: number | string): boolean;
+declare function UnionTypeFunction(a?: string | number): boolean;
