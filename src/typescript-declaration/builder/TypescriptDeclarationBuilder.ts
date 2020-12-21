@@ -184,12 +184,8 @@ export class TypescriptDeclarationBuilder {
       return type.value !== DTSTypeKeywords.OBJECT;
     });
 
-    if (
-      inputTypeOfs.some((t) => t.value === DTSTypeKeywords.STRING) &&
-      this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(interfaceDeclaration)
-    ) {
-      this.removeInterfaceDeclaration(interfaceDeclaration);
-      return inputTypeOfs;
+    if (inputTypeOfs.some((t) => t.value === DTSTypeKeywords.STRING)) {
+      return this.mergeTypesForString(inputTypeOfs, interfaceDeclaration);
     }
 
     if (inputTypeOfs.some((t) => t.kind === DTSTypeKinds.ARRAY)) {
@@ -199,51 +195,81 @@ export class TypescriptDeclarationBuilder {
     return [...inputTypeOfs, createInterface(interfaceDeclaration.name)];
   }
 
+  private mergeTypesForString(
+    inputTypeOfs: DTSType[],
+    interfaceDeclaration: InterfaceDeclaration,
+  ): DTSType[] {
+    this.removeInterfaceDeclaration(interfaceDeclaration);
+
+    const interfaceAttribute = new InterfaceDeclaration();
+    interfaceAttribute.name = interfaceDeclaration.name;
+    interfaceDeclaration.getAttributes().forEach((a) => {
+      if (!this.interfaceSubsetPrimitiveValidator.isStringAttribute(a.name)) {
+        interfaceAttribute.addAttribute(a.name, a.getTypeOfs());
+      }
+    });
+
+    if (interfaceAttribute.getAttributes().length === 0) {
+      return inputTypeOfs;
+    }
+
+    this.interfaceNames.set(interfaceAttribute.name, interfaceAttribute);
+    return [...inputTypeOfs, createInterface(interfaceAttribute.name)];
+  }
+
   private mergeTypesForArray(
     inputTypeOfs: DTSType[],
     interfaceDeclaration: InterfaceDeclaration,
   ): DTSType[] {
-    if (this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(interfaceDeclaration)) {
-      const interfaceArrayElement = new InterfaceDeclaration();
-      interfaceArrayElement.name = interfaceDeclaration.name;
+    this.removeInterfaceDeclaration(interfaceDeclaration);
 
-      const arrayElementTypes = new Map<string, DTSType>();
+    const interfaceArrayElement = new InterfaceDeclaration();
+    interfaceArrayElement.name = `${interfaceDeclaration.name}_element`;
+    const arrayElementTypes = new Map<string, DTSType>();
 
-      interfaceDeclaration.getAttributes().forEach((attribute) => {
-        attribute.getTypeOfs().forEach((attributeTypeOf) => {
-          const interfaceOfAttribute =
-            attributeTypeOf.kind === DTSTypeKinds.INTERFACE &&
-            this.interfaceNames.get(attributeTypeOf.value);
+    const interfaceAttribute = new InterfaceDeclaration();
+    interfaceAttribute.name = interfaceDeclaration.name;
 
-          if (interfaceOfAttribute) {
-            interfaceArrayElement.mergeWith(interfaceOfAttribute);
-            this.removeInterfaceDeclaration(interfaceOfAttribute);
-          } else {
-            arrayElementTypes.set(objectHash(attributeTypeOf), attributeTypeOf);
-          }
-        });
-      });
+    interfaceDeclaration.getAttributes().forEach((attribute) => {
+      if (!this.interfaceSubsetPrimitiveValidator.isArrayAttribute(attribute.name)) {
+        interfaceAttribute.addAttribute(attribute.name, attribute.getTypeOfs());
+      } else {
+        if (this.interfaceSubsetPrimitiveValidator.isArrayElement(attribute.name)) {
+          attribute.getTypeOfs().forEach((attributeTypeOf) => {
+            const interfaceOfAttribute =
+              attributeTypeOf.kind === DTSTypeKinds.INTERFACE &&
+              this.interfaceNames.get(attributeTypeOf.value);
 
-      const interfaceType: DTSType = {
-        kind: DTSTypeKinds.INTERFACE,
-        value: interfaceArrayElement.name,
-      };
-      arrayElementTypes.set(objectHash(interfaceType), interfaceType);
-
-      this.removeInterfaceDeclaration(interfaceDeclaration);
-      this.interfaceNames.set(interfaceArrayElement.name, interfaceArrayElement);
-
-      return inputTypeOfs.map((i) => {
-        if (i.kind !== DTSTypeKinds.ARRAY) {
-          return i;
+            if (interfaceOfAttribute) {
+              interfaceArrayElement.mergeWith(interfaceOfAttribute);
+              this.removeInterfaceDeclaration(interfaceOfAttribute);
+            } else {
+              arrayElementTypes.set(objectHash(attributeTypeOf), attributeTypeOf);
+            }
+          });
         }
+      }
+    });
 
-        i.value = mergeDTSTypes(Array.from(arrayElementTypes.values()));
-        return i;
-      });
+    if (interfaceArrayElement.getAttributes().length > 0) {
+      const interfaceType = createInterface(interfaceArrayElement.name);
+      arrayElementTypes.set(objectHash(interfaceType), interfaceType);
+      this.interfaceNames.set(interfaceArrayElement.name, interfaceArrayElement);
     }
 
-    return [...inputTypeOfs, createInterface(interfaceDeclaration.name)];
+    if (interfaceAttribute.getAttributes().length > 0) {
+      this.interfaceNames.set(interfaceAttribute.name, interfaceAttribute);
+      inputTypeOfs.push(createInterface(interfaceAttribute.name));
+    }
+
+    return inputTypeOfs.map((i) => {
+      if (i.kind !== DTSTypeKinds.ARRAY) {
+        return i;
+      }
+
+      i.value = mergeDTSTypes(Array.from(arrayElementTypes.values()));
+      return i;
+    });
   }
 
   private removeInterfaceDeclaration(interfaceToBeRemoved: InterfaceDeclaration) {

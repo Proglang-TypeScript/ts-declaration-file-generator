@@ -32,8 +32,34 @@
             "isComputed": false,
             "isOpAssign": false,
             "enclosingFunctionId": "functionId_3",
+            "followingInteractions": [
+              {
+                "code": "operator",
+                "traceId": null,
+                "leftType": "undefined",
+                "rightType": "string",
+                "leftIsNaN": true,
+                "rightIsNan": true,
+                "leftToPrimitiveType": "undefined",
+                "rightToPrimitiveType": "string",
+                "leftToPrimitiveIsNaN": true,
+                "rightToPrimitiveIsNaN": true,
+                "operator": "===",
+                "operandForInteraction": "left"
+              }
+            ],
+            "iid": 81,
+            "field": "somethingNotInString",
+            "returnTypeOf": "undefined"
+          },
+          {
+            "code": "getField",
+            "traceId": "trace__2",
+            "isComputed": false,
+            "isOpAssign": false,
+            "enclosingFunctionId": "functionId_3",
             "followingInteractions": [],
-            "iid": 57,
+            "iid": 145,
             "field": "length",
             "returnTypeOf": "number"
           }
@@ -47,7 +73,7 @@
         "traceId": "trace__2"
       }
     ],
-    "functionIid": 81,
+    "functionIid": 169,
     "requiredModule": "./string-manipulator",
     "isExported": true,
     "constructedBy": ""
