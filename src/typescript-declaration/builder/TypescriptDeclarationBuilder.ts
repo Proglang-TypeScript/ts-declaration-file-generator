@@ -199,22 +199,12 @@ export class TypescriptDeclarationBuilder {
     inputTypeOfs: DTSType[],
     interfaceDeclaration: InterfaceDeclaration,
   ): DTSType[] {
-    this.removeInterfaceDeclaration(interfaceDeclaration);
-
-    const interfaceAttribute = new InterfaceDeclaration();
-    interfaceAttribute.name = interfaceDeclaration.name;
-    interfaceDeclaration.getAttributes().forEach((a) => {
-      if (!this.interfaceSubsetPrimitiveValidator.isStringAttribute(a.name)) {
-        interfaceAttribute.addAttribute(a.name, a.getTypeOfs());
-      }
-    });
-
-    if (interfaceAttribute.getAttributes().length === 0) {
-      return inputTypeOfs;
+    if (!this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfString(interfaceDeclaration)) {
+      return [...inputTypeOfs, createInterface(interfaceDeclaration.name)];
     }
 
-    this.interfaceNames.set(interfaceAttribute.name, interfaceAttribute);
-    return [...inputTypeOfs, createInterface(interfaceAttribute.name)];
+    this.removeInterfaceDeclaration(interfaceDeclaration);
+    return inputTypeOfs;
   }
 
   private mergeTypesForArray(
