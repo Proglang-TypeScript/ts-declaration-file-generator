@@ -351,7 +351,7 @@ export class TypescriptDeclarationBuilder {
   private getInputTypeOfs(argument: ArgumentRuntimeInfo): DTSType[] {
     return argument.interactions
       .filter((interaction) => {
-        return interaction.code === 'inputValue';
+        return interaction.code === 'inputValue' && interaction.typeof !== '';
       })
       .map((interaction) => {
         return this.matchToTypescriptType(interaction.typeof);
