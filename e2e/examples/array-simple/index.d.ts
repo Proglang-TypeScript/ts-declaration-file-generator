@@ -1,2 +1,2 @@
 export = ArraySimple;
-declare function ArraySimple(a: string[]): string;
+declare function ArraySimple(a: (string | number)[]): string;

@@ -138,11 +138,11 @@
                 "code": "operator",
                 "traceId": null,
                 "leftType": "string",
-                "rightType": "string",
+                "rightType": "number",
                 "leftIsNaN": false,
                 "rightIsNan": false,
                 "leftToPrimitiveType": "string",
-                "rightToPrimitiveType": "string",
+                "rightToPrimitiveType": "number",
                 "leftToPrimitiveIsNaN": false,
                 "rightToPrimitiveIsNaN": false,
                 "operator": "+",
@@ -151,7 +151,7 @@
             ],
             "iid": 137,
             "field": 2,
-            "returnTypeOf": "string"
+            "returnTypeOf": "number"
           },
           {
             "code": "getField",

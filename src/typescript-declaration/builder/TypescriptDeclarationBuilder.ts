@@ -221,6 +221,10 @@ export class TypescriptDeclarationBuilder {
     inputTypeOfs: DTSType[],
     interfaceDeclaration: InterfaceDeclaration,
   ): DTSType[] {
+    if (!this.interfaceSubsetPrimitiveValidator.isInterfaceSubsetOfArray(interfaceDeclaration)) {
+      return [...inputTypeOfs, createInterface(interfaceDeclaration.name)];
+    }
+
     this.removeInterfaceDeclaration(interfaceDeclaration);
 
     const interfaceArrayElement = new InterfaceDeclaration();
@@ -231,23 +235,19 @@ export class TypescriptDeclarationBuilder {
     interfaceAttribute.name = interfaceDeclaration.name;
 
     interfaceDeclaration.getAttributes().forEach((attribute) => {
-      if (!this.interfaceSubsetPrimitiveValidator.isArrayAttribute(attribute.name)) {
-        interfaceAttribute.addAttribute(attribute.name, attribute.getTypeOfs());
-      } else {
-        if (this.interfaceSubsetPrimitiveValidator.isArrayElement(attribute.name)) {
-          attribute.getTypeOfs().forEach((attributeTypeOf) => {
-            const interfaceOfAttribute =
-              attributeTypeOf.kind === DTSTypeKinds.INTERFACE &&
-              this.interfaceNames.get(attributeTypeOf.value);
+      if (this.interfaceSubsetPrimitiveValidator.isArrayElement(attribute.name)) {
+        attribute.getTypeOfs().forEach((attributeTypeOf) => {
+          const interfaceOfAttribute =
+            attributeTypeOf.kind === DTSTypeKinds.INTERFACE &&
+            this.interfaceNames.get(attributeTypeOf.value);
 
-            if (interfaceOfAttribute) {
-              interfaceArrayElement.mergeWith(interfaceOfAttribute);
-              this.removeInterfaceDeclaration(interfaceOfAttribute);
-            } else {
-              arrayElementTypes.set(objectHash(attributeTypeOf), attributeTypeOf);
-            }
-          });
-        }
+          if (interfaceOfAttribute) {
+            interfaceArrayElement.mergeWith(interfaceOfAttribute);
+            this.removeInterfaceDeclaration(interfaceOfAttribute);
+          } else {
+            arrayElementTypes.set(objectHash(attributeTypeOf), attributeTypeOf);
+          }
+        });
       }
     });
 
@@ -260,6 +260,11 @@ export class TypescriptDeclarationBuilder {
     if (interfaceAttribute.getAttributes().length > 0) {
       this.interfaceNames.set(interfaceAttribute.name, interfaceAttribute);
       inputTypeOfs.push(createInterface(interfaceAttribute.name));
+    }
+
+    if (arrayElementTypes.size === 0) {
+      const anyDTSType = createAny();
+      arrayElementTypes.set(objectHash(anyDTSType), anyDTSType);
     }
 
     return inputTypeOfs.map((i) => {
