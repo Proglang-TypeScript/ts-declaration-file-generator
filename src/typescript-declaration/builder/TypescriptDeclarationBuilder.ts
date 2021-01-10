@@ -215,8 +215,6 @@ export class TypescriptDeclarationBuilder {
       return [...inputTypeOfs, createInterface(interfaceDeclaration.name)];
     }
 
-    this.removeInterfaceDeclaration(interfaceDeclaration);
-
     const interfaceArrayElement = new InterfaceDeclaration();
     interfaceArrayElement.name = `${interfaceDeclaration.name}_element`;
     const arrayElementTypes = new Map<string, DTSType>();
@@ -249,6 +247,8 @@ export class TypescriptDeclarationBuilder {
       arrayElementTypes.set(objectHash(anyDTSType), anyDTSType);
     }
 
+    this.removeInterfaceDeclaration(interfaceDeclaration);
+
     return inputTypeOfs.map((i) => {
       if (i.kind !== DTSTypeKinds.ARRAY) {
         return i;
@@ -262,8 +262,14 @@ export class TypescriptDeclarationBuilder {
   private removeInterfaceDeclaration(interfaceToBeRemoved: InterfaceDeclaration) {
     Array.from(this.interfaceDeclarations.entries()).forEach(([key, i]) => {
       if (i.name === interfaceToBeRemoved.name) {
-        this.interfaceDeclarations.delete(key);
-        this.interfaceNames.delete(interfaceToBeRemoved.name);
+        interfaceToBeRemoved.getAttributes().forEach((a) => {
+          i.removeAttribute(a);
+        });
+
+        if (i.getAttributes().length === 0) {
+          this.interfaceDeclarations.delete(key);
+          this.interfaceNames.delete(i.name);
+        }
       }
     });
   }

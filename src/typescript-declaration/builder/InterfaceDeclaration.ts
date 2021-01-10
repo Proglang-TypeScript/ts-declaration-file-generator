@@ -19,6 +19,10 @@ export class InterfaceDeclaration {
     });
   }
 
+  removeAttribute(a: InterfaceAttributeDeclaration) {
+    this.attributes.delete(a.name);
+  }
+
   addAttribute(name: string, types: DTSType[]): void {
     const alreadyAddedTypesForThisName = this.attributes.get(name) || [];
 
