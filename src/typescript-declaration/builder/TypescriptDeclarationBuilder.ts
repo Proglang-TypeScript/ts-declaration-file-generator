@@ -221,9 +221,6 @@ export class TypescriptDeclarationBuilder {
     interfaceArrayElement.name = `${interfaceDeclaration.name}_element`;
     const arrayElementTypes = new Map<string, DTSType>();
 
-    const interfaceAttribute = new InterfaceDeclaration();
-    interfaceAttribute.name = interfaceDeclaration.name;
-
     interfaceDeclaration.getAttributes().forEach((attribute) => {
       if (this.interfaceSubsetPrimitiveValidator.isArrayElement(attribute.name)) {
         attribute.getTypeOfs().forEach((attributeTypeOf) => {
@@ -245,11 +242,6 @@ export class TypescriptDeclarationBuilder {
       const interfaceType = createInterface(interfaceArrayElement.name);
       arrayElementTypes.set(objectHash(interfaceType), interfaceType);
       this.interfaceNames.set(interfaceArrayElement.name, interfaceArrayElement);
-    }
-
-    if (interfaceAttribute.getAttributes().length > 0) {
-      this.interfaceNames.set(interfaceAttribute.name, interfaceAttribute);
-      inputTypeOfs.push(createInterface(interfaceAttribute.name));
     }
 
     if (arrayElementTypes.size === 0) {
