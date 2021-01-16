@@ -236,15 +236,21 @@ export class TypescriptDeclarationBuilder {
       }
     });
 
+    if (arrayElementTypes.size === 0) {
+      const anyDTSType = createAny();
+      arrayElementTypes.set(objectHash(anyDTSType), anyDTSType);
+    }
+
+    let arrayElementTypesValues: DTSType[] = Array.from(arrayElementTypes.values());
     if (interfaceArrayElement.getAttributes().length > 0) {
       const interfaceType = createInterface(interfaceArrayElement.name);
       arrayElementTypes.set(objectHash(interfaceType), interfaceType);
       this.interfaceNames.set(interfaceArrayElement.name, interfaceArrayElement);
-    }
 
-    if (arrayElementTypes.size === 0) {
-      const anyDTSType = createAny();
-      arrayElementTypes.set(objectHash(anyDTSType), anyDTSType);
+      arrayElementTypesValues = this.mergeTypesForArray(
+        arrayElementTypesValues,
+        interfaceArrayElement,
+      );
     }
 
     this.removeInterfaceDeclaration(interfaceDeclaration);
@@ -254,24 +260,31 @@ export class TypescriptDeclarationBuilder {
         return i;
       }
 
-      i.value = mergeDTSTypes(Array.from(arrayElementTypes.values()));
+      i.value = mergeDTSTypes(arrayElementTypesValues);
       return i;
     });
   }
 
   private removeInterfaceDeclaration(interfaceToBeRemoved: InterfaceDeclaration) {
-    Array.from(this.interfaceDeclarations.entries()).forEach(([key, i]) => {
-      if (i.name === interfaceToBeRemoved.name) {
-        interfaceToBeRemoved.getAttributes().forEach((a) => {
-          i.removeAttribute(a);
-        });
+    let interfaceShouldBeRemoved = false;
 
-        if (i.getAttributes().length === 0) {
+    const i = this.interfaceNames.get(interfaceToBeRemoved.name);
+    if (i) {
+      interfaceToBeRemoved.getAttributes().forEach((a) => {
+        i.removeAttribute(a);
+      });
+
+      interfaceShouldBeRemoved = i.getAttributes().length === 0;
+    }
+
+    if (interfaceShouldBeRemoved) {
+      this.interfaceNames.delete(interfaceToBeRemoved.name);
+      [...this.interfaceDeclarations.entries()].forEach(([key, i]) => {
+        if (i.name === interfaceToBeRemoved.name) {
           this.interfaceDeclarations.delete(key);
-          this.interfaceNames.delete(i.name);
         }
-      }
-    });
+      });
+    }
   }
 
   private getInterfaceName(name: string): string {

@@ -1,0 +1,240 @@
+{
+  "functionId_1": {
+    "functionId": "functionId_1",
+    "functionName": "arrayInArray",
+    "isConstructor": false,
+    "args": {
+      "0": {
+        "argumentIndex": 0,
+        "argumentName": "a",
+        "interactions": [
+          {
+            "code": "inputValue",
+            "traceId": "trace__1",
+            "typeof": "array"
+          },
+          {
+            "code": "getField",
+            "traceId": "trace__1",
+            "isComputed": false,
+            "isOpAssign": false,
+            "enclosingFunctionId": "functionId_1",
+            "followingInteractions": [
+              {
+                "code": "convertedTo",
+                "traceId": null,
+                "convertedTo": "number",
+                "isNaN": false,
+                "toPrimitive": null,
+                "operator": "<",
+                "originalTypeof": "number"
+              },
+              {
+                "code": "operator",
+                "traceId": null,
+                "leftType": "number",
+                "rightType": "number",
+                "leftIsNaN": false,
+                "rightIsNan": false,
+                "leftToPrimitiveType": "number",
+                "rightToPrimitiveType": "number",
+                "leftToPrimitiveIsNaN": false,
+                "rightToPrimitiveIsNaN": false,
+                "operator": "<",
+                "operandForInteraction": "right"
+              }
+            ],
+            "iid": 81,
+            "field": "length",
+            "returnTypeOf": "number"
+          },
+          {
+            "code": "getField",
+            "traceId": "trace__1",
+            "isComputed": true,
+            "isOpAssign": false,
+            "enclosingFunctionId": "functionId_1",
+            "followingInteractions": [
+              {
+                "code": "getField",
+                "traceId": null,
+                "isComputed": false,
+                "isOpAssign": false,
+                "enclosingFunctionId": "functionId_1",
+                "followingInteractions": [
+                  {
+                    "code": "convertedTo",
+                    "traceId": null,
+                    "convertedTo": "number",
+                    "isNaN": false,
+                    "toPrimitive": null,
+                    "operator": "<",
+                    "originalTypeof": "number"
+                  },
+                  {
+                    "code": "operator",
+                    "traceId": null,
+                    "leftType": "number",
+                    "rightType": "number",
+                    "leftIsNaN": false,
+                    "rightIsNan": false,
+                    "leftToPrimitiveType": "number",
+                    "rightToPrimitiveType": "number",
+                    "leftToPrimitiveIsNaN": false,
+                    "rightToPrimitiveIsNaN": false,
+                    "operator": "<",
+                    "operandForInteraction": "right"
+                  }
+                ],
+                "iid": 201,
+                "field": "length",
+                "returnTypeOf": "number"
+              },
+              {
+                "code": "getField",
+                "traceId": null,
+                "isComputed": true,
+                "isOpAssign": false,
+                "enclosingFunctionId": "functionId_1",
+                "followingInteractions": [
+                  {
+                    "code": "convertedTo",
+                    "traceId": null,
+                    "convertedTo": "number",
+                    "isNaN": false,
+                    "toPrimitive": null,
+                    "operator": "+",
+                    "originalTypeof": "number"
+                  },
+                  {
+                    "code": "operator",
+                    "traceId": null,
+                    "leftType": "number",
+                    "rightType": "number",
+                    "leftIsNaN": false,
+                    "rightIsNan": false,
+                    "leftToPrimitiveType": "number",
+                    "rightToPrimitiveType": "number",
+                    "leftToPrimitiveIsNaN": false,
+                    "rightToPrimitiveIsNaN": false,
+                    "operator": "+",
+                    "operandForInteraction": "right"
+                  }
+                ],
+                "iid": 257,
+                "field": 0,
+                "returnTypeOf": "number"
+              },
+              {
+                "code": "getField",
+                "traceId": null,
+                "isComputed": true,
+                "isOpAssign": false,
+                "enclosingFunctionId": "functionId_1",
+                "followingInteractions": [
+                  {
+                    "code": "convertedTo",
+                    "traceId": null,
+                    "convertedTo": "number",
+                    "isNaN": false,
+                    "toPrimitive": null,
+                    "operator": "+",
+                    "originalTypeof": "number"
+                  },
+                  {
+                    "code": "operator",
+                    "traceId": null,
+                    "leftType": "number",
+                    "rightType": "number",
+                    "leftIsNaN": false,
+                    "rightIsNan": false,
+                    "leftToPrimitiveType": "number",
+                    "rightToPrimitiveType": "number",
+                    "leftToPrimitiveIsNaN": false,
+                    "rightToPrimitiveIsNaN": false,
+                    "operator": "+",
+                    "operandForInteraction": "right"
+                  }
+                ],
+                "iid": 257,
+                "field": 1,
+                "returnTypeOf": "number"
+              },
+              {
+                "code": "getField",
+                "traceId": null,
+                "isComputed": true,
+                "isOpAssign": false,
+                "enclosingFunctionId": "functionId_1",
+                "followingInteractions": [
+                  {
+                    "code": "convertedTo",
+                    "traceId": null,
+                    "convertedTo": "number",
+                    "isNaN": false,
+                    "toPrimitive": null,
+                    "operator": "+",
+                    "originalTypeof": "number"
+                  },
+                  {
+                    "code": "operator",
+                    "traceId": null,
+                    "leftType": "number",
+                    "rightType": "number",
+                    "leftIsNaN": false,
+                    "rightIsNan": false,
+                    "leftToPrimitiveType": "number",
+                    "rightToPrimitiveType": "number",
+                    "leftToPrimitiveIsNaN": false,
+                    "rightToPrimitiveIsNaN": false,
+                    "operator": "+",
+                    "operandForInteraction": "right"
+                  }
+                ],
+                "iid": 257,
+                "field": 2,
+                "returnTypeOf": "number"
+              }
+            ],
+            "iid": 137,
+            "field": 0,
+            "returnTypeOf": "array"
+          },
+          {
+            "code": "getField",
+            "traceId": "trace__1",
+            "isComputed": true,
+            "isOpAssign": false,
+            "enclosingFunctionId": "functionId_1",
+            "followingInteractions": [],
+            "iid": 137,
+            "field": 1,
+            "returnTypeOf": "array"
+          },
+          {
+            "code": "getField",
+            "traceId": "trace__1",
+            "isComputed": true,
+            "isOpAssign": false,
+            "enclosingFunctionId": "functionId_1",
+            "followingInteractions": [],
+            "iid": 137,
+            "field": 2,
+            "returnTypeOf": "array"
+          }
+        ]
+      }
+    },
+    "declarationEnclosingFunctionId": -1,
+    "returnTypeOfs": [
+      {
+        "typeOf": "number",
+        "traceId": "trace__1"
+      }
+    ],
+    "functionIid": 313,
+    "requiredModule": "./array-in-array",
+    "isExported": true,
+    "constructedBy": ""
+  }
+}
