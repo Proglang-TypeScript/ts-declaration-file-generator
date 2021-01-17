@@ -4,7 +4,9 @@ module.exports = function (a) {
   if (a.value && a.value.length > 0) {
     for (var i = 0; i < a.value.length; i++) {
       var element = a.value[i];
-      sum += element;
+      for (var j = 0; j < element.length; j++) {
+        sum += element[j];
+      }
     }
   }
 
