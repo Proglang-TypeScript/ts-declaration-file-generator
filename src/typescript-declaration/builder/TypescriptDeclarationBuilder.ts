@@ -102,7 +102,7 @@ export class TypescriptDeclarationBuilder {
               argument.argumentName,
             );
 
-            this.mergeInputTypeWithInterface(
+            this.mergeTypeWithInterface(
               this.getInputTypeOfs(argument),
               this.getInterfacesForArgument(argument, functionRunTimeInfo),
             ).forEach((typeOf) => {
@@ -172,7 +172,7 @@ export class TypescriptDeclarationBuilder {
     });
   }
 
-  private mergeInputTypeWithInterface(
+  private mergeTypeWithInterface(
     inputTypeOfs: DTSType[],
     interfaceDeclaration?: InterfaceDeclaration,
   ): DTSType[] {
@@ -242,6 +242,7 @@ export class TypescriptDeclarationBuilder {
     }
 
     let arrayElementTypesValues: DTSType[] = Array.from(arrayElementTypes.values());
+
     if (interfaceArrayElement.getAttributes().length > 0) {
       const interfaceType = createInterface(interfaceArrayElement.name);
       arrayElementTypes.set(objectHash(interfaceType), interfaceType);
@@ -252,6 +253,8 @@ export class TypescriptDeclarationBuilder {
         interfaceArrayElement,
       );
     }
+
+    arrayElementTypesValues = this.filterTypeOfs(arrayElementTypesValues);
 
     this.removeInterfaceDeclaration(interfaceDeclaration);
 
@@ -307,7 +310,7 @@ export class TypescriptDeclarationBuilder {
         );
       }
 
-      let attributeType: DTSType;
+      let attributeType: DTSType[] = [this.matchToTypescriptType(interaction.returnTypeOf)];
       if (filteredFollowingInteractions.length > 0) {
         const followingInterfaceDeclaration = this.buildInterfaceDeclaration(
           filteredFollowingInteractions,
@@ -316,15 +319,15 @@ export class TypescriptDeclarationBuilder {
           functionRunTimeInfo,
         );
 
-        attributeType = this.matchToTypescriptType(followingInterfaceDeclaration.name);
-      } else {
-        attributeType = this.matchToTypescriptType(interaction.returnTypeOf);
+        attributeType = this.mergeTypeWithInterface(attributeType, followingInterfaceDeclaration);
       }
 
-      interfaceDeclaration.addAttribute(`${interaction.field}`, [attributeType]);
+      interfaceDeclaration.addAttribute(`${interaction.field}`, attributeType);
     });
 
     interfaceDeclaration.name = name;
+    interfaceDeclaration.filterTypeOfs(this.filterTypeOfs);
+
     this.addInterfaceDeclaration(interfaceDeclaration, argument, functionRunTimeInfo);
 
     return interfaceDeclaration;
@@ -357,6 +360,28 @@ export class TypescriptDeclarationBuilder {
       this.interfaceNames.set(interfaceDeclaration.name, interfaceDeclaration);
       this.interfaceDeclarations.set(serializedInterface, interfaceDeclaration);
     }
+  }
+
+  private filterTypeOfs(mergedTypes: DTSType[]): DTSType[] {
+    const anyTypeHash = objectHash(createAny());
+    const objectTypeHash = objectHash(createObject());
+    const hasSpecificArrayType = mergedTypes.some(
+      (t) => t.kind === DTSTypeKinds.ARRAY && objectHash(t.value) !== anyTypeHash,
+    );
+
+    const hasInterfaceType = mergedTypes.some((t) => t.kind === DTSTypeKinds.INTERFACE);
+
+    return mergedTypes.filter((t) => {
+      if (hasSpecificArrayType && objectHash(t.value) === anyTypeHash) {
+        return false;
+      }
+
+      if (hasInterfaceType && objectHash(t) === objectTypeHash) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
   private getInputTypeOfs(argument: ArgumentRuntimeInfo): DTSType[] {

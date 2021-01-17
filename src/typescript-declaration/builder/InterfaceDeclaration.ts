@@ -19,6 +19,12 @@ export class InterfaceDeclaration {
     });
   }
 
+  filterTypeOfs(filter: (mergedAttributeTypes: DTSType[]) => DTSType[]) {
+    [...this.attributes.entries()].forEach(([key, typeOfs]) => {
+      this.attributes.set(key, filter(typeOfs));
+    });
+  }
+
   removeAttribute(a: InterfaceAttributeDeclaration) {
     this.attributes.delete(a.name);
   }

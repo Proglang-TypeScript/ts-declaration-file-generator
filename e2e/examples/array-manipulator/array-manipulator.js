@@ -10,15 +10,5 @@ module.exports = function (a) {
     }
   }
 
-  a.forEach(function (element) {
-    if (element.anotherProperty === 'some-value') {
-      i++;
-    }
-  });
-
-  if (a.someOtherProperty === 123) {
-    i++;
-  }
-
   return i;
 };

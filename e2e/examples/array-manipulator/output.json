@@ -65,44 +65,6 @@
                   {
                     "code": "operator",
                     "traceId": null,
-                    "leftType": "undefined",
-                    "rightType": "undefined",
-                    "leftIsNaN": true,
-                    "rightIsNan": true,
-                    "leftToPrimitiveType": "undefined",
-                    "rightToPrimitiveType": "undefined",
-                    "leftToPrimitiveIsNaN": true,
-                    "rightToPrimitiveIsNaN": true,
-                    "operator": "conditional",
-                    "operandForInteraction": "left"
-                  }
-                ],
-                "iid": 169,
-                "field": "hello",
-                "returnTypeOf": "undefined"
-              }
-            ],
-            "iid": 137,
-            "field": 0,
-            "returnTypeOf": "number"
-          },
-          {
-            "code": "getField",
-            "traceId": "trace__1",
-            "isComputed": true,
-            "isOpAssign": false,
-            "enclosingFunctionId": "functionId_1",
-            "followingInteractions": [
-              {
-                "code": "getField",
-                "traceId": null,
-                "isComputed": false,
-                "isOpAssign": false,
-                "enclosingFunctionId": "functionId_1",
-                "followingInteractions": [
-                  {
-                    "code": "operator",
-                    "traceId": null,
                     "leftType": "string",
                     "rightType": "undefined",
                     "leftIsNaN": true,
@@ -145,6 +107,44 @@
                 "field": "world",
                 "returnTypeOf": "string"
               },
+              {
+                "code": "getField",
+                "traceId": null,
+                "isComputed": false,
+                "isOpAssign": false,
+                "enclosingFunctionId": "functionId_1",
+                "followingInteractions": [
+                  {
+                    "code": "operator",
+                    "traceId": null,
+                    "leftType": "undefined",
+                    "rightType": "undefined",
+                    "leftIsNaN": true,
+                    "rightIsNan": true,
+                    "leftToPrimitiveType": "undefined",
+                    "rightToPrimitiveType": "undefined",
+                    "leftToPrimitiveIsNaN": true,
+                    "rightToPrimitiveIsNaN": true,
+                    "operator": "conditional",
+                    "operandForInteraction": "left"
+                  }
+                ],
+                "iid": 201,
+                "field": "something",
+                "returnTypeOf": "undefined"
+              }
+            ],
+            "iid": 137,
+            "field": 0,
+            "returnTypeOf": "object"
+          },
+          {
+            "code": "getField",
+            "traceId": "trace__1",
+            "isComputed": true,
+            "isOpAssign": false,
+            "enclosingFunctionId": "functionId_1",
+            "followingInteractions": [
               {
                 "code": "getField",
                 "traceId": null,
@@ -258,49 +258,37 @@
             "isComputed": true,
             "isOpAssign": false,
             "enclosingFunctionId": "functionId_1",
-            "followingInteractions": [],
+            "followingInteractions": [
+              {
+                "code": "getField",
+                "traceId": null,
+                "isComputed": false,
+                "isOpAssign": false,
+                "enclosingFunctionId": "functionId_1",
+                "followingInteractions": [
+                  {
+                    "code": "operator",
+                    "traceId": null,
+                    "leftType": "undefined",
+                    "rightType": "undefined",
+                    "leftIsNaN": true,
+                    "rightIsNan": true,
+                    "leftToPrimitiveType": "undefined",
+                    "rightToPrimitiveType": "undefined",
+                    "leftToPrimitiveIsNaN": true,
+                    "rightToPrimitiveIsNaN": true,
+                    "operator": "conditional",
+                    "operandForInteraction": "left"
+                  }
+                ],
+                "iid": 169,
+                "field": "hello",
+                "returnTypeOf": "undefined"
+              }
+            ],
             "iid": 137,
             "field": 3,
             "returnTypeOf": "string"
-          },
-          {
-            "code": "methodCall",
-            "traceId": "trace__1",
-            "isComputed": false,
-            "isOpAssign": false,
-            "enclosingFunctionId": "functionId_1",
-            "followingInteractions": [],
-            "iid": 419,
-            "methodName": "forEach",
-            "functionId": "functionId_3",
-            "returnTypeOf": "undefined",
-            "traceIdInTargetFunction": "trace__2"
-          },
-          {
-            "code": "getField",
-            "traceId": "trace__1",
-            "isComputed": false,
-            "isOpAssign": false,
-            "enclosingFunctionId": "functionId_1",
-            "followingInteractions": [
-              {
-                "code": "operator",
-                "traceId": null,
-                "leftType": "undefined",
-                "rightType": "number",
-                "leftIsNaN": true,
-                "rightIsNan": false,
-                "leftToPrimitiveType": "undefined",
-                "rightToPrimitiveType": "number",
-                "leftToPrimitiveIsNaN": true,
-                "rightToPrimitiveIsNaN": false,
-                "operator": "===",
-                "operandForInteraction": "left"
-              }
-            ],
-            "iid": 441,
-            "field": "someOtherProperty",
-            "returnTypeOf": "undefined"
           }
         ]
       }
@@ -312,63 +300,9 @@
         "traceId": "trace__1"
       }
     ],
-    "functionIid": 521,
+    "functionIid": 337,
     "requiredModule": "./array-manipulator",
     "isExported": true,
-    "constructedBy": ""
-  },
-  "functionId_3": {
-    "functionId": "functionId_3",
-    "functionName": "forEach",
-    "isConstructor": false,
-    "args": {},
-    "returnTypeOfs": [
-      {
-        "typeOf": "undefined",
-        "traceId": "trace__6"
-      }
-    ],
-    "requiredModule": "",
-    "isExported": false,
-    "constructedBy": ""
-  },
-  "functionId_5": {
-    "functionId": "functionId_5",
-    "functionName": "",
-    "isConstructor": false,
-    "args": {
-      "0": {
-        "argumentIndex": 0,
-        "argumentName": "element",
-        "interactions": [
-          {
-            "code": "inputValue",
-            "traceId": "trace__3",
-            "typeof": "number"
-          },
-          {
-            "code": "inputValue",
-            "traceId": "trace__4",
-            "typeof": "object"
-          },
-          {
-            "code": "inputValue",
-            "traceId": "trace__5",
-            "typeof": "object"
-          },
-          {
-            "code": "inputValue",
-            "traceId": "trace__6",
-            "typeof": "string"
-          }
-        ]
-      }
-    },
-    "declarationEnclosingFunctionId": "functionId_1",
-    "returnTypeOfs": [],
-    "functionIid": 385,
-    "requiredModule": "",
-    "isExported": false,
     "constructedBy": ""
   }
 }
