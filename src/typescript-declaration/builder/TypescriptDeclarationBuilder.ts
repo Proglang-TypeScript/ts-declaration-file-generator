@@ -348,6 +348,7 @@ export class TypescriptDeclarationBuilder {
     const existingInterface = this.interfaceDeclarations.get(serializedInterface);
     if (existingInterface) {
       existingInterface.mergeWith(interfaceDeclaration);
+      existingInterface.filterTypeOfs(this.filterTypeOfs);
     } else {
       let interfaceName = interfaceDeclaration.name;
       while (this.interfaceNames.has(interfaceName)) {
@@ -362,16 +363,16 @@ export class TypescriptDeclarationBuilder {
     }
   }
 
-  private filterTypeOfs(mergedTypes: DTSType[]): DTSType[] {
+  private filterTypeOfs(typeOfs: DTSType[]): DTSType[] {
     const anyTypeHash = objectHash(createAny());
     const objectTypeHash = objectHash(createObject());
-    const hasSpecificArrayType = mergedTypes.some(
+    const hasSpecificArrayType = typeOfs.some(
       (t) => t.kind === DTSTypeKinds.ARRAY && objectHash(t.value) !== anyTypeHash,
     );
 
-    const hasInterfaceType = mergedTypes.some((t) => t.kind === DTSTypeKinds.INTERFACE);
+    const hasInterfaceType = typeOfs.some((t) => t.kind === DTSTypeKinds.INTERFACE);
 
-    return mergedTypes.filter((t) => {
+    return typeOfs.filter((t) => {
       if (hasSpecificArrayType && objectHash(t.value) === anyTypeHash) {
         return false;
       }
