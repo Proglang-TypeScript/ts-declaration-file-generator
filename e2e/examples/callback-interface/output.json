@@ -1,0 +1,163 @@
+{
+  "functionId_1": {
+    "functionId": "functionId_1",
+    "functionName": "callbackInterface",
+    "isConstructor": false,
+    "args": {
+      "0": {
+        "argumentIndex": 0,
+        "argumentName": "a",
+        "interactions": [
+          {
+            "code": "inputValue",
+            "traceId": "trace__1",
+            "typeof": "object"
+          },
+          {
+            "code": "getField",
+            "traceId": "trace__1",
+            "isComputed": false,
+            "isOpAssign": false,
+            "enclosingFunctionId": "functionId_1",
+            "followingInteractions": [
+              {
+                "code": "usedAsArgument",
+                "traceId": null,
+                "enclosingFunctionId": "functionId_1",
+                "targetFunctionId": "functionId_3",
+                "traceIdInTargetFunction": "trace__2",
+                "argumentIndexInTargetFunction": "0"
+              }
+            ],
+            "iid": 33,
+            "field": "callbackItem",
+            "returnTypeOf": "object"
+          }
+        ]
+      },
+      "1": {
+        "argumentIndex": 1,
+        "argumentName": "cb",
+        "interactions": [
+          {
+            "code": "inputValue",
+            "traceId": "trace__1",
+            "typeof": "function",
+            "functionId": "functionId_3"
+          }
+        ]
+      }
+    },
+    "declarationEnclosingFunctionId": -1,
+    "returnTypeOfs": [
+      {
+        "typeOf": "string",
+        "traceId": "trace__1"
+      }
+    ],
+    "functionIid": 65,
+    "requiredModule": "./callback-interface",
+    "isExported": true,
+    "constructedBy": ""
+  },
+  "functionId_3": {
+    "functionId": "functionId_3",
+    "functionName": "",
+    "isConstructor": false,
+    "args": {
+      "0": {
+        "argumentIndex": 0,
+        "argumentName": "callbackItem",
+        "interactions": [
+          {
+            "code": "inputValue",
+            "traceId": "trace__2",
+            "typeof": "object"
+          },
+          {
+            "code": "getField",
+            "traceId": "trace__2",
+            "isComputed": false,
+            "isOpAssign": false,
+            "enclosingFunctionId": "functionId_3",
+            "followingInteractions": [
+              {
+                "code": "convertedTo",
+                "traceId": null,
+                "convertedTo": "string",
+                "isNaN": false,
+                "toPrimitive": null,
+                "operator": "+",
+                "originalTypeof": "string"
+              },
+              {
+                "code": "operator",
+                "traceId": null,
+                "leftType": "string",
+                "rightType": "string",
+                "leftIsNaN": true,
+                "rightIsNan": false,
+                "leftToPrimitiveType": "string",
+                "rightToPrimitiveType": "string",
+                "leftToPrimitiveIsNaN": true,
+                "rightToPrimitiveIsNaN": false,
+                "operator": "+",
+                "operandForInteraction": "left"
+              }
+            ],
+            "iid": 97,
+            "field": "firstName",
+            "returnTypeOf": "string"
+          },
+          {
+            "code": "getField",
+            "traceId": "trace__2",
+            "isComputed": false,
+            "isOpAssign": false,
+            "enclosingFunctionId": "functionId_3",
+            "followingInteractions": [
+              {
+                "code": "convertedTo",
+                "traceId": null,
+                "convertedTo": "string",
+                "isNaN": false,
+                "toPrimitive": null,
+                "operator": "+",
+                "originalTypeof": "string"
+              },
+              {
+                "code": "operator",
+                "traceId": null,
+                "leftType": "string",
+                "rightType": "string",
+                "leftIsNaN": true,
+                "rightIsNan": true,
+                "leftToPrimitiveType": "string",
+                "rightToPrimitiveType": "string",
+                "leftToPrimitiveIsNaN": true,
+                "rightToPrimitiveIsNaN": true,
+                "operator": "+",
+                "operandForInteraction": "right"
+              }
+            ],
+            "iid": 121,
+            "field": "lastName",
+            "returnTypeOf": "string"
+          }
+        ]
+      }
+    },
+    "declarationEnclosingFunctionId": "functionId_1",
+    "returnTypeOfs": [
+      {
+        "typeOf": "string",
+        "traceId": "trace__2",
+        "declarationTraceId": "trace__1"
+      }
+    ],
+    "functionIid": 145,
+    "requiredModule": "",
+    "isExported": false,
+    "constructedBy": ""
+  }
+}
