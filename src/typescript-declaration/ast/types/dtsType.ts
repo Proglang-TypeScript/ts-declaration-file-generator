@@ -1,10 +1,13 @@
+import { DTSFunction } from './dtsFunction';
+
 export type DTSType =
   | DTSTypeKeyword
   | DTSTypeLiteralType
   | DTSTypeUnion
   | DTSTypeInterface
   | DTSTypeReference
-  | DTSTypeArray;
+  | DTSTypeArray
+  | DTSTypeFunction;
 
 interface BaseType {
   kind: DTSTypeKinds;
@@ -18,6 +21,7 @@ export const enum DTSTypeKinds {
   ARRAY = 'ARRAY',
   INTERFACE = 'INTERFACE',
   TYPE_REFERENCE = 'TYPE_REFERENCE',
+  FUNCTION = 'FUNCTION',
 }
 
 export interface DTSTypeKeyword extends BaseType {
@@ -60,4 +64,9 @@ export interface DTSTypeInterface extends BaseType {
 export interface DTSTypeArray extends BaseType {
   kind: DTSTypeKinds.ARRAY;
   value: DTSType;
+}
+
+export interface DTSTypeFunction extends BaseType {
+  kind: DTSTypeKinds.FUNCTION;
+  value: DTSFunction;
 }

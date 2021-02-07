@@ -7,8 +7,10 @@ import {
   DTSTypeReference,
   DTS,
   DTSTypeInterface,
+  DTSTypeFunction,
 } from '../types';
 import ts from 'typescript';
+import { createParameter } from './createParameter';
 
 export const createTypeNode = (type: DTSType, context?: DTS): ts.TypeNode => {
   switch (type.kind) {
@@ -29,6 +31,9 @@ export const createTypeNode = (type: DTSType, context?: DTS): ts.TypeNode => {
 
     case DTSTypeKinds.ARRAY:
       return ts.createArrayTypeNode(createTypeNode(type.value, context));
+
+    case DTSTypeKinds.FUNCTION:
+      return createFunctionType(type);
 
     default:
       return createKeywordType({
@@ -99,4 +104,13 @@ const createInterfaceType = (type: DTSTypeInterface, context?: DTS): ts.TypeRefe
 
 const createReferenceType = (type: DTSTypeReference): ts.TypeReferenceNode => {
   return ts.createTypeReferenceNode(type.value, undefined);
+};
+
+const createFunctionType = (type: DTSTypeFunction): ts.FunctionTypeNode => {
+  const dtsFunction = type.value;
+  return ts.createFunctionTypeNode(
+    undefined,
+    dtsFunction.parameters?.map((p) => createParameter(p)) || [],
+    dtsFunction.returnType ? createTypeNode(dtsFunction.returnType) : undefined,
+  );
 };

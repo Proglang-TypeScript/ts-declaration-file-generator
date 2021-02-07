@@ -136,4 +136,41 @@ describe('createTypeNode', () => {
       expect(emit(typeNode)).toBe(`(number | "hello")[]`);
     });
   });
+
+  describe('function type', () => {
+    it('creates the function type', () => {
+      const type: DTSType = {
+        kind: DTSTypeKinds.FUNCTION,
+        value: {
+          name: 'cb',
+          returnType: {
+            kind: DTSTypeKinds.ARRAY,
+            value: {
+              kind: DTSTypeKinds.KEYWORD,
+              value: DTSTypeKeywords.STRING,
+            },
+          },
+          parameters: [
+            {
+              name: 'a',
+              type: {
+                kind: DTSTypeKinds.KEYWORD,
+                value: DTSTypeKeywords.NUMBER,
+              },
+            },
+            {
+              name: 'b',
+              type: {
+                kind: DTSTypeKinds.KEYWORD,
+                value: DTSTypeKeywords.BOOLEAN,
+              },
+            },
+          ],
+        },
+      };
+
+      const typeNode = createTypeNode(type);
+      expect(emit(typeNode)).toBe(`(a: number, b: boolean) => string[]`);
+    });
+  });
 });

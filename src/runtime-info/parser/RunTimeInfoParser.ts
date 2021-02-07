@@ -30,6 +30,7 @@ export class RuntimeInfoParser {
         ...jsonFunctionContainer,
         args: this.getArgumentsInfo(jsonFunctionContainer),
         returnTypeOfs: this.getReturnTypeOfsByTraceId(jsonFunctionContainer),
+        declarationTraceIdsMatch: this.getDeclarationTraceIdsMatch(jsonFunctionContainer),
       };
 
       runTimeInfo[functionId] = functionInfo;
@@ -90,14 +91,29 @@ export class RuntimeInfoParser {
     return attributesAggregatedByTraceId;
   }
 
-  private getReturnTypeOfsByTraceId(
-    functionInfo: JsonFunctionContainer,
-  ): { [traceId: string]: string } {
-    const returnTypeOfsInfo: { [traceId: string]: string } = {};
+  private getReturnTypeOfsByTraceId(functionInfo: JsonFunctionContainer): Record<string, string> {
+    const returnTypeOfsInfo: Record<string, string> = {};
     functionInfo.returnTypeOfs.forEach((returnTypeOf) => {
       returnTypeOfsInfo[returnTypeOf.traceId] = returnTypeOf.typeOf;
     });
 
     return returnTypeOfsInfo;
+  }
+
+  private getDeclarationTraceIdsMatch(
+    functionInfo: JsonFunctionContainer,
+  ): Record<string, string[]> {
+    const match: Record<string, string[]> = {};
+    functionInfo.returnTypeOfs.forEach((returnTypeOf) => {
+      if (returnTypeOf.declarationTraceId) {
+        if (!match[returnTypeOf.declarationTraceId]) {
+          match[returnTypeOf.declarationTraceId] = [];
+        }
+
+        match[returnTypeOf.declarationTraceId].push(returnTypeOf.traceId);
+      }
+    });
+
+    return match;
   }
 }

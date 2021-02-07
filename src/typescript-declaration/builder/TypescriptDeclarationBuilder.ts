@@ -8,6 +8,7 @@ import {
   FunctionRuntimeInfo,
   ArgumentRuntimeInfo,
   InteractionRuntimeInfo,
+  RuntimeInfo,
 } from '../../runtime-info/parser/parsedTypes';
 import { DTS, DTSType, DTSTypeKeywords, DTSTypeKinds } from '../ast/types';
 import { TypescriptDeclaration } from './types/TypescriptDeclaration';
@@ -28,6 +29,7 @@ import {
   createVoid,
 } from '../dts/helpers/createDTSType';
 import objectHash from 'object-hash';
+import { createDTSFunction } from '../dts/helpers/createDTSFunction';
 
 export class TypescriptDeclarationBuilder {
   private interfaceNames = new Map<string, InterfaceDeclaration>();
@@ -54,12 +56,12 @@ export class TypescriptDeclarationBuilder {
     return this.cleaner.clean(this.functionDeclarations);
   }
 
-  build(runTimeInfo: { [id: string]: FunctionRuntimeInfo }, moduleName: string): DTS {
+  build(runTimeInfo: RuntimeInfo, moduleName: string): DTS {
     this.moduleName = moduleName;
 
     for (const key in runTimeInfo) {
       this.functionDeclarations = this.functionDeclarations.concat(
-        this.processRunTimeInfoElement(runTimeInfo[key]),
+        this.processRunTimeInfoElement(runTimeInfo[key], runTimeInfo),
       );
     }
 
@@ -80,6 +82,7 @@ export class TypescriptDeclarationBuilder {
 
   private processRunTimeInfoElement(
     functionRunTimeInfo: FunctionRuntimeInfo,
+    runTimeInfo: RuntimeInfo,
   ): FunctionDeclaration[] {
     const functionDeclarations: FunctionDeclaration[] = [];
 
@@ -94,24 +97,9 @@ export class TypescriptDeclarationBuilder {
           traceId,
         );
 
-        if (functionRunTimeInfo.args.hasOwnProperty(traceId)) {
-          const argumentInfo = functionRunTimeInfo.args[traceId];
-          argumentInfo.forEach((argument) => {
-            const argumentDeclaration = new ArgumentDeclaration(
-              argument.argumentIndex,
-              argument.argumentName,
-            );
-
-            this.mergeTypeWithInterface(
-              this.getInputTypeOfs(argument),
-              this.getInterfacesForArgument(argument, functionRunTimeInfo),
-            ).forEach((typeOf) => {
-              argumentDeclaration.addTypeOf(typeOf);
-            });
-
-            functionDeclaration.addArgument(argumentDeclaration);
-          });
-        }
+        this.getArgumentDeclarations(functionRunTimeInfo, runTimeInfo, traceId).map((a) =>
+          functionDeclaration.addArgument(a),
+        );
       }
     }
 
@@ -385,14 +373,85 @@ export class TypescriptDeclarationBuilder {
     });
   }
 
-  private getInputTypeOfs(argument: ArgumentRuntimeInfo): DTSType[] {
+  private getInputTypeOfs(argument: ArgumentRuntimeInfo, runTimeInfo: RuntimeInfo): DTSType[] {
     return argument.interactions
       .filter((interaction) => {
         return interaction.code === 'inputValue' && interaction.typeof !== '';
       })
       .map((interaction) => {
+        if (interaction.typeof === 'function') {
+          const functionType = this.buildFunctionType(interaction, runTimeInfo);
+          if (functionType) return functionType;
+        }
+
         return this.matchToTypescriptType(interaction.typeof);
       });
+  }
+
+  private buildFunctionType(
+    interaction: InteractionRuntimeInfo,
+    runTimeInfo: RuntimeInfo,
+  ): DTSType | undefined {
+    const targetFunction = runTimeInfo[interaction.functionId || ''];
+
+    if (!targetFunction) return;
+
+    const traceIdsOfFunctionType = targetFunction.declarationTraceIdsMatch[interaction.traceId];
+    if (!traceIdsOfFunctionType) return;
+
+    const functionDeclarations: FunctionDeclaration[] = [];
+
+    traceIdsOfFunctionType.forEach((traceId) => {
+      const functionDeclaration = new FunctionDeclaration();
+      functionDeclaration.addReturnTypeOf(
+        this.matchReturnTypeOfs(targetFunction.returnTypeOfs[traceId]),
+      );
+
+      this.getArgumentDeclarations(targetFunction, runTimeInfo, traceId).map((a) =>
+        functionDeclaration.addArgument(a),
+      );
+
+      functionDeclarations.push(functionDeclaration);
+    });
+
+    if (functionDeclarations.length === 0) return;
+
+    return {
+      kind: DTSTypeKinds.UNION,
+      value: this.cleaner.clean(functionDeclarations).map((f) => ({
+        kind: DTSTypeKinds.FUNCTION,
+        value: createDTSFunction(f),
+      })),
+    };
+  }
+
+  private getArgumentDeclarations(
+    functionRuntimeInfo: FunctionRuntimeInfo,
+    runTimeInfo: RuntimeInfo,
+    traceId: string,
+  ) {
+    const argumentDeclarations: ArgumentDeclaration[] = [];
+
+    if (functionRuntimeInfo.args.hasOwnProperty(traceId)) {
+      const argumentInfo = functionRuntimeInfo.args[traceId];
+      argumentInfo.forEach((argument) => {
+        const argumentDeclaration = new ArgumentDeclaration(
+          argument.argumentIndex,
+          argument.argumentName,
+        );
+
+        this.mergeTypeWithInterface(
+          this.getInputTypeOfs(argument, runTimeInfo),
+          this.getInterfacesForArgument(argument, functionRuntimeInfo),
+        ).forEach((typeOf) => {
+          argumentDeclaration.addTypeOf(typeOf);
+        });
+
+        argumentDeclarations.push(argumentDeclaration);
+      });
+    }
+
+    return argumentDeclarations;
   }
 
   private matchToTypescriptType(t: string): DTSType {
