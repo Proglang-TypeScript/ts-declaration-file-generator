@@ -1,6 +1,6 @@
 import { JsonArgumentContainer, JsonInteraction, JsonFunctionContainer } from './inputTypes';
 
-export type RuntimeInfo = { [id: string]: FunctionRuntimeInfo };
+export type RuntimeInfo = Record<string, FunctionRuntimeInfo>;
 
 export interface FunctionRuntimeInfo extends Omit<JsonFunctionContainer, 'args' | 'returnTypeOfs'> {
   args: { [traceId: string]: ArgumentRuntimeInfo[] };
