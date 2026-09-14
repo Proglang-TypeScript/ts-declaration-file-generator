@@ -7,11 +7,10 @@ export const createNamespaceDeclaration = (
   namespace: DTSNamespace,
   context?: DTS,
 ): ts.ModuleDeclaration => {
-  return ts.createModuleDeclaration(
-    undefined,
+  return ts.factory.createModuleDeclaration(
     createModifiers([DTSModifiers.DECLARE]),
-    ts.createIdentifier(namespace.name),
-    ts.createModuleBlock(createStatements(namespace, context)),
+    ts.factory.createIdentifier(namespace.name),
+    ts.factory.createModuleBlock(createStatements(namespace, context)),
     ts.NodeFlags.Namespace,
   );
 };

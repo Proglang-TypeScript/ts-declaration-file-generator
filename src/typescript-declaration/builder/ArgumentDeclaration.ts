@@ -13,7 +13,10 @@ const UNDEFINED_TYPE: DTSType = { kind: DTSTypeKinds.KEYWORD, value: DTSTypeKeyw
 export default class ArgumentDeclaration implements PropertyDeclaration {
   private typeOfs = new Map<string, DTSType>();
 
-  constructor(public index: number, public name: string) {}
+  constructor(
+    public index: number,
+    public name: string,
+  ) {}
 
   addTypeOf(typeOf: DTSType) {
     this.typeOfs.set(hash(typeOf), typeOf);

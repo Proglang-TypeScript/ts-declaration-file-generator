@@ -14,9 +14,7 @@ export function emit(node: ts.Node): string {
 }
 
 export function createASTFromFile(file: string): ts.Node {
-  return (
-    ts.createProgram([file], {}).getSourceFile(file) || ts.createNode(ts.SyntaxKind.EmptyStatement)
-  );
+  return ts.createProgram([file], {}).getSourceFile(file) || ts.factory.createEmptyStatement();
 }
 
 export function createFromString(content: string): ts.Node {

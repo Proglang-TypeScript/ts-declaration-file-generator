@@ -7,12 +7,13 @@ export const createParameter = (
   dtsParameter: DTSProperty,
   context?: DTS,
 ): ts.ParameterDeclaration => {
-  return ts.createParameter(
-    undefined,
+  return ts.factory.createParameterDeclaration(
     undefined,
     undefined,
     dtsParameter.name,
-    dtsParameter.optional === true ? ts.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+    dtsParameter.optional === true
+      ? ts.factory.createToken(ts.SyntaxKind.QuestionToken)
+      : undefined,
     createTypeNode(dtsParameter.type, context),
     undefined,
   );

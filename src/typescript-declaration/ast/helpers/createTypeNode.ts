@@ -21,7 +21,7 @@ export const createTypeNode = (type: DTSType, context?: DTS): ts.TypeNode => {
       return createLiteralType(type);
 
     case DTSTypeKinds.UNION:
-      return ts.createUnionTypeNode(type.value.map((v) => createTypeNode(v, context)));
+      return ts.factory.createUnionTypeNode(type.value.map((v) => createTypeNode(v, context)));
 
     case DTSTypeKinds.TYPE_REFERENCE:
       return createReferenceType(type);
@@ -30,7 +30,7 @@ export const createTypeNode = (type: DTSType, context?: DTS): ts.TypeNode => {
       return createInterfaceType(type, context);
 
     case DTSTypeKinds.ARRAY:
-      return ts.createArrayTypeNode(createTypeNode(type.value, context));
+      return ts.factory.createArrayTypeNode(createTypeNode(type.value, context));
 
     case DTSTypeKinds.FUNCTION:
       return createFunctionType(type);
@@ -43,7 +43,9 @@ export const createTypeNode = (type: DTSType, context?: DTS): ts.TypeNode => {
   }
 };
 
-const createKeywordType = (type: DTSTypeKeyword): ts.KeywordTypeNode => {
+const createKeywordType = (type: DTSTypeKeyword): ts.TypeNode => {
+  if (type.value === DTSTypeKeywords.NULL)
+    return ts.factory.createLiteralTypeNode(ts.factory.createNull());
   type SupportedKeywords =
     | ts.SyntaxKind.VoidKeyword
     | ts.SyntaxKind.StringKeyword
@@ -52,10 +54,11 @@ const createKeywordType = (type: DTSTypeKeyword): ts.KeywordTypeNode => {
     | ts.SyntaxKind.UnknownKeyword
     | ts.SyntaxKind.BooleanKeyword
     | ts.SyntaxKind.UndefinedKeyword
-    | ts.SyntaxKind.NullKeyword
     | ts.SyntaxKind.ObjectKeyword;
 
-  const mapTypeScriptNodes: { [k in DTSTypeKeywords]: SupportedKeywords } = {
+  const mapTypeScriptNodes: {
+    [k in Exclude<DTSTypeKeywords, DTSTypeKeywords.NULL>]: SupportedKeywords;
+  } = {
     [DTSTypeKeywords.VOID]: ts.SyntaxKind.VoidKeyword,
     [DTSTypeKeywords.STRING]: ts.SyntaxKind.StringKeyword,
     [DTSTypeKeywords.NUMBER]: ts.SyntaxKind.NumberKeyword,
@@ -63,25 +66,24 @@ const createKeywordType = (type: DTSTypeKeyword): ts.KeywordTypeNode => {
     [DTSTypeKeywords.UNKNOWN]: ts.SyntaxKind.UnknownKeyword,
     [DTSTypeKeywords.BOOLEAN]: ts.SyntaxKind.BooleanKeyword,
     [DTSTypeKeywords.UNDEFINED]: ts.SyntaxKind.UndefinedKeyword,
-    [DTSTypeKeywords.NULL]: ts.SyntaxKind.NullKeyword,
     [DTSTypeKeywords.OBJECT]: ts.SyntaxKind.ObjectKeyword,
   };
 
-  return ts.createKeywordTypeNode(mapTypeScriptNodes[type.value]);
+  return ts.factory.createKeywordTypeNode(mapTypeScriptNodes[type.value]);
 };
 
 const createLiteralType = (type: DTSTypeLiteralType): ts.LiteralTypeNode => {
   switch (typeof type.value) {
     case 'string':
-      return ts.createLiteralTypeNode(ts.createStringLiteral(type.value));
+      return ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(type.value));
 
     case 'number':
-      return ts.createLiteralTypeNode(ts.createNumericLiteral(`${type.value}`));
+      return ts.factory.createLiteralTypeNode(ts.factory.createNumericLiteral(`${type.value}`));
 
     case 'boolean':
       return type.value === true
-        ? ts.createLiteralTypeNode(ts.createTrue())
-        : ts.createLiteralTypeNode(ts.createFalse());
+        ? ts.factory.createLiteralTypeNode(ts.factory.createTrue())
+        : ts.factory.createLiteralTypeNode(ts.factory.createFalse());
   }
 };
 
@@ -93,24 +95,26 @@ const createInterfaceType = (type: DTSTypeInterface, context?: DTS): ts.TypeRefe
     interfacesInNamespace.length > 0 &&
     interfacesInNamespace.some((i) => i.name === type.value)
   ) {
-    typeReferenceValue = ts.createQualifiedName(
-      ts.createIdentifier(context?.namespace?.name || ''),
+    typeReferenceValue = ts.factory.createQualifiedName(
+      ts.factory.createIdentifier(context?.namespace?.name || ''),
       type.value,
     );
   }
 
-  return ts.createTypeReferenceNode(typeReferenceValue, undefined);
+  return ts.factory.createTypeReferenceNode(typeReferenceValue, undefined);
 };
 
 const createReferenceType = (type: DTSTypeReference): ts.TypeReferenceNode => {
-  return ts.createTypeReferenceNode(type.value, undefined);
+  return ts.factory.createTypeReferenceNode(type.value, undefined);
 };
 
 const createFunctionType = (type: DTSTypeFunction): ts.FunctionTypeNode => {
   const dtsFunction = type.value;
-  return ts.createFunctionTypeNode(
+  return ts.factory.createFunctionTypeNode(
     undefined,
     dtsFunction.parameters?.map((p) => createParameter(p)) || [],
-    dtsFunction.returnType ? createTypeNode(dtsFunction.returnType) : undefined,
+    dtsFunction.returnType
+      ? createTypeNode(dtsFunction.returnType)
+      : ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword),
   );
 };

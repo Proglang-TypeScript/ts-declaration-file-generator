@@ -7,8 +7,7 @@ export const createInterfaceDeclaration = (
   dtsInterface: DTSInterface,
   context?: DTS,
 ): ts.InterfaceDeclaration => {
-  return ts.createInterfaceDeclaration(
-    undefined,
+  return ts.factory.createInterfaceDeclaration(
     createModifiers([DTSModifiers.EXPORT]),
     dtsInterface.name,
     undefined,
@@ -20,12 +19,11 @@ export const createInterfaceDeclaration = (
 const createProperties = (dtsInterface: DTSInterface, context?: DTS): ts.PropertySignature[] => {
   return (
     dtsInterface.properties?.map((p) => {
-      return ts.createPropertySignature(
+      return ts.factory.createPropertySignature(
         undefined,
         p.name,
-        p.optional === true ? ts.createToken(ts.SyntaxKind.QuestionToken) : undefined,
+        p.optional === true ? ts.factory.createToken(ts.SyntaxKind.QuestionToken) : undefined,
         createTypeNode(p.type, context),
-        undefined,
       );
     }) || []
   );

@@ -39,14 +39,13 @@ export const createStatements = (
     ...(namespace ? [namespace] : []),
   ];
 
-  return (statements as unknown) as ts.NodeArray<ts.Statement>;
+  return statements as unknown as ts.NodeArray<ts.Statement>;
 };
 
 const createExportAssignment = (exportAssignment: string): ts.ExportAssignment => {
-  return ts.createExportAssignment(
-    undefined,
+  return ts.factory.createExportAssignment(
     undefined,
     true,
-    ts.createIdentifier(exportAssignment),
+    ts.factory.createIdentifier(exportAssignment),
   );
 };

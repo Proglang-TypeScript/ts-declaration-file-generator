@@ -8,11 +8,10 @@ export const createFunctionDeclaration = (
   dtsFunction: DTSFunction,
   context?: DTS,
 ): ts.FunctionDeclaration => {
-  return ts.createFunctionDeclaration(
-    undefined,
+  return ts.factory.createFunctionDeclaration(
     createModifiers([dtsFunction.export !== false ? DTSModifiers.EXPORT : DTSModifiers.DECLARE]),
     undefined,
-    ts.createIdentifier(dtsFunction.name),
+    ts.factory.createIdentifier(dtsFunction.name),
     undefined,
     createParameters(dtsFunction, context),
     createReturnType(dtsFunction, context),

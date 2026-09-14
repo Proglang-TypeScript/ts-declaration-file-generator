@@ -130,12 +130,4 @@ export const createInterface = (name: string): DTSType => ({
 });
 
 type SupportedTypes =
-  | 'any'
-  | 'string'
-  | 'number'
-  | 'undefined'
-  | 'void'
-  | 'null'
-  | 'object'
-  | 'boolean'
-  | 'Function';
+  'any' | 'string' | 'number' | 'undefined' | 'void' | 'null' | 'object' | 'boolean' | 'Function';

@@ -6,10 +6,10 @@ export const createModifiers = (modifiers: DTSModifiers[]): ts.Modifier[] => {
     modifiers.map((modifier) => {
       switch (modifier) {
         case DTSModifiers.EXPORT:
-          return ts.createModifier(ts.SyntaxKind.ExportKeyword);
+          return ts.factory.createModifier(ts.SyntaxKind.ExportKeyword);
 
         case DTSModifiers.DECLARE:
-          return ts.createModifier(ts.SyntaxKind.DeclareKeyword);
+          return ts.factory.createModifier(ts.SyntaxKind.DeclareKeyword);
       }
     }) || []
   );

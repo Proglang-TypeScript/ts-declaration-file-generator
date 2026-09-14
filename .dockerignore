@@ -1,6 +1,6 @@
-# Ignore everything
-**
-
-!src/**
-!package*.json
-!tsconfig.json
+node_modules
+dist
+.git
+work
+.env
+.env.*

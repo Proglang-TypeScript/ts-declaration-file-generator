@@ -39,9 +39,9 @@ export class RuntimeInfoParser {
     return runTimeInfo;
   }
 
-  private getArgumentsInfo(
-    functionInfo: JsonFunctionContainer,
-  ): { [traceId: string]: ArgumentRuntimeInfo[] } {
+  private getArgumentsInfo(functionInfo: JsonFunctionContainer): {
+    [traceId: string]: ArgumentRuntimeInfo[];
+  } {
     const attributesAggregatedByTraceId = this.aggregateArgumentsByTraceId(functionInfo);
 
     const args: { [traceId: string]: ArgumentRuntimeInfo[] } = {};
