@@ -40,6 +40,7 @@ export class TypescriptDeclarationBuilder {
   private functionDeclarations: FunctionDeclaration[] = [];
   private cleaner = new FunctionDeclarationCleaner();
   private interfaceSubsetPrimitiveValidator = new InterfaceSubsetPrimitiveValidator();
+  private functionTypesBeingBuilt = new Set<string>();
 
   private getInterfaceDeclarations(): InterfaceDeclaration[] {
     return Array.from(this.interfaceNames.values());
@@ -392,37 +393,43 @@ export class TypescriptDeclarationBuilder {
     interaction: InteractionRuntimeInfo,
     runTimeInfo: RuntimeInfo,
   ): DTSType | undefined {
-    const targetFunction = runTimeInfo[interaction.functionId || ''];
+    const functionId = interaction.functionId || '';
+    const targetFunction = runTimeInfo[functionId];
 
-    if (!targetFunction) return;
+    if (!targetFunction || this.functionTypesBeingBuilt.has(functionId)) return;
 
     const traceIdsOfFunctionType = targetFunction.declarationTraceIdsMatch[interaction.traceId];
     if (!traceIdsOfFunctionType) return;
 
-    const functionDeclarations: FunctionDeclaration[] = [];
+    this.functionTypesBeingBuilt.add(functionId);
+    try {
+      const functionDeclarations: FunctionDeclaration[] = [];
 
-    traceIdsOfFunctionType.forEach((traceId) => {
-      const functionDeclaration = new FunctionDeclaration();
-      functionDeclaration.addReturnTypeOf(
-        this.matchReturnTypeOfs(targetFunction.returnTypeOfs[traceId]),
-      );
+      traceIdsOfFunctionType.forEach((traceId) => {
+        const functionDeclaration = new FunctionDeclaration();
+        functionDeclaration.addReturnTypeOf(
+          this.matchReturnTypeOfs(targetFunction.returnTypeOfs[traceId]),
+        );
 
-      this.getArgumentDeclarations(targetFunction, runTimeInfo, traceId).map((a) =>
-        functionDeclaration.addArgument(a),
-      );
+        this.getArgumentDeclarations(targetFunction, runTimeInfo, traceId).map((a) =>
+          functionDeclaration.addArgument(a),
+        );
 
-      functionDeclarations.push(functionDeclaration);
-    });
+        functionDeclarations.push(functionDeclaration);
+      });
 
-    if (functionDeclarations.length === 0) return;
+      if (functionDeclarations.length === 0) return;
 
-    return {
-      kind: DTSTypeKinds.UNION,
-      value: this.cleaner.clean(functionDeclarations).map((f) => ({
-        kind: DTSTypeKinds.FUNCTION,
-        value: createDTSFunction(f),
-      })),
-    };
+      return {
+        kind: DTSTypeKinds.UNION,
+        value: this.cleaner.clean(functionDeclarations).map((f) => ({
+          kind: DTSTypeKinds.FUNCTION,
+          value: createDTSFunction(f),
+        })),
+      };
+    } finally {
+      this.functionTypesBeingBuilt.delete(functionId);
+    }
   }
 
   private getArgumentDeclarations(
